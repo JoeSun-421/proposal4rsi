@@ -5,68 +5,137 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>按需想象的 VLA｜具身 RSI 实验提案</title>
 <style>
-:root{color-scheme:light;--paper:#f3f6f7;--surface:#fff;--ink:#17262c;--dim:#485c65;--line:#c9d5d9;--real:#13615d;--real-bg:#e1f1ec;--im:#854024;--im-bg:#faece4;--code:#e9eff2;--sans:system-ui,"Noto Sans CJK SC",sans-serif;--serif:"Noto Serif CJK SC",Georgia,serif}
-@media(prefers-color-scheme:dark){:root{color-scheme:dark;--paper:#111a1e;--surface:#19262c;--ink:#ecf5f6;--dim:#b7cbd1;--line:#435b64;--real:#9ae2d5;--real-bg:#193b39;--im:#ffb99b;--im-bg:#3a2923;--code:#202f37}}
+:root {
+  color-scheme: light;
+  --paper:#f3f1eb; --ink:#1f1d19; --dim:#5c5850; --line:#d3cfc4;
+  --surface:#fbf9f4; --trace:#396b68; --block:#a3573b; --gutter:clamp(1.2rem,5vw,3rem);
+  --serif:"Noto Serif CJK SC","Songti SC",Georgia,serif;
+  --sans:system-ui,"Noto Sans CJK SC",sans-serif;
+  --mono:ui-monospace,Consolas,"Noto Sans Mono CJK SC",monospace;
+}
 *{box-sizing:border-box}
 html{scroll-padding-top:1rem}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.78 var(--sans)}
-main{max-width:1160px;margin:auto;padding:0 clamp(1rem,4vw,3rem) 5rem}
-header{padding:clamp(2.5rem,7vw,5.5rem) 0 1.5rem;border-top:6px solid var(--real)}
-.eyebrow,.label{color:var(--dim);font:700 .77rem/1.5 var(--sans);letter-spacing:.1em}
-h1,h2,h3,p,figure,ul,ol{margin:0}
-h1,h2{font-family:var(--serif);line-height:1.25;text-wrap:balance}
-h1{font-size:clamp(2.35rem,7vw,5rem);margin:.65rem 0 1rem}
-h2{font-size:clamp(1.7rem,4vw,2.55rem)}
-h3{font-size:1.1rem;line-height:1.5}
-p,li{max-width:75ch}
-.deck{font-size:clamp(1.02rem,2.4vw,1.24rem)}
-a{color:var(--real);text-underline-offset:.2em}
-a:focus-visible,summary:focus-visible,.scroll:focus-visible{outline:2px solid var(--im);outline-offset:4px}
-nav{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem;border-block:1px solid var(--line);padding:.65rem 0;font-size:.9rem}
-section{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;padding:2.5rem 0;border-bottom:1px solid var(--line)}
-figure{display:grid;gap:.65rem;background:var(--surface);padding:clamp(.85rem,3vw,1.8rem);border:1px solid var(--line)}
-.start,.end{border:1px solid var(--line);padding:.6rem .9rem;text-align:center}
-.fork{display:grid;grid-template-columns:1fr 1.45fr;gap:.8rem}
-.route{border-top:3px solid currentColor;padding:.7rem .85rem}
-.route strong{display:block;margin-bottom:.3rem}
-.real{color:var(--real);background:var(--real-bg)}
-.im{color:var(--im);background:var(--im-bg)}
-.loop{border:1px dashed var(--line);padding:.65rem .85rem}
-figcaption,.note,.refs{font-size:.88rem;color:var(--dim)}
-.scroll{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
-table{border-collapse:collapse;width:100%;min-width:620px;font-size:.91rem;line-height:1.6;font-variant-numeric:tabular-nums}
-th,td{text-align:left;vertical-align:top;padding:.62rem .78rem;border-bottom:1px solid var(--line)}
-th{background:var(--code)}
-td:first-child{font-weight:650}
+body{margin:0;color:var(--ink);background:var(--paper);font:16px/1.85 var(--sans)}
+main{max-width:1180px;margin:auto;padding:0 var(--gutter) 5rem}
+.sitebar,.intro,.toc,section,footer{max-width:768px;margin-inline:auto}
+.sitebar{padding-top:clamp(1.5rem,4vw,2.9rem);display:flex;justify-content:space-between;align-items:baseline;gap:.65rem 1rem;flex-wrap:wrap}
+.site-name{font:400 clamp(1.3rem,3vw,1.75rem)/1.3 var(--serif);text-decoration:none}
+.sitebar nav{display:flex;flex-wrap:wrap;gap:.2rem 1.05rem;font:400 .82rem/1.7 var(--mono)}
+a{color:inherit;text-decoration-color:#7c7464;text-underline-offset:.24em}
+a:hover{color:#315c57}
+a:focus-visible,summary:focus-visible,.scroll:focus-visible{outline:2px solid var(--trace);outline-offset:4px}
+.intro{padding:clamp(2.7rem,6vw,4.5rem) 0 clamp(1.45rem,4vw,2.5rem)}
+h1,h2,h3,p,figure,ul,ol,dl,dd{margin:0}
+h1,h2{font-family:var(--serif);line-height:1.25;font-weight:500;text-wrap:balance}
+h1{font-size:clamp(2.45rem,5.6vw,4rem);margin:0 0 1.25rem}
+h2{font-size:clamp(1.55rem,3.4vw,2.15rem)}
+h3{font-size:1.02rem;line-height:1.55;margin-top:.22rem}
+.meta{display:grid;grid-template-columns:max-content 1fr;gap:.15rem 1rem;font:400 .82rem/1.65 var(--mono);color:var(--dim)}
+.meta dt{color:var(--ink)}
+.deck{margin-top:1.4rem;font-size:1.05rem}
+.hero-figure{display:grid;gap:.75rem;margin:0 auto 2.45rem}
+.hero-figure svg{display:block;width:100%;height:auto;background:#ece8de;border:1px solid var(--line)}
+.triptych{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.scene{min-width:0;display:grid;gap:.3rem}
+.scene p,.label{font:500 .79rem/1.55 var(--mono)}
+.scene p{color:var(--dim)}
+figcaption,.note,.refs{font-size:.85rem;color:var(--dim)}
+.toc{display:flex;flex-wrap:wrap;gap:.25rem 1rem;border-block:1px solid var(--line);padding:.7rem 0;font-size:.85rem}
+section{display:grid;grid-template-columns:minmax(0,1fr);gap:.9rem;padding:2.45rem 0;border-bottom:1px solid var(--line)}
+section p{overflow-wrap:break-word}
+.flow-figure{display:grid;gap:.6rem;padding:1rem 0}
+.start,.end{border-block:1px solid var(--line);padding:.55rem .6rem;text-align:center}
+.fork{display:grid;grid-template-columns:1fr 1.45fr;gap:.65rem}
+.route{border-top:2px solid currentColor;padding:.65rem}
+.route strong{display:block;margin-bottom:.25rem}
+.real{color:#2b5652;background:#e9ede7}
+.im{color:#77422c;background:#efe5d9}
+.loop{border-bottom:1px dashed var(--line);padding:.6rem}
+.scroll{overflow-x:auto;border-block:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:610px;font-size:.88rem;line-height:1.65;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:top;padding:.58rem .65rem;border-bottom:1px solid var(--line)}
+th{font-weight:650;background:#eae6dc}
+td:first-child{font-weight:600}
 tr:last-child td{border-bottom:0}
-ul,ol{padding-inline-start:1.45rem}
-li+li{margin-top:.5rem}
-pre{margin:0;background:var(--code);border:1px solid var(--line);padding:.9rem;overflow:auto;font-size:.81rem;line-height:1.6;tab-size:2}
-code{font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+ul,ol{padding-inline-start:1.4rem}
+li+li{margin-top:.45rem}
+pre{margin:.65rem 0;background:#eae6dc;padding:.75rem;overflow:auto;font-size:.78rem;line-height:1.65}
+code{font-family:var(--mono);overflow-wrap:anywhere}
 pre code{overflow-wrap:normal}
-.callout{background:var(--real-bg);border-left:3px solid var(--real);padding:.75rem .95rem}
-details{background:var(--surface);border:1px solid var(--line);padding:.65rem .9rem}
-summary{cursor:pointer;font-weight:650}
-details[open] summary{margin-bottom:.7rem}
-details p+p{margin-top:.6rem}
-@media(max-width:560px){.fork{grid-template-columns:1fr}body{font-size:15px}}
-@media print{main{max-width:none;padding:0}body{background:white;color:#111;font-size:10pt}header{padding:1rem 0}nav{display:none}section{padding:1rem 0}h2,h3{break-after:avoid}figure,tr,pre{break-inside:avoid}table{min-width:0}.scroll{overflow:visible}pre{white-space:pre-wrap}}
+.callout{border-inline-start:2px solid var(--trace);padding:.1rem .8rem}
+details{border-block:1px solid var(--line);padding:.65rem 0}
+summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:.65rem}
+details p+p{margin-top:.55rem}
+footer{padding-top:1.4rem;font:400 .83rem/1.6 var(--mono);color:var(--dim)}
+@media(max-width:620px){.fork{grid-template-columns:1fr}.triptych{grid-template-columns:repeat(2,minmax(0,1fr))}.scene:first-child{grid-column:1/-1;width:min(100%,360px);justify-self:center}body{font-size:15px}}
+@media print{main{max-width:none;padding:0}body{background:white;color:#111;font-size:10pt}.sitebar,.toc{display:none}section{padding:1rem 0}h2,h3{break-after:avoid}figure,tr,pre{break-inside:avoid}table{min-width:0}.scroll{overflow:visible}pre{white-space:pre-wrap}}
 </style>
 </head>
 <body>
 <main>
-<header>
-<div class="eyebrow">具身 RSI · 研究提案</div>
+<div class="sitebar" id="top">
+<a class="site-name" href="#top">具身智能研究笔记</a>
+<nav aria-label="站点导航"><a href="../">项目首页</a><a href="#flow">方法</a><a href="#related-work">Related Work</a></nav>
+</div>
+<header class="intro">
 <h1>什么时候该想，<br>什么时候该做</h1>
-<p class="deck">让 VLA 在原技能受阻时，选择要不要想象不同的准备动作，用环境结果验证哪个动作真的有用，再学会选出能让下一版策略进步的实验。</p>
+<dl class="meta"><dt>主题</dt><dd>按需想象与具身 RSI</dd><dt>实验平台</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>状态</dt><dd>研究提案 · 待验证</dd></dl>
+<p class="deck">当抓取入口被挡住，机器人可以直接重试，也可以先想象绕行或移开阻挡的结果。我们用同一快照验证哪种动作有用，再测试系统能否学会何时值得想象，以及哪些失败值得拿去训练。</p>
 </header>
-<nav aria-label="目录">
-<a href="#flow">原流程与假设</a><a href="#platform">平台选型</a><a href="#wm">世界模型与下载</a><a href="#integration">接口与任务</a><a href="#data">数据与开源</a><a href="#protocol">实验方法</a><a href="#rl">RL 流程</a><a href="#validation">验收</a><a href="#rsi">递归验证</a><a href="#execution">开工顺序</a>
+<figure class="hero-figure" aria-labelledby="example-caption">
+<div class="triptych">
+<div class="scene">
+<svg viewBox="0 0 340 202" role="img" aria-label="夹爪到碗的抓取路径受阻" xmlns="http://www.w3.org/2000/svg">
+<rect x="16" y="15" width="308" height="172" rx="6" fill="#f8f5ed" stroke="#cfc8b9"/>
+<path d="M32 65H308M32 103H308M32 141H308M72 30V172M120 30V172M170 30V172M220 30V172M268 30V172" stroke="#e6e0d4"/>
+<circle cx="262" cy="103" r="28" fill="#d8e6df" stroke="#396b68" stroke-width="2"/>
+<circle cx="262" cy="103" r="18" fill="none" stroke="#71928a" stroke-width="1.2"/>
+<path d="M47 103h26m0 0v-17m0 17v17m0-34h20m-20 34h20" fill="none" stroke="#3d3d39" stroke-width="8" stroke-linecap="round"/>
+
+<rect x="145" y="87" width="41" height="33" rx="3" fill="#c68969" stroke="#9a533b" stroke-width="2"/>
+</svg>
+<p><strong>初始状态</strong> · 夹爪到碗的抓取路径受阻</p>
+</div>
+<div class="scene">
+<svg viewBox="0 0 340 202" role="img" aria-label="沿原路径接近" xmlns="http://www.w3.org/2000/svg">
+<rect x="16" y="15" width="308" height="172" rx="6" fill="#f8f5ed" stroke="#cfc8b9"/>
+<path d="M32 65H308M32 103H308M32 141H308M72 30V172M120 30V172M170 30V172M220 30V172M268 30V172" stroke="#e6e0d4"/>
+<circle cx="262" cy="103" r="28" fill="#d8e6df" stroke="#396b68" stroke-width="2"/>
+<circle cx="262" cy="103" r="18" fill="none" stroke="#71928a" stroke-width="1.2"/>
+<path d="M47 103h26m0 0v-17m0 17v17m0-34h20m-20 34h20" fill="none" stroke="#3d3d39" stroke-width="8" stroke-linecap="round"/>
+<path d="M101 103H131" fill="none" stroke="#a3573b" stroke-width="3" stroke-dasharray="5 4"/>
+<path d="m130 98 7 5-7 5z" fill="#a3573b"/>
+<rect x="145" y="87" width="41" height="33" rx="3" fill="#c68969" stroke="#9a533b" stroke-width="2"/>
+</svg>
+<p><strong>直接重试</strong> · 沿原路径接近</p>
+</div>
+<div class="scene">
+<svg viewBox="0 0 340 202" role="img" aria-label="移开阻挡，再接近目标" xmlns="http://www.w3.org/2000/svg">
+<rect x="16" y="15" width="308" height="172" rx="6" fill="#f8f5ed" stroke="#cfc8b9"/>
+<path d="M32 65H308M32 103H308M32 141H308M72 30V172M120 30V172M170 30V172M220 30V172M268 30V172" stroke="#e6e0d4"/>
+<circle cx="262" cy="103" r="28" fill="#d8e6df" stroke="#396b68" stroke-width="2"/>
+<circle cx="262" cy="103" r="18" fill="none" stroke="#71928a" stroke-width="1.2"/>
+<path d="M47 103h26m0 0v-17m0 17v17m0-34h20m-20 34h20" fill="none" stroke="#3d3d39" stroke-width="8" stroke-linecap="round"/>
+<rect x="145" y="87" width="41" height="33" rx="3" fill="none" stroke="#9a533b" stroke-dasharray="4 4"/>
+<path d="M167 87Q179 72 190 66" fill="none" stroke="#a3573b" stroke-width="2"/>
+<path d="m183 66 10-3-4 9z" fill="#a3573b"/>
+<path d="M101 103H220" fill="none" stroke="#396b68" stroke-width="3" stroke-dasharray="5 4"/>
+<path d="m218 98 9 5-9 5z" fill="#396b68"/>
+<rect x="184" y="43" width="41" height="33" rx="3" fill="#c68969" stroke="#9a533b" stroke-width="2"/>
+</svg>
+<p><strong>准备动作</strong> · 移开阻挡，再接近目标</p>
+</div>
+</div>
+<figcaption id="example-caption"><strong>图 1 · 从同一快照比较候选。</strong> 俯视示意。深灰色表示夹爪，棕色方块表示可移动障碍，圆环表示目标碗。路线用于解释实验设置，实际抓取成功由环境回放判定。</figcaption>
+</figure>
+<nav class="toc" aria-label="目录">
+<a href="#flow">原流程与假设</a><a href="#platform">平台选型</a><a href="#wm">世界模型与下载</a><a href="#integration">接口与任务</a><a href="#data">数据与开源</a><a href="#protocol">实验方法</a><a href="#rl">RL 流程</a><a href="#validation">验收</a><a href="#rsi">递归验证</a><a href="#execution">开工顺序</a><a href="#related-work">相关工作</a>
 </nav>
 <section id="flow">
 <h2>两条回路，共用环境证据</h2>
 <p>沿用原版 <strong>Observe → Imagine → Verify → Improve</strong>。保留原图的 <code>PROPOSE / IMAGINE / EXECUTE / STOP</code> 与训练时的 <code>LEARN</code>。把“分支值得做吗”和“这笔经验值得拿去训练吗”分成两个决策头，让两种收益可以各自测量。</p>
-<figure aria-labelledby="loop-caption">
+<figure class="flow-figure" aria-labelledby="loop-caption">
 <div class="label">执行回路 · 每个重规划点</div>
 <div class="start"><strong>OBSERVE</strong> 真实图像、机器人状态、任务、近期失败 → belief → controller</div>
 <div class="fork">
@@ -244,7 +313,6 @@ hf download physical-intelligence/libero --repo-type dataset \
 <li><strong>做新学生移植。</strong> 至少比较三个更新轮、三个独立种子作起点。把 φ₀、φᵣ、冻结规则与打乱反馈版本各自接到同一全新 θ₀、WM、effect head 和相同初始记忆。在未见任务的 adaptation starts 内用等量预算收数据，在另一批封存的 evaluation starts 测量学习曲线。禁止用封存评测分数更新任一版本或调阈值。</li>
 <li><strong>检查递归一跳。</strong> 让早期与后期选择器各产生一批等量的下一轮实验，采用相同 meta-update 规则更新各自的副本，测各自更新前后对另一批新学生的边际教学增益。冻结选择器与等量、打乱的 meta 反馈是对照。若只有 G3 通过，结果支持策略自改进。若移植通过而递归一跳未通过，结果支持改进器学习，递归仍待证。</li>
 </ol>
-<p class="refs">最近邻　<a href="https://arxiv.org/abs/2607.26789">CheckVLA</a> 已研究何时用 WM 验证；<a href="https://arxiv.org/abs/2610.20474">AdaRSI</a> 已用快照定位何时调整执行器；本案检验准备动作的成对效应，以及改进器是否能让新学生在相同预算下更会学。<a href="https://physical2rsi.github.io/">Physical2RSI 的主张分层</a></p>
 </section>
 <section id="execution">
 <h2>开工顺序与交付证据</h2>
@@ -256,6 +324,18 @@ hf download physical-intelligence/libero --repo-type dataset \
 </ol>
 <p class="note">提案中的门槛与样本量需要在开发集预试后固定。公开来源、训练接口和下载路径已核对。数据采集、模型训练和实验结果均为后续执行项。</p>
 </section>
+<section id="related-work">
+<h2>相关工作</h2>
+<h3>何时想象</h3>
+<p><strong>Agima</strong> 把提出动作、生成未来图像和执行决策放进同一个模型，并用 RL 训练智能体在关键点分支。<strong>CheckVLA</strong> 用冻结的动作条件世界模型预测已发出的动作段会产生什么观察，再根据实际偏差决定是否介入。我们的门控在执行前选择是否比较准备动作，主对照是同调用预算下的固定频率触发。 <a href="https://arxiv.org/abs/2610.26845">Agima</a> · <a href="https://arxiv.org/abs/2607.26789">CheckVLA</a></p>
+<p><strong>π0.7</strong> 使用语言、动作方式和视觉子目标来描述任务，测试时也可以由世界模型生成视觉子目标。我们的接口输入具体候选动作并预测其后果，实验比较同一状态下不同动作的结果。 <a href="https://www.pi.website/blog/pi07">π0.7 研究报告</a></p>
+<h3>如何验证分支</h3>
+<p><strong>Rollback</strong> 从关键决策点回溯，在世界模型中对比反事实分支，用真实交互校正模型并蒸馏改进策略。这里用物理仿真恢复同一快照，逐个执行准备动作，再用相同的冻结技能测成功。这样能分别测出准备动作的效果、WM 排序误差和触发器的成本收益。 <a href="https://arxiv.org/abs/2610.36068">Rollback</a></p>
+<h3>如何更新策略与改进器</h3>
+<p><strong>RISE</strong> 用多视角世界模型和进度价值模型，在想象轨迹上估计优势并更新策略。<strong>Prophet</strong> 提供可接收指定连续动作的视频模型，<strong>πRL</strong> 提供 flow-based VLA 的在线 RL 方法。本提案先用 Prophet 选分支，用环境结果给连续动作 RL 提供奖励。 <a href="https://arxiv.org/abs/2602.11075">RISE</a> · <a href="https://arxiv.org/abs/2511.20633">Prophet</a> · <a href="https://arxiv.org/abs/2510.25889">πRL</a></p>
+<p><strong>AdaRSI</strong> 从保存的状态重试失败子任务，判断何时调整执行流程、何时微调执行器。<strong>Physical2RSI</strong> 区分行为改善、改进过程改善，以及改进器对自身后续迭代的贡献。这里用等预算的新学生实验检验后期选择器是否更有效，再让它选择下一轮实验，比较更新前后的学习曲线。 <a href="https://arxiv.org/abs/2610.20474">AdaRSI</a> · <a href="https://arxiv.org/abs/2610.29677">Physical2RSI</a></p>
+</section>
+<footer><a href="#top">返回顶部</a></footer>
 </main>
 </body>
 </html>

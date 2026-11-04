@@ -80,7 +80,7 @@ footer{padding-top:1.4rem;font:400 .83rem/1.6 var(--mono);color:var(--dim)}
 </div>
 <header class="intro">
 <h1>什么时候该想，<br>什么时候该做</h1>
-<dl class="meta"><dt>主题</dt><dd>按需想象与具身 RSI</dd><dt>实验平台</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>状态</dt><dd>研究提案 · 待验证</dd></dl>
+<dl class="meta"><dt>主题</dt><dd>按需想象与具身 RSI</dd><dt>实验平台</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>状态</dt><dd>研究提案 · 已完成接口与回放预试</dd></dl>
 <p class="deck">当抓取入口被挡住，机器人可以直接重试，也可以先想象绕行或移开阻挡的结果。我们用同一快照验证哪种动作有用，再测试系统能否学会何时值得想象，以及哪些失败值得拿去训练。</p>
 </header>
 <figure class="hero-figure" aria-labelledby="example-caption">
@@ -148,6 +148,29 @@ footer{padding-top:1.4rem;font:400 .83rem/1.6 var(--mono);color:var(--dim)}
 </figure>
 <p class="callout"><strong>主要假设</strong>　在相同想象预算下，学到的触发器比固定频率或随机触发带来更多成功。在相同环境步数与训练量下，后期实验选择器比初始版本更能教会同一起点的新策略。</p>
 </section>
+<section id="research-review">
+<h2>可行性与查新</h2>
+<p><strong>可以开始做小规模验证。最值得押注的是“准备动作的配对证据能否帮助系统学会挑选下一轮实验”。</strong> 按需想象、失败回溯、主动采集和按学习进度选课程，都已有接近的工作。这里把这些部件分开测量，并用等预算的新学生实验检验选择器本身的改进。</p>
+<h3>目前测到了什么</h3>
+<p>在现有容器中，用 RTX 4090 D、原版 LIBERO-Goal 任务索引 3（打开上层抽屉并把碗放进去）与 π0.5 checkpoint 实测。初始状态索引 0 的一条基线 rollout 在 settle 之后第 <strong>199</strong> 步成功。模型返回 <strong>10 × 7</strong> 动作段，在线按 5 步执行。当前机器人状态实测是 <strong>8 维</strong>，由末端位置、轴角和两维夹爪关节位置拼接。该次 rollout 的预热后策略 RPC 中位数约 78 ms，作为本机估算参考。</p>
+<p id="replay-evidence">在同一任务的五个官方初始状态（索引 0–4，仿真种子 7）分别保存前 5 步策略命令。重置并重放这段命令后，同一状态的 agentview 图像逐像素一致。相同候选执行两次，5 步扁平仿真状态的最大绝对差都是 0。改用等长保持对照，末端位置与候选相差 <strong>4.33–4.61 cm</strong>。这验证了本机可以通过确定性前缀回放构造分支对照。直接恢复中途快照和跨任务重放仍需单独验收。</p>
+<p><strong>目前尚无世界模型排序、干预成功率或 RSI 的实测结果。</strong> Prophet 的 LIBERO 权重公开，但运行所需的 NVIDIA tokenizer 匿名请求返回 HTTP 401。需要已有 Hugging Face 访问权限和独立运行环境。其公开接口固定 20 步、单视角；短时间接触和候选尾序列引起的排序偏差，必须用实跑分支检查。 <a href="https://huggingface.co/Fleurrr/Prophet-World-Model">Prophet 模型卡</a> · <a href="https://huggingface.co/nvidia/Cosmos-Predict2-2B-Video2World">Cosmos 依赖</a></p>
+<h3>哪些部分已有先例，哪些值得验证</h3>
+<div class="scroll" tabindex="0" role="region" aria-label="查新与实验对照">
+<table><thead><tr><th scope="col">主张</th><th scope="col">最接近的工作</th><th scope="col">本提案如何做出可区分的证据</th></tr></thead><tbody>
+<tr><td>按需想象和执行</td><td>τ₀-VLA 按置信度选择是否搜索语言子任务。ForkCast 在共同视界比较 Commit、Reobserve、Replan。CheckVLA 监测已执行动作的预测偏差。</td><td>在同一候选集和调用预算下，用环境回报训练触发器。除固定频率外，加入置信度门控，以及 ForkCast 风格的候选优势门控。<br><a href="https://tau0-vla.github.io/">τ₀-VLA</a> · <a href="https://arxiv.org/html/2610.18650v1">ForkCast</a> · <a href="https://arxiv.org/abs/2607.26789">CheckVLA</a></td></tr>
+<tr><td>准备动作使后续技能可行</td><td>推抓协同已有长期研究。InSight 识别缺失原语、执行并蒸馏。Rollback 已比较反事实分支并用真实转移校正模型。</td><td>用同一快照、等长重试和保持、同一冻结后续技能测 <code>Δenable</code>。在未见阻碍机制或新技能组合上检查迁移。把改变环境、换视角获得信息和只改变机械臂起点分开报告。<br><a href="https://arxiv.org/abs/1803.09956">推抓协同</a> · <a href="https://insight-vla.github.io/">InSight</a> · <a href="https://arxiv.org/abs/2610.36068">Rollback</a></td></tr>
+<tr><td>想象辅助训练</td><td>WISE 调度短视界想象，RISE 和 Prophet 用模型内 rollout 帮助策略训练。</td><td>先用环境验证 WM 的增量排序价值。冻结 WM，比较同算力的 action-only head，另外量化排序对尾序列的敏感度。<br><a href="https://arxiv.org/html/2609.03681v1">WISE</a> · <a href="https://arxiv.org/abs/2602.11075">RISE</a></td></tr>
+<tr><td>改进如何采集数据</td><td>EmbodiedRSI 按信息价值选择实验，并按后续收益更新记忆。EmbodiRSI 按弱点采纠错示范。自动课程学习早已用学习进展作为 bandit 回报。</td><td>同一个新学生、同一交互与训练预算，比较初始／后期选择器、固定难例、学习进度采样、打乱反馈。再固定更新方法，比较两类选择器各自产生的下一轮更新能带来多少额外教学生收益。<br><a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a> · <a href="https://arxiv.org/abs/2609.38905">EmbodiRSI</a> · <a href="https://proceedings.mlr.press/v100/portelas20a.html">ALP-GMM</a></td></tr>
+</tbody></table></div>
+<p class="note">查新范围为已核对的机器人想象、恢复、技能学习与自动课程工作。可以主张的是以上组合的待验证实验贡献，稀缺性仍取决于最接近对照上的结果。<a href="https://arxiv.org/abs/2610.29677">Physical2RSI 的证据分层</a></p>
+<h3>三个决定是否继续的实验</h3>
+<ol>
+<li><strong>先测干预上限。</strong> 用 30 个独立快照测可执行候选相对等长重试的配对收益，同时包含正常状态和无解状态。按预先固定的规则选出候选，再用独立回放种子估计其收益，避免同一批回放既选最佳又报最佳。若上限很低，优先改善任务和候选库。</li>
+<li><strong>再测想象有没有额外价值。</strong> 用真实未来图像的打分器作为观察上限，和 action-only、Prophet 三者共享候选。如果真实未来图像也无法区分有效动作，先改视角、事件定义或预测视界。如果上限高而 Prophet 追不上，借鉴 ForkCast 的短视界 latent 预测，使用本地分支数据训练。</li>
+<li><strong>最后测改进器是否在学。</strong> 先复用一批已验证数据，隔离“选样本”的效果，用三种简单配方比较开发集收益方差。只有配对收益稳定后，才在线让选择器改变采集，并检验它是否强于学习进度采样。如果只有学生表现提高，结论限于数据采集或策略改进。</li>
+</ol>
+</section>
 <section id="platform">
 <h2>平台选择</h2>
 <p><strong>主实验采用 LIBERO 的独立干预扩展，RoboCasa365 做跨平台复验。</strong> 第一阶段优先考虑能否重放干预、能否独立下载动作条件 WM、与现有 VLA 是否兼容，以及成对分支的采集成本。原版 LIBERO 用来测接口与退化，研究效果在有准备动作需求的扩展场景上验证。</p>
@@ -202,7 +225,7 @@ prophet-rollout --checkpoint "$RSI_ROOT/weights/prophet-libero.pt" \
 <h2>π0.5 与 WM 的接口</h2>
 <div class="scroll" tabindex="0" role="region" aria-label="系统接口">
 <table><thead><tr><th scope="col">模块</th><th scope="col">输入与输出</th><th scope="col">第一版做法</th></tr></thead><tbody>
-<tr><td>VLA / 候选生成</td><td>真实 RGB 双视角、7 维 state、指令 → 动作 chunk</td><td>原 π0.5 websocket 输出作预设。候选加入 skill library 的 retreat、换进入方向、推开阻挡。以脚本或可测技能 adapter 产生连续命令，同一候选池供各方法共用。后续测 learned proposer 是否能重组技能。</td></tr>
+<tr><td>VLA / 候选生成</td><td>真实 RGB 双视角、8 维 state、指令 → 动作 chunk</td><td>原 π0.5 websocket 输出作预设。候选加入 skill library 的 retreat、换进入方向、推开阻挡。以脚本或可测技能 adapter 产生连续命令，同一候选池供各方法共用。后续测 learned proposer 是否能重组技能。</td></tr>
 <tr><td>Controller</td><td>任务阶段、重试、停滞、进展、候选差异、预算 → 分支或直接执行</td><td>先用规则收数据，再以分支真实收益回归 gate。历史只用真实观测。预测收益扣除延迟与 WM 不确定性后才触发。</td></tr>
 <tr><td>WM worker</td><td>当前 agentview、候选 env 命令、seed → 带时间索引的未来图像</td><td>独立常驻服务。WM 相机预处理比对上游 demo converter。使用 <code>libero-servo</code> 一次做位移／旋转缩放 0.05 和夹爪映射，缺臂补零。对照测试夹爪方向、画面翻转、动作与帧对齐。显示视频 FPS 与 env step 对齐分开验证。</td></tr>
 <tr><td>Effect head / 验证</td><td>当前与预测画面、受阻 skill k → 后续 skill 成功概率</td><td>先以实际未来画面和成功标签训练小分类器，再在开发集校准其 WM 输入分数。模拟器物体位姿、接触与任务 success 只供离线标签及 oracle。没有合格候选时退回预设动作。</td></tr>
@@ -219,7 +242,7 @@ prophet-rollout --checkpoint "$RSI_ROOT/weights/prophet-libero.pt" \
 <div class="scroll" tabindex="0" role="region" aria-label="数据来源与用途">
 <table><thead><tr><th scope="col">数据</th><th scope="col">获取方式</th><th scope="col">用途</th></tr></thead><tbody>
 <tr><td>原始 LIBERO HDF5</td><td><code>yifengzhu-hf/LIBERO-datasets</code>，先取一个 <code>libero_goal/</code> 任务。需要整套时再用官方下载脚本。</td><td>回放示范，校对环境动作、帧与状态。用 <code>prophet-prepare-libero</code> 生成 WM 的视频和动作标注。</td></tr>
-<tr><td>π0.5 示范</td><td><code>physical-intelligence/libero</code>。LeRobot v2.0，四套任务、1,693 条轨迹，数据卡标注 10 FPS 和 CC BY 4.0。</td><td>抽取基础技能示范做 SFT 和遗忘对照。使用原数据转换和统计量，单独验证训练表中 8 维 state 到在线 7 维 state 的各字段语义。数据卡的 FPS 单独记录。</td></tr>
+<tr><td>π0.5 示范</td><td><code>physical-intelligence/libero</code>。LeRobot v2.0，四套任务、1,693 条轨迹，数据卡标注 10 FPS 和 CC BY 4.0。</td><td>抽取基础技能示范做 SFT 和遗忘对照。使用原数据转换和统计量，并校验训练表与在线状态的字段顺序和单位。数据卡的 FPS 单独记录。</td></tr>
 <tr><td>自己的分支数据</td><td>在可控干预场景运行冻结 π0.5，采集受阻、正常和无法修复的状态。恢复同一快照，用脚本、策略采样或少量人工示范生成可执行候选，再逐条回放。</td><td>保留成功、失败、无效和直接重试。提供 WM 动力学监督、成对成功标签、SFT 正例及 RL 采样起点。</td></tr>
 <tr><td>在线 RL 轨迹</td><td>训练时从训练场景实时滚动采样。外层每轮重新收集入选数据。</td><td>为 PPO 提供本轮策略的 log-prob、真实环境奖励与终止信号。公共示范作为独立监督批次。</td></tr>
 </tbody></table></div>
@@ -259,7 +282,7 @@ hf download physical-intelligence/libero --repo-type dataset \
 <h3>实验 B · WM 会不会按动作改变判断</h3>
 <p>在同一快照生成同一组候选，记录实际分支的关键事件，例如阻挡物是否离开抓取区域，以及后续技能成功。用真实观察训练 effect head。用独立开发快照校准 WM 预测输入。固定相同候选与计算预算，在封存快照上对比真实未来画面上限、WM、同容量 action-only head、复制起始帧和打乱动作的 WM。主指标是非平局配对排序与选中候选的真实 regret。实际收益并列的候选对单列。对其余候选对，模型预测并列计半分。统计按任务与快照聚类。另列接触和物体运动的逐事件准确率、Brier 分数及更换 15 步尾序列后的排序稳定性。</p>
 <h3>实验 C · 什么时候值得分支</h3>
-<p>部署从完整 episode 起点运行，不能跳到已知失败状态。各组共用候选生成器、执行周期和任务上限。固定频率与随机触发先在 dev 匹配可用的 WM calls/episode，按候选预测次数计费。封存测试分别报告实际消耗和不同预算下的成功率曲线。每个初始状态和种子同时测直接执行、固定频率、随机触发、学习触发与仅用 action-only 打分，另用全点想象描出成本上界。按训练资源、基础动作候选生成调用和 WM 推理分开报告 GPU 时间。主对照为学习触发对等预算固定频率。</p>
+<p>部署从完整 episode 起点运行，不能跳到已知失败状态。各组共用候选生成器、执行周期和任务上限。固定频率与随机触发先在 dev 匹配可用的 WM calls/episode，按候选预测次数计费。封存测试分别报告实际消耗和不同预算下的成功率曲线。每个初始状态和种子同时测直接执行、固定频率、随机触发、学习触发与仅用 action-only 打分，另用全点想象描出成本上界。增加同预算的候选优势门控和廉价置信度门控，检查学习触发器是否优于接近的已有做法。按训练资源、基础动作候选生成调用和 WM 推理分开报告 GPU 时间。主对照为学习触发对等预算固定频率。</p>
 <h3>实验 D · 学到了技能，还是只靠推理时搜索</h3>
 <p>对比同一 π0.5 起点上的原策略、仅 SFT、SFT + 环境 RL、以及只在推理时使用 controller。SFT 各组使用相同数量的训练动作和优化步数，对比分支排序选出的正例与随机抽样正例。RL 组从同一 SFT 起点出发，在相同训练环境步数下对比有无分支初始化课程。评测时各权重组关闭 WM 和外层控制器，以单次策略调用执行，另报告完整系统成绩。扩展场景和原版 LIBERO 分开计分。</p>
 <p class="note">启动预算建议为 120 个快照、每个最多四条主分支和三组可用种子，约 1,440 次分支，等长 hold 另计。确认性实验按 dev 的配对差、方差与任务内相关性估算样本量，提前锁定主指标。跨任务样本较少时逐任务报告，并把区间和结论限定在实际任务族。</p>
@@ -310,19 +333,19 @@ hf download physical-intelligence/libero --repo-type dataset \
 <li><strong>选实验。</strong> 第 r 轮在同一训练快照池，以选择器 φᵣ 分配候选验证与数据比例。固定规则／随机探索用相同验证预算。保留探索配额，覆盖预测器没有信心的场景。</li>
 <li><strong>测量学习增益。</strong> 将同一 θᵣ 的 adapter、optimizer 起点及更新步数复制到实验组与对照组。用各自收集的真实数据更新 K 步。保持 WM、effect head 与 evaluator 一致，记录 <code>Rlearn = Jdev(θselected) − Jdev(θcontrol) − λ·额外成本</code>。开发集只提供外层反馈。</li>
 <li><strong>用收益更新选择器。</strong> 第一版用小型 contextual bandit，记录探索概率及每批数据的 <code>Rlearn</code>，更新哪些状态、干预和难度值得验证。执行 gate 由 G2 的决策收益监督。保存 φ₀、φ₁、φ₂ 等 checkpoint 及产生各版的数据路径。</li>
-<li><strong>做新学生移植。</strong> 至少比较三个更新轮、三个独立种子作起点。把 φ₀、φᵣ、冻结规则与打乱反馈版本各自接到同一全新 θ₀、WM、effect head 和相同初始记忆。在未见任务的 adaptation starts 内用等量预算收数据，在另一批封存的 evaluation starts 测量学习曲线。禁止用封存评测分数更新任一版本或调阈值。</li>
+<li><strong>做新学生移植。</strong> 至少比较三个更新轮、三个独立种子作起点。把 φ₀、φᵣ、冻结规则、学习进度采样与打乱反馈版本各自接到同一全新 θ₀、WM、effect head 和相同初始记忆。在未见任务的 adaptation starts 内用等量预算收数据，在另一批封存的 evaluation starts 测量学习曲线。禁止用封存评测分数更新任一版本或调阈值。</li>
 <li><strong>检查递归一跳。</strong> 让早期与后期选择器各产生一批等量的下一轮实验，采用相同 meta-update 规则更新各自的副本，测各自更新前后对另一批新学生的边际教学增益。冻结选择器与等量、打乱的 meta 反馈是对照。若只有 G3 通过，结果支持策略自改进。若移植通过而递归一跳未通过，结果支持改进器学习，递归仍待证。</li>
 </ol>
 </section>
 <section id="execution">
 <h2>开工顺序与交付证据</h2>
 <ol>
-<li><strong>资产与 baseline。</strong> 在仓库外建 WM runtime，验 SHA、跑 demo 原动作／替换动作、记录单卡显存及延迟。用既有 π0.5 server 跑原版 smoke，确认 180° 翻转、224 pad resize、7 维 state、10 步 settle、suite step cap 及 5 步重规划。官方结果与自建任务分表。</li>
+<li><strong>资产与 baseline。</strong> 在仓库外建 WM runtime，验 SHA、跑 demo 原动作／替换动作、记录单卡显存及延迟。用既有 π0.5 server 跑原版 smoke，确认 180° 翻转、224 pad resize、8 维 state、10 步 settle、suite step cap 及 5 步重规划。官方结果与自建任务分表。</li>
 <li><strong>干预数据与 shadow mode。</strong> 建一个阻挡场景，做快照回放验收。记录同一状态所有候选的预测与真实对照，先离线给分支排序。保存 <code>snapshot_id</code>、任务／分割、候选命令、模型版本、帧对齐、事件、决策、<code>Δenable</code> 与成本。输出 G0／G1 报告及失败样本。</li>
 <li><strong>闭环消融。</strong> G1 通过才在独立实验 runner 接 controller；接入点是 action queue 补充前的重规划边界。WM timeout、低置信度与预算用尽均记录回退原因。以相同 seeds 完成 G2 对照，再做 G3 adapter 蒸馏。</li>
 <li><strong>改进器验证。</strong> G3 通过后跑外层更新与新学生移植，封存 per-round manifests、数据选择轨迹、成本与学习曲线。RoboCasa365 先以官方 GR00T checkpoint 重做 G0，若采用本地适配 WM 则重做 G1，再复验 G2 与 G4。</li>
 </ol>
-<p class="note">提案中的门槛与样本量需要在开发集预试后固定。公开来源、训练接口和下载路径已核对。数据采集、模型训练和实验结果均为后续执行项。</p>
+<p class="note">提案中的门槛与样本量需要在开发集预试后固定。公开来源、训练接口和下载路径已核对。已完成接口与分支回放预试。干预数据采集、世界模型排序验证与 RL 训练是后续执行项。</p>
 </section>
 <section id="related-work">
 <h2>相关工作</h2>

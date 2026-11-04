@@ -254,6 +254,29 @@ figcaption{font-size:1rem;color:var(--ink)}
   .hero-evidence p{margin-top:.6mm}
 }
 
+#data .data-step{margin-inline:auto;display:grid;gap:.54rem;padding-top:.64rem;border-top:1px solid var(--line)}
+#data .data-step figcaption{display:grid;gap:.15rem;margin:0;font-size:.93rem}
+#data .data-step figcaption strong{font-size:1rem}
+#data .data-step p,.data-step-note{font-size:.87rem;line-height:1.55}
+.data-step-track,.data-step-routes{display:grid;gap:.43rem}
+.data-real-track,.data-imagined-track{display:grid;grid-template-columns:9.2rem minmax(0,1fr);align-items:center;gap:.34rem .65rem;border:1px solid #829fbc;border-radius:4px;padding:.43rem .62rem;background:#e2edf9;font-size:.86rem;line-height:1.4}
+.data-imagined-track{background:#eee4f7;border:1px dashed #926ba9}
+.data-step-chain{display:flex;flex-wrap:wrap;align-items:center;gap:.16rem .5rem}
+.data-step-routes{grid-template-columns:repeat(3,minmax(0,1fr))}
+.data-step-routes>div{display:grid;align-content:start;gap:.12rem;padding:.46rem .59rem;border-top:2px solid #4c927c;background:#d9eee4;font-size:.86rem;line-height:1.4}
+.data-step-routes .data-route-wm{border-color:#6c8eb5;background:#e2edf9}
+.data-step-routes .data-route-gate{border-color:#926ba9;background:#eee4f7}
+.data-step-routes a{font-weight:700;width:fit-content}
+@media(max-width:580px){
+  .data-real-track,.data-imagined-track,.data-step-routes{grid-template-columns:1fr}
+}
+@media print{
+  #data .data-step{gap:1.2mm;padding-top:1.5mm;break-inside:avoid}
+  #data .data-step figcaption,#data .data-step figcaption strong{font-size:9pt}
+  #data .data-step p,.data-step-note,.data-step-track>div,.data-step-routes>div{font-size:8pt}
+  .data-step-track,.data-step-routes{gap:1mm}
+  .data-step-track>div,.data-step-routes>div{padding:1mm 1.4mm}
+}
 .pitch-lead{font-size:clamp(1.08rem,2.4vw,1.28rem);line-height:1.68}
 .pitch-diagram .column-title{font-size:16px;font-weight:700}
 .pitch-diagram .direct-edge{stroke:#3e7769}
@@ -377,7 +400,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 </section>
 <section class="page" id="data">
 <h2>Data from replayable stalls</h2>
-<p>用训练集示范初始化策略，随后冻结 π0.5 和 Cosmos 采集轨迹，保留成功和失败。每个 SYNC 快照走两条采集路线，专家提示教策略怎样脱困，自动 ACT / THINK 对照教 Gate 何时值得调用。</p>
+<p class="data-step-note">用训练示范初始化策略，采集时冻结 π0.5 和 Cosmos。示范来源 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO</a> · <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo</a></p>
 <figure class="data-flow-figure" id="recovery-sft">
 <div class="data-flow-scroll" tabindex="0" role="region" aria-label="How recovery and gate supervision are collected">
 <svg class="diagram data-flow" viewBox="0 0 940 225" role="img" aria-labelledby="capture-title capture-desc" xmlns="http://www.w3.org/2000/svg">
@@ -400,50 +423,27 @@ figcaption{font-size:1rem;color:var(--ink)}
 <text class="left label" x="632" y="160">Matched real outcomes</text><text class="left sub" x="632" y="182">Return, latency and retained progress</text>
 </svg>
 </div>
+<figcaption id="cold-start">从同一 SYNC 快照采两类数据。专家引导的恢复须保留进度并通过终局验收。自动 ACT 与 THINK 按相同时限实测。首批目标是 100 条经专家复核的恢复轨迹。</figcaption>
 </figure>
-
-<figure class="data-flow-figure" id="supervision-routes">
-<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Trajectory record and model supervision">
-<svg class="diagram data-flow" viewBox="0 0 940 255" role="img" aria-labelledby="record-title record-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="record-title">b · Record observations and provenance</title>
-<desc id="record-desc">A frame log synchronizes cameras, proprioception, commands, and measured results by step. An imagined branch is stored separately under its snapshot ID. Intent is available before acting; outcome is post-rollout supervision; provenance identifies the source for filtering and audit. </desc>
-<defs><marker id="record-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
-
-<text class="panel" x="20" y="26">b</text><text class="left label" x="49" y="26">Record observations and provenance</text>
-<path class="rule" d="M20 36H920"/>
-<rect class="record-tint" x="20" y="51" width="602" height="167" rx="5"/>
-<text class="left eyebrow" x="34" y="73">TRAJECTORY RECORD</text>
-<text class="right sub" x="606" y="73">Parquet + camera MP4</text>
-<g>
-<rect class="frame-box" x="34" y="86" width="150" height="48" rx="4"/>
-<text class="label" x="109" y="106">Observation t</text><text class="sub" x="109" y="124">Camera + proprio</text>
-<rect class="action-chip" x="212" y="86" width="138" height="48" rx="4"/>
-<text class="label" x="281" y="106">ACT at t</text><text class="sub" x="281" y="124">Native command</text>
-<rect class="frame-box" x="378" y="86" width="228" height="48" rx="4"/>
-<text class="label" x="492" y="106">Measured observation t+1</text><text class="sub" x="492" y="124">Camera + proprio + outcome</text>
-<path class="edge" d="M184 110h24" marker-end="url(#record-arrow)"/><path class="edge" d="M350 110h24" marker-end="url(#record-arrow)"/>
-</g>
-<rect class="imagine-box" x="34" y="151" width="572" height="49" rx="4"/>
-<text class="left label" x="48" y="172">Imagined branch log</text>
-<text class="left sub" x="48" y="190">Predicted frames and candidate actions · linked by snapshot and step</text>
-
-<rect class="intent-tag" x="644" y="51" width="276" height="50" rx="4"/>
-<text class="left label" x="659" y="72">Intent</text><text class="left sub" x="659" y="90">Task and phase · known before ACT</text>
-<rect class="outcome-tag" x="644" y="110" width="276" height="50" rx="4"/>
-<text class="left label" x="659" y="131">Outcome</text><text class="left sub" x="659" y="149">Recovery and success · training target</text>
-<rect class="source-tag" x="644" y="169" width="276" height="50" rx="4"/>
-<text class="left label" x="659" y="190">Provenance</text><text class="left sub" x="659" y="208">Demo / policy / guided / imagined</text>
-
-<text class="left sub" x="20" y="244">Split by task and initial state · keep all branches from one snapshot in the same split</text>
-</svg>
+<figure class="data-step" id="supervision-routes">
+<figcaption><strong>b · Record what happened</strong><span>在同一快照下按步号对齐两份记录。原生动作和相机帧一一对齐，预测另存。</span></figcaption>
+<div class="data-step-track">
+<div class="data-real-track">
+<span>Real rollout</span>
+<div class="data-step-chain"><strong>Observation <var>t</var></strong><span aria-hidden="true">→</span><strong>Executed command</strong><span aria-hidden="true">→</span><strong>Measured <var>t</var>+1</strong></div>
 </div>
-<figcaption>示范来源 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO</a> · <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo</a></figcaption>
+<div class="data-imagined-track"><span>Imagined branch</span><strong>Candidate commands + predicted frames</strong></div>
+</div>
+<p><strong>Intent</strong> 记任务与阶段，<strong>Outcome</strong> 记实测结果，<strong>Provenance</strong> 记数据来源。同一快照的分支进入同一数据划分。<a href="https://github.com/huggingface/lerobot/blob/main/docs/source/lerobot-dataset-v3.mdx">记录格式</a> · <a href="pilot/moka-recovery-sft.zip">试跑样本（待专家复核）</a></p>
 </figure>
-<div class="data-records">
-<p id="cold-start"><strong>Cold start.</strong> 目标是 100 条专家复核的 VLA 恢复轨迹。只有成功脱困、保留此前进度并通过官方终局判定，才把已执行动作并入 SFT。专家接管单独记为示教。</p>
-<p><strong>Record format.</strong> 按步号对齐原生动作、状态和分相机 MP4。分支索引记录 <code>snapshot_id, pair_id, valid_mask</code> 与三类标签。同一快照的所有分支进入同一划分。记录兼容 <a href="https://github.com/huggingface/lerobot/blob/main/docs/source/lerobot-dataset-v3.mdx">LeRobot v3</a>。</p>
-<p><strong>Recorded example.</strong> 双摩卡壶提示恢复记录含复位快照、标签、原生动作与对齐视频，已通过行为检查，待专家复核。<a href="pilot/moka-recovery-sft.zip">Parquet 样本</a> · <a href="pilot/moka-full-vla-trajectory.zip">完整轨迹</a></p>
+<figure class="data-step">
+<figcaption><strong>c · Turn real results into supervision</strong></figcaption>
+<div class="data-step-routes">
+<div class="data-route-policy"><strong>通过验收的真实动作</strong><span aria-hidden="true">↓</span><a href="#model-policy">π0.5</a><span>脱困时该怎么做</span></div>
+<div class="data-route-wm"><strong>已执行动作 + 实测后继帧</strong><span aria-hidden="true">↓</span><a href="#model-cosmos">Cosmos</a><span>动作会带来什么变化</span></div>
+<div class="data-route-gate"><strong>同起点 ACT / THINK 的回报差与耗时</strong><span aria-hidden="true">↓</span><a href="#rl">Gate</a><span>预演值不值得调用</span></div>
 </div>
+</figure>
 </section>
 <section class="page" id="models">
 <h2>How each model learns</h2>

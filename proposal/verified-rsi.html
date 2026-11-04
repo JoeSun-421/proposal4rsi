@@ -128,7 +128,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 #question .hero-figure{margin-top:.4rem}
 #question h3{font-size:1rem}
 .diagram .sub{font-size:13.4px}
-@media print{#question h1{font-size:32pt}.page{gap:2.1mm}#models{gap:1.22mm}.loss-panel .equation{font-size:8.3pt}}
+@media print{#question h1{font-size:32pt}#question .hero-figure{width:92%}#question .deck{font-size:11pt;line-height:1.53}.page{gap:2.1mm}#models{gap:1.22mm}.loss-panel .equation{font-size:8.3pt}}
 
 .sample-record{margin:0;padding:.65rem .8rem;border:1px solid var(--line);overflow:auto;font-size:.85rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
 .record-print{display:none}
@@ -265,8 +265,10 @@ figcaption{font-size:1rem;color:var(--ink)}
 <text class="smallcaps" x="850" y="391">Held-out evaluation</text>
 <text class="sub" x="850" y="406">LIBERO · RoboDojo · RoboCasa365</text>
 </svg></figure>
-<h2 class="abstract-heading">Abstract</h2>
-<p class="deck">长程操作中，VLA 在顺畅阶段只需执行下一段动作；一旦进展停滞，它容易重复同一失败。始终调用世界模型又增加时延。我们让门控选择 ACT 或 THINK：前者直接执行 π0.5，后者短视界预演多个恢复候选，选中后从当前状态执行一段，再回到 ACT。真实执行后的观测和动作分别用于校正 Cosmos 与训练 π0.5。我们将比较等调用预算下的固定频率和置信度门控，并检验更新后的采样器能否提高新学生的学习效率和下一轮更新收益。</p>
+<h2 class="abstract-heading" id="abstract">Abstract</h2>
+<p class="deck">在未见布局或技能组合中，视觉–语言–动作模型（VLA）可能在完成部分子目标后反复重试同一动作。世界模型可以预演不同恢复动作的后果，但每个决策点都调用会增加延迟，连续预测也会累积误差。我们提出一种按需预演的方法：门控根据当前观测和近期进展，估计调用世界模型相对于直接执行的收益。预期收益足以抵消调用成本时进入 THINK，其余决策由 π0.5 直接执行（ACT）。</p>
+<p class="deck">当重复失败触发 SYNC，系统记录当前观测和已执行前缀，并以同一观测启动四条候选分支。每条分支交替调用 π0.5 生成动作和动作条件 Cosmos 预测后继观测。系统按预测的子目标进展选择分支，只在真实环境执行短前缀，随后重新观测。采集时，将通过环境成功判定的恢复动作与原轨迹前缀拼接，用于监督微调 π0.5。按时间步配对的预测与实测观测用于校正 Cosmos。</p>
+<p class="deck">后续以真实回报更新门控和策略，再根据同一起点学生在保留任务上的学习增益调整下一轮采样。我们将检验在相同世界模型调用预算下，学习式门控能否提高恢复成功率，以及在相同训练与交互预算下，更新后的采样器能否让新学生学得更快。目前的 LIBERO-90 试验已复现停滞并保存校准记录，四路 Cosmos 预演能否带来实际恢复仍待验证。</p>
 <h3>When a task stalls</h3>
 <p>比如一手已经稳住笔筒，另一手却连续无法插入下一支笔。若连续若干重规划点没有新增进展，Gate 可发出 <strong>THINK</strong>。先检查最近的有效子目标，比较继续尝试、撤回重对齐和换视角；必要时只对高价值候选追加一段预演。回看的是历史观测与决策，部署时的所有候选从当前真实状态开始。选中可行动作后发出 <strong>ACT</strong>，只提交一段并重新观测。没有可信分支时转入可执行的重新观察或停止。</p>
 <p>首版采用<strong>同一个 π0.5 执行器 + Gate + 动作条件 WM</strong>。THINK 路径由候选生成器、Cosmos 和 effect head 组成，提供 WAM 式的提议与预演接口；独立 WAM 只作为候选生成器的对照。</p>

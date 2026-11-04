@@ -3,397 +3,217 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>按需想象的 VLA｜具身 RSI 实验提案</title>
+<title>让 VLA 学会何时想象｜具身 RSI 实验提案</title>
 <style>
-:root {
-  color-scheme: light;
-  --paper:#f3f1eb; --ink:#1f1d19; --dim:#5c5850; --line:#d3cfc4;
-  --surface:#fbf9f4; --trace:#396b68; --block:#a3573b; --gutter:clamp(1.2rem,5vw,3rem);
-  --serif:"Noto Serif CJK SC","Songti SC",Georgia,serif;
-  --sans:system-ui,"Noto Sans CJK SC",sans-serif;
-  --mono:ui-monospace,Consolas,"Noto Sans Mono CJK SC",monospace;
-}
-*{box-sizing:border-box}
-html{scroll-padding-top:1rem}
-body{margin:0;color:var(--ink);background:var(--paper);font:16px/1.85 var(--sans)}
-main{max-width:1180px;margin:auto;padding:0 var(--gutter) 5rem}
-.sitebar,.intro,.toc,section,footer{max-width:768px;margin-inline:auto}
-.sitebar{padding-top:clamp(1.5rem,4vw,2.9rem);display:flex;justify-content:space-between;align-items:baseline;gap:.65rem 1rem;flex-wrap:wrap}
-.site-name{font:400 clamp(1.3rem,3vw,1.75rem)/1.3 var(--serif);text-decoration:none}
-.sitebar nav{display:flex;flex-wrap:wrap;gap:.2rem 1.05rem;font:400 .82rem/1.7 var(--mono)}
-a{color:inherit;text-decoration-color:#7c7464;text-underline-offset:.24em}
-a:hover{color:#315c57}
-a:focus-visible,summary:focus-visible,.scroll:focus-visible{outline:2px solid var(--trace);outline-offset:4px}
-.intro{padding:clamp(2.7rem,6vw,4.5rem) 0 clamp(1.45rem,4vw,2.5rem)}
-h1,h2,h3,p,figure,ul,ol,dl,dd{margin:0}
-h1,h2{font-family:var(--serif);line-height:1.25;font-weight:500;text-wrap:balance}
-h1{font-size:clamp(2.45rem,5.6vw,4rem);margin:0 0 1.25rem}
-h2{font-size:clamp(1.55rem,3.4vw,2.15rem)}
-h3{font-size:1.02rem;line-height:1.55;margin-top:.22rem}
-.meta{display:grid;grid-template-columns:max-content 1fr;gap:.15rem 1rem;font:400 .82rem/1.65 var(--mono);color:var(--dim)}
-.meta dt{color:var(--ink)}
-.deck{margin-top:1.4rem;font-size:1.05rem}
-.system-figures{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(1.2rem,3vw,2.4rem);margin:0 auto 2.45rem}
-.system-figure{min-width:0;display:grid;align-content:start;gap:.58rem}
-.figure-header{display:flex;gap:.65rem;align-items:baseline;border-top:1px solid var(--line);padding-top:.65rem}
-.figure-header span{flex:none;font:500 .78rem/1.5 var(--mono);color:var(--dim)}
-.figure-header h2{font-size:clamp(1.15rem,2.35vw,1.5rem)}
-.system-figure svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line)}
-.diagram-node rect{fill:#f4f1e9;stroke:#a9a193;stroke-width:1.15}
-.diagram-node text{fill:var(--dim);font:15.5px var(--sans);text-anchor:middle}
-.diagram-node .node-title{fill:var(--ink);font-size:19px;font-weight:650}
-.diagram-decision rect{fill:#efeae0;stroke:#827767}
-.diagram-plain rect{fill:#f5f3ee}
-.diagram-imagined rect{fill:#f4e8dd;stroke:#a3573b}
-.diagram-observed rect{fill:#e7eee8;stroke:#396b68}
-.diagram-edge,.diagram-return{fill:none;stroke:#5c5850;stroke-width:1.5;stroke-linejoin:round}
-.diagram-return{stroke:#396b68;stroke-dasharray:5 4}
-figcaption,.note,.refs{font-size:.85rem;color:var(--dim)}
-.toc{display:flex;flex-wrap:wrap;gap:.25rem 1rem;border-block:1px solid var(--line);padding:.7rem 0;font-size:.85rem}
-section{display:grid;grid-template-columns:minmax(0,1fr);gap:.9rem;padding:2.45rem 0;border-bottom:1px solid var(--line)}
-section p{overflow-wrap:break-word}
-.scroll{overflow-x:auto;border-block:1px solid var(--line)}
-table{border-collapse:collapse;width:100%;min-width:610px;font-size:.88rem;line-height:1.65;font-variant-numeric:tabular-nums}
-th,td{text-align:left;vertical-align:top;padding:.58rem .65rem;border-bottom:1px solid var(--line)}
-th{font-weight:650;background:#eae6dc}
-td:first-child{font-weight:600}
+:root{color-scheme:light;--paper:#f4f2ec;--ink:#1f1e1b;--serif:"Noto Serif CJK SC","Songti SC",Georgia,serif;--sans:Arial,"Noto Sans CJK SC","PingFang SC",sans-serif;--mono:ui-monospace,Consolas,monospace;--line:color-mix(in srgb,var(--ink) 25%,var(--paper));--muted:color-mix(in srgb,var(--ink) 76%,var(--paper))}
+*{box-sizing:border-box}html{scroll-padding-top:1rem}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.77 var(--sans)}
+main{max-width:1060px;padding:0 clamp(1.15rem,5vw,3rem) 3rem;margin:auto}
+.sitebar,.page>*{max-width:768px;margin-inline:auto}.sitebar{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.5rem 1.3rem;padding-top:2.4rem}
+.site-name{font:500 clamp(1.15rem,3vw,1.6rem)/1.4 var(--serif);text-decoration:none}
+nav{display:flex;flex-wrap:wrap;gap:.1rem 1rem;font:400 .82rem/1.7 var(--mono)}
+a{color:inherit;text-underline-offset:.19em}a:focus-visible,summary:focus-visible,.table-wrap:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+h1,h2,h3,p,figure,ol,dl,dd{margin-block:0}
+h1,h2{font-family:var(--serif);font-weight:500;line-height:1.3;text-wrap:balance}
+h1{font-size:clamp(2.45rem,6.3vw,4.25rem)}
+h2{font-size:clamp(1.65rem,4vw,2.35rem)}
+h3{font-size:1rem;line-height:1.45}
+.page{display:flex;flex-direction:column;gap:.8rem;padding:2.1rem 0;border-bottom:1px solid var(--line)}
+#question{padding-top:clamp(2.6rem,6vw,4.3rem)}
+.page>*{width:100%;min-width:0}
+.kicker,.note,figcaption,.refs,.page-id{color:var(--muted);font-size:.84rem}
+.kicker,.page-id{font-family:var(--mono);letter-spacing:.05em}
+.deck{font-size:clamp(1.06rem,2.6vw,1.2rem);line-height:1.62}
+.meta{display:grid;grid-template-columns:max-content 1fr;gap:.06rem 1rem;font:400 .84rem/1.6 var(--mono);margin:.35rem auto .75rem}
+.meta dt{color:var(--muted)}.meta dd{margin-inline:0}
+.callout{padding:.15rem 0 .15rem .8rem;border-inline-start:2px solid var(--ink)}
+.figures{max-width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;align-items:start}
+.figures figure{margin-inline:0;min-width:0}
+.figures svg{width:100%;height:auto;display:block;border-block:1px solid var(--line);padding:.12rem 0}
+figcaption{margin-top:.55rem;line-height:1.55}
+.diagram text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink);text-anchor:middle}
+.diagram .panel{font-size:20px;font-weight:700;text-anchor:start}
+.diagram .label{font-size:15px;font-weight:700}
+.diagram .sub{font-size:13.4px}
+.diagram .edge-label{font-size:12.8px;text-anchor:start}
+.diagram rect{fill:none;stroke:var(--ink);stroke-width:1}
+.diagram .edge,.diagram .return{fill:none;stroke:var(--ink);stroke-width:1.15;stroke-linejoin:round}
+.diagram .return{stroke-dasharray:4 4}
+.diagram marker path{fill:var(--ink)}
+.table-wrap{overflow-x:auto;border-block:1px solid var(--line)}
+table{width:100%;min-width:565px;border-collapse:collapse;font-size:.88rem;line-height:1.55;table-layout:fixed}
+th,td{text-align:left;vertical-align:top;padding:.46rem .52rem;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+th{border-bottom:1px solid var(--ink)}
 tr:last-child td{border-bottom:0}
-ul,ol{padding-inline-start:1.4rem}
-li+li{margin-top:.45rem}
-pre{margin:.65rem 0;background:#eae6dc;padding:.75rem;overflow:auto;font-size:.78rem;line-height:1.65}
-code{font-family:var(--mono);overflow-wrap:anywhere}
-pre code{overflow-wrap:normal}
-.callout{border-inline-start:2px solid var(--trace);padding:.1rem .8rem}
-details{border-block:1px solid var(--line);padding:.65rem 0}
-summary{cursor:pointer;font-weight:600}
-details[open] summary{margin-bottom:.65rem}
-details p+p{margin-top:.55rem}
-footer{padding-top:1.4rem;font:400 .83rem/1.6 var(--mono);color:var(--dim)}
-@media(max-width:800px){.system-figures{grid-template-columns:minmax(0,1fr);max-width:540px}}
-@media(max-width:620px){body{font-size:15px}}
-@media print{main{max-width:none;padding:0}body{background:white;color:#111;font-size:10pt}.sitebar,.toc{display:none}section{padding:1rem 0}h2,h3{break-after:avoid}figure,tr,pre{break-inside:avoid}table{min-width:0}.scroll{overflow:visible}pre{white-space:pre-wrap}}
+td:first-child{font-weight:650}
+.formula{margin-block:0;border-inline-start:1px solid var(--line);padding:.08rem 0 .08rem .7rem;font:400 .91rem/1.65 var(--mono);overflow-wrap:anywhere}
+code{font:400 .9em var(--mono);overflow-wrap:anywhere}
+ol{padding-inline-start:1.35rem}
+li+li{margin-top:.25rem}
+.refs a{white-space:normal}
+@media(max-width:680px){.sitebar{padding-top:1.5rem}.figures{grid-template-columns:1fr;max-width:470px}.page{padding:1.7rem 0}body{font-size:15px}}
+@page{size:A4;margin:14mm 15mm}
+@media print{
+  :root{--paper:#fff}
+  html,body{background:var(--paper);font-size:10pt;line-height:1.48}
+  main{max-width:none;padding:0}
+  .sitebar{display:none}
+  .page,#question{gap:2.8mm;padding:0;border:0;break-inside:avoid}
+  .page:not(:first-of-type){break-before:page}
+  .page>*{max-width:none}
+  h1{font-size:34pt}h2{font-size:22pt}h3{font-size:10.6pt}
+  .deck{font-size:12pt}.meta,.note,.refs,figcaption,.page-id,.kicker{font-size:8.4pt}
+  .figures{grid-template-columns:repeat(2,minmax(0,1fr));gap:5mm;max-width:none}
+  .table-wrap{overflow:visible}table{min-width:0;font-size:8.7pt;line-height:1.38}
+  td,th{padding:1.35mm 1.6mm}
+  .formula{font-size:8.4pt;line-height:1.52}
+  figure,tr,.formula{break-inside:avoid}
+}
 </style>
 </head>
 <body>
-<main>
-<div class="sitebar" id="top">
-<a class="site-name" href="#top">具身智能研究笔记</a>
-<nav aria-label="站点导航"><a href="../">项目首页</a><a href="#inference-diagram">流程图</a><a href="#flow">方法</a><a href="#related-work">Related Work</a></nav>
-</div>
-<header class="intro">
-<h1>什么时候该想，<br>什么时候该做</h1>
-<dl class="meta"><dt>主题</dt><dd>按需想象与具身 RSI</dd><dt>实验平台</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>状态</dt><dd>研究提案 · 已完成接口与回放预试</dd></dl>
-<p class="deck">当抓取入口被挡住，机器人可以直接重试，也可以先想象绕行或移开阻挡的结果。我们用同一快照验证哪种动作有用，再测试系统能否学会何时值得想象，以及哪些失败值得拿去训练。</p>
+<main id="top">
+<header class="sitebar">
+<a class="site-name" href="../">具身智能研究笔记</a>
+<nav aria-label="目录"><a href="#question">问题</a><a href="#flow">流程图</a><a href="#protocol">实验</a><a href="#models">模型</a><a href="#related-work">附录</a></nav>
 </header>
-<div class="system-figures" aria-label="推理和训练流程图">
-<figure class="system-figure" id="inference-diagram">
-<div class="figure-header"><span>图 1</span><h2>推理：何时想象，何时执行</h2></div>
-<svg viewBox="0 0 500 475" role="img" aria-labelledby="inference-title inference-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="inference-title">推理时的按需想象流程</title>
-<desc id="inference-desc">真实观测进入触发器。低收益时直接用默认动作；触发时，世界模型预测候选后果，由效果模型排序。执行选中前缀后，以新观测验证效果并返回下一次判断。</desc>
-<defs>
-<marker id="infer-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#5c5850"/></marker>
-<marker id="infer-feedback-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#396b68"/></marker>
-</defs>
-<g class="diagram-edge" marker-end="url(#infer-arrow)">
-<path d="M250 77V104"/><path d="M250 162V184H125V213"/><path d="M250 184H368V213"/>
-<path d="M125 286V310H250V331"/><path d="M368 286V310H250" marker-end="none"/>
-<path d="M250 390V411"/>
+
+<section class="page" id="question">
+<div class="kicker">01 / RESEARCH QUESTION</div>
+<h1>让 VLA 学会何时想象</h1>
+<p class="deck">复杂任务里，已经掌握的技能也可能在错误的时机失效。我们让 VLA 在可能改变结果的决策点预演不同动作，并用真实执行的结果训练它何时值得多想一步。</p>
+<dl class="meta"><dt>报告类型</dt><dd>实验提案 · 含本机基线预试</dd><dt>执行器</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>主要比较</dt><dd>同预算下的成功率与学习效率</dd></dl>
+<h3>Zero-shot 执行卡在哪里</h3>
+<p>在未见布局或技能组合中，VLA 需要保持已经完成的进度、识别当前受阻的技能，并判断要不要先改变视角、抓取姿态或物体摆放。直接执行的动作段可能反复沿着同一失败路径尝试。世界模型可以比较这些准备动作的后果，但每个重规划点都生成多条未来，会增加推理时延，预测偏差也会放大。<a href="https://tau0-vla.github.io/">τ₀-VLA</a> · <a href="https://arxiv.org/abs/2610.18650">ForkCast</a></p>
+<h3>切入点：学习想象的边际价值</h3>
+<p>每个决策点默认保留 π0.5 的动作。Gate 先用当前观测和失败历史估计<strong>调用世界模型能增加多少真实回报</strong>。收益盖过成本时才预测并比较候选，否则直接执行。执行同样长度的动作前缀后，重新读取真实观测。</p>
+<p>训练时从同一快照分支，比较准备动作、重试和保持，再交给同一个冻结技能。用这种成对轨迹训练 Gate、蒸馏有效动作，并用环境 rollout 继续做 RL。外层选择器根据学生实际学到多少来调整下一轮采样。</p>
+<p class="callout"><strong>两项主张分别验收。</strong> ① 相同 WM 调用预算下，训练后的 Gate 优于固定频率和置信度触发。② 相同交互与训练预算下，后期选择器在未见任务上能更快教会同一起点的新学生，其选出的下一轮实验也能带来额外收益。</p>
+<p class="note">评测术语。原版 LIBERO 日志是已在该 benchmark 上微调过的 checkpoint 的推理基线。本文的 zero-shot 指对封存的新布局、阻碍条件或技能组合直接部署，和允许少量交互的新学生适应实验分开报告。</p>
+</section>
+
+<section class="page" id="flow">
+<div class="page-id">02 / SYSTEM OVERVIEW</div>
+<h2>推理与训练</h2>
+<div class="figures" aria-label="Inference and training diagrams">
+<figure id="inference-diagram">
+<svg class="diagram" viewBox="0 0 400 440" role="img" aria-labelledby="infer-title infer-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="infer-title">Inference: budgeted imagination</title>
+<desc id="infer-desc">A gate uses observed history to decide whether to run a world model. It executes the default action or the ranked candidate, then observes the actual outcome.</desc>
+<defs><marker id="i-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
+<text class="panel" x="17" y="28">a</text><text class="label" x="192" y="27">Inference</text>
+<g class="edge" marker-end="url(#i-arrow)">
+<path d="M192 92V114"/><path d="M192 168V187H93V214"/><path d="M192 187H290V214"/>
+<path d="M93 283V304H192V326"/><path d="M290 283V304H192" marker-end="none"/><path d="M192 378V398"/>
 </g>
-<path class="diagram-return" d="M409 437H483V50H433" marker-end="url(#infer-feedback-arrow)"/>
-<g class="diagram-node">
-<rect x="70" y="23" width="360" height="54" rx="5"/>
-<text class="node-title" x="250" y="46">真实观测</text><text x="250" y="66">双视角 · 本体状态 · 指令与历史</text>
-</g>
-<g class="diagram-node diagram-decision">
-<rect x="70" y="107" width="360" height="55" rx="5"/>
-<text class="node-title" x="250" y="130">值不值得分支想象？</text><text x="250" y="151">按预期收益、置信度与预算判断</text>
-</g>
-<g class="diagram-node diagram-plain">
-<rect x="30" y="216" width="190" height="70" rx="5"/>
-<text class="node-title" x="125" y="245">直接执行</text><text x="125" y="267">采用 π0.5 默认动作</text>
-</g>
-<g class="diagram-node diagram-imagined">
-<rect x="266" y="216" width="204" height="70" rx="5"/>
-<text class="node-title" x="368" y="241">分支想象</text><text x="368" y="261">提出候选 → WM 预测</text><text x="368" y="278">后续技能成功率打分</text>
-</g>
-<g class="diagram-node">
-<rect x="91" y="334" width="318" height="56" rx="5"/>
-<text class="node-title" x="250" y="357">执行选中的 5 步</text><text x="250" y="378">想象无可靠收益时回退到默认动作</text>
-</g>
-<g class="diagram-node diagram-observed">
-<rect x="91" y="414" width="318" height="46" rx="5"/>
-<text class="node-title" x="250" y="443">观察实际结果，进入下一轮判断</text>
-</g>
+<path class="return" d="M329 414H385V66H332" marker-end="url(#i-arrow)"/>
+<g class="node"><rect x="55" y="40" width="274" height="52"/><text class="label" x="192" y="62">Observe</text><text class="sub" x="192" y="80">Images, proprioception, goal and history</text></g>
+<g class="node"><rect x="55" y="117" width="274" height="51"/><text class="label" x="192" y="139">Estimate value of imagination</text><text class="sub" x="192" y="157">Expected gain, cost and remaining budget</text></g>
+<text class="edge-label" x="100" y="205">Skip</text><text class="edge-label" x="297" y="205">Invoke</text>
+<g class="node"><rect x="17" y="217" width="152" height="66"/><text class="label" x="93" y="242">Direct execution</text><text class="sub" x="93" y="264">Use default action</text></g>
+<g class="node"><rect x="209" y="217" width="162" height="66"/><text class="label" x="290" y="240">Imagine branches</text><text class="sub" x="290" y="259">Predict candidate effects</text><text class="sub" x="290" y="275">Rank with effect head</text></g>
+<g class="node"><rect x="55" y="329" width="274" height="49"/><text class="label" x="192" y="349">Execute five steps</text><text class="sub" x="192" y="367">Fall back if no branch is reliable</text></g>
+<g class="node"><rect x="55" y="401" width="274" height="27"/><text class="sub" x="192" y="419">Read actual outcome</text></g>
 </svg>
-<figcaption>世界模型只预测候选。执行后用新观测判断进展，再决定是否想象或停止。</figcaption>
+<figcaption><strong>a</strong>　实线为当前决策，虚线为下一次决策。WM 预测用于选动作，π0.5 下一轮仍以真实观测为输入。</figcaption>
 </figure>
-<figure class="system-figure" id="training-diagram">
-<div class="figure-header"><span>图 2</span><h2>训练：怎样验证、怎样改进</h2></div>
-<svg viewBox="0 0 500 475" role="img" aria-labelledby="training-title training-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="training-title">训练时的环境验证和递归改进</title>
-<desc id="training-desc">实验选择器挑选快照，同快照执行准备动作和对照，用同一个冻结技能测试。实测结果一方面训练触发器与动作策略，另一方面在等预算配对学生实验中估计学习增益并更新实验选择器，决定下一轮采样。</desc>
-<defs>
-<marker id="train-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#5c5850"/></marker>
-<marker id="train-feedback-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#396b68"/></marker>
-</defs>
-<g class="diagram-edge" marker-end="url(#train-arrow)">
-<path d="M250 77V104"/><path d="M250 162V184H128V213"/><path d="M250 184H361V213"/>
-<path d="M128 286V331"/><path d="M361 286V331"/>
-<path d="M361 390V411"/>
+<figure id="training-diagram">
+<svg class="diagram" viewBox="0 0 400 440" role="img" aria-labelledby="train-title train-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="train-title">Training: environment verification and recursive improvement</title>
+<desc id="train-desc">The selector chooses branch experiments. Matched environment trials train the gate and the VLA. A matched student experiment measures learning gain and updates the selector for the next round.</desc>
+<defs><marker id="t-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
+<text class="panel" x="17" y="28">b</text><text class="label" x="192" y="27">Training</text>
+<g class="edge" marker-end="url(#t-arrow)">
+<path d="M192 92V114"/><path d="M192 168V187H93V214"/><path d="M192 187H290V214"/>
+<path d="M93 283V326"/><path d="M290 283V326"/><path d="M290 378V398"/>
 </g>
-<path class="diagram-return" d="M466 437H483V50H433" marker-end="url(#train-feedback-arrow)"/>
-<g class="diagram-node diagram-observed">
-<rect x="70" y="23" width="360" height="54" rx="5"/>
-<text class="node-title" x="250" y="46">选择训练快照与候选</text><text x="250" y="66">失败与正常状态 · 随机探索配额</text>
-</g>
-<g class="diagram-node">
-<rect x="70" y="107" width="360" height="55" rx="5"/>
-<text class="node-title" x="250" y="130">环境内成对验证</text><text x="250" y="151">准备 / 重试 / 保持 → 同一冻结技能</text>
-</g>
-<g class="diagram-node diagram-plain">
-<rect x="27" y="216" width="202" height="70" rx="5"/>
-<text class="node-title" x="128" y="244">实测执行反馈</text><text x="128" y="267">成功、失败、动作与成本</text>
-</g>
-<g class="diagram-node diagram-decision">
-<rect x="256" y="216" width="210" height="70" rx="5"/>
-<text class="node-title" x="361" y="244">等预算训练两组学生</text><text x="361" y="267">选择数据 vs. 对照数据</text>
-</g>
-<g class="diagram-node">
-<rect x="27" y="334" width="202" height="56" rx="5"/>
-<text class="node-title" x="128" y="357">更新触发器与策略</text><text x="128" y="378">分支标签、SFT 与环境 RL</text>
-</g>
-<g class="diagram-node">
-<rect x="256" y="334" width="210" height="56" rx="5"/>
-<text class="node-title" x="361" y="357">测开发集学习增益</text><text x="361" y="378">同一起点 · 等更新步数</text>
-</g>
-<g class="diagram-node diagram-observed">
-<rect x="256" y="414" width="210" height="46" rx="5"/>
-<text class="node-title" x="361" y="443">更新实验选择器</text>
-</g>
+<path class="return" d="M371 414H385V66H332" marker-end="url(#t-arrow)"/>
+<g class="node"><rect x="55" y="40" width="274" height="52"/><text class="label" x="192" y="62">Select experiments</text><text class="sub" x="192" y="80">Snapshots, candidate types and controls</text></g>
+<g class="node"><rect x="55" y="117" width="274" height="51"/><text class="label" x="192" y="139">Verify paired branches</text><text class="sub" x="192" y="157">Same snapshot and frozen skill</text></g>
+<text class="edge-label" x="100" y="205">Inner loop</text><text class="edge-label" x="297" y="205">Outer loop</text>
+<g class="node"><rect x="17" y="217" width="152" height="66"/><text class="label" x="93" y="242">Verified experience</text><text class="sub" x="93" y="264">Actions and outcomes</text></g>
+<g class="node"><rect x="209" y="217" width="162" height="66"/><text class="label" x="290" y="242">Train paired students</text><text class="sub" x="290" y="264">Same init and budget</text></g>
+<g class="node"><rect x="17" y="329" width="152" height="49"/><text class="label" x="93" y="349">Update gate + VLA</text><text class="sub" x="93" y="367">SFT + online RL</text></g>
+<g class="node"><rect x="209" y="329" width="162" height="49"/><text class="label" x="290" y="349">Test learning gain</text><text class="sub" x="290" y="367">Held-out dev rollouts</text></g>
+<g class="node"><rect x="209" y="401" width="162" height="27"/><text class="sub" x="290" y="419">Update selector</text></g>
 </svg>
-<figcaption>执行反馈用于改进策略。开发集学习增益用于更新选择器，决定下一轮采哪些分支。</figcaption>
+<figcaption><strong>b</strong>　真实分支监督内层策略。两组同起点学生的学习增益更新外层选择器，并反馈到下一轮采样。</figcaption>
 </figure>
 </div>
-<nav class="toc" aria-label="目录">
-<a href="#flow">原流程与假设</a><a href="#research-review">可行性与查新</a><a href="#platform">平台选型</a><a href="#wm">世界模型与下载</a><a href="#integration">接口与任务</a><a href="#data">数据与开源</a><a href="#protocol">实验方法</a><a href="#rl">RL 流程</a><a href="#validation">验收</a><a href="#rsi">递归验证</a><a href="#execution">开工顺序</a><a href="#related-work">相关工作</a>
-</nav>
-<section id="flow">
-<h2>两条回路，共用环境证据</h2>
-<p>沿用原版 <strong>Observe → Imagine → Verify → Improve</strong>。保留原图的 <code>PROPOSE / IMAGINE / EXECUTE / STOP</code> 与训练时的 <code>LEARN</code>。把“分支值得做吗”和“这笔经验值得拿去训练吗”分成两个决策头，让两种收益可以各自测量。</p>
-<p class="callout"><strong>主要假设</strong>　在相同想象预算下，学到的触发器比固定频率或随机触发带来更多成功。在相同环境步数与训练量下，后期实验选择器比初始版本更能教会同一起点的新策略。</p>
+<p class="note">图示采用可编辑矢量与英文标签，以箭头、分面字母和线型区分关系。<a href="https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/">Nature Research figure guide</a> · <a href="https://www.nature.com/articles/s42256-025-00983-2">Nature Machine Intelligence 图示参考</a></p>
 </section>
-<section id="research-review">
-<h2>可行性与查新</h2>
-<p><strong>可以开始做小规模验证。最值得押注的是“准备动作的配对证据能否帮助系统学会挑选下一轮实验”。</strong> 按需想象、失败回溯、主动采集和按学习进度选课程，都已有接近的工作。这里把这些部件分开测量，并用等预算的新学生实验检验选择器本身的改进。</p>
-<h3>目前测到了什么</h3>
-<p>在现有容器中，用 RTX 4090 D、原版 LIBERO-Goal 任务索引 3（打开上层抽屉并把碗放进去）与 π0.5 checkpoint 实测。初始状态索引 0 的一条基线 rollout 在 settle 之后第 <strong>199</strong> 步成功。模型返回 <strong>10 × 7</strong> 动作段，在线按 5 步执行。当前机器人状态实测是 <strong>8 维</strong>，由末端位置、轴角和两维夹爪关节位置拼接。该次 rollout 的预热后策略 RPC 中位数约 78 ms，作为本机估算参考。</p>
-<p id="replay-evidence">在同一任务的五个官方初始状态（索引 0–4，仿真种子 7）分别保存前 5 步策略命令。重置并重放这段命令后，同一状态的 agentview 图像逐像素一致。相同候选执行两次，5 步扁平仿真状态的最大绝对差都是 0。改用等长保持对照，末端位置与候选相差 <strong>4.33–4.61 cm</strong>。这验证了本机可以通过确定性前缀回放构造分支对照。直接恢复中途快照和跨任务重放仍需单独验收。</p>
-<p><strong>目前尚无世界模型排序、干预成功率或 RSI 的实测结果。</strong> Prophet 的 LIBERO 权重公开，但运行所需的 NVIDIA tokenizer 匿名请求返回 HTTP 401。需要已有 Hugging Face 访问权限和独立运行环境。其公开接口固定 20 步、单视角；短时间接触和候选尾序列引起的排序偏差，必须用实跑分支检查。 <a href="https://huggingface.co/Fleurrr/Prophet-World-Model">Prophet 模型卡</a> · <a href="https://huggingface.co/nvidia/Cosmos-Predict2-2B-Video2World">Cosmos 依赖</a></p>
-<h3>哪些部分已有先例，哪些值得验证</h3>
-<div class="scroll" tabindex="0" role="region" aria-label="查新与实验对照">
-<table><thead><tr><th scope="col">主张</th><th scope="col">最接近的工作</th><th scope="col">本提案如何做出可区分的证据</th></tr></thead><tbody>
-<tr><td>按需想象和执行</td><td>τ₀-VLA 按置信度选择是否搜索语言子任务。ForkCast 在共同视界比较 Commit、Reobserve、Replan。CheckVLA 监测已执行动作的预测偏差。</td><td>在同一候选集和调用预算下，用环境回报训练触发器。除固定频率外，加入置信度门控，以及 ForkCast 风格的候选优势门控。<br><a href="https://tau0-vla.github.io/">τ₀-VLA</a> · <a href="https://arxiv.org/html/2610.18650v1">ForkCast</a> · <a href="https://arxiv.org/abs/2607.26789">CheckVLA</a></td></tr>
-<tr><td>准备动作使后续技能可行</td><td>推抓协同已有长期研究。InSight 识别缺失原语、执行并蒸馏。Rollback 已比较反事实分支并用真实转移校正模型。</td><td>用同一快照、等长重试和保持、同一冻结后续技能测 <code>Δenable</code>。在未见阻碍机制或新技能组合上检查迁移。把改变环境、换视角获得信息和只改变机械臂起点分开报告。<br><a href="https://arxiv.org/abs/1803.09956">推抓协同</a> · <a href="https://insight-vla.github.io/">InSight</a> · <a href="https://arxiv.org/abs/2610.36068">Rollback</a></td></tr>
-<tr><td>想象辅助训练</td><td>WISE 调度短视界想象，RISE 和 Prophet 用模型内 rollout 帮助策略训练。</td><td>先用环境验证 WM 的增量排序价值。冻结 WM，比较同算力的 action-only head，另外量化排序对尾序列的敏感度。<br><a href="https://arxiv.org/html/2609.03681v1">WISE</a> · <a href="https://arxiv.org/abs/2602.11075">RISE</a></td></tr>
-<tr><td>改进如何采集数据</td><td>EmbodiedRSI 按信息价值选择实验，并按后续收益更新记忆。EmbodiRSI 按弱点采纠错示范。自动课程学习早已用学习进展作为 bandit 回报。</td><td>同一个新学生、同一交互与训练预算，比较初始／后期选择器、固定难例、学习进度采样、打乱反馈。再固定更新方法，比较两类选择器各自产生的下一轮更新能带来多少额外教学生收益。<br><a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a> · <a href="https://arxiv.org/abs/2609.38905">EmbodiRSI</a> · <a href="https://proceedings.mlr.press/v100/portelas20a.html">ALP-GMM</a></td></tr>
-</tbody></table></div>
-<p class="note">查新范围为已核对的机器人想象、恢复、技能学习与自动课程工作。可以主张的是以上组合的待验证实验贡献，稀缺性仍取决于最接近对照上的结果。<a href="https://arxiv.org/abs/2610.29677">Physical2RSI 的证据分层</a></p>
-<h3>三个决定是否继续的实验</h3>
-<ol>
-<li><strong>先测干预上限。</strong> 用 30 个独立快照测可执行候选相对等长重试的配对收益，同时包含正常状态和无解状态。按预先固定的规则选出候选，再用独立回放种子估计其收益，避免同一批回放既选最佳又报最佳。若上限很低，优先改善任务和候选库。</li>
-<li><strong>再测想象有没有额外价值。</strong> 用真实未来图像的打分器作为观察上限，和 action-only、Prophet 三者共享候选。如果真实未来图像也无法区分有效动作，先改视角、事件定义或预测视界。如果上限高而 Prophet 追不上，借鉴 ForkCast 的短视界 latent 预测，使用本地分支数据训练。</li>
-<li><strong>最后测改进器是否在学。</strong> 先复用一批已验证数据，隔离“选样本”的效果，用三种简单配方比较开发集收益方差。只有配对收益稳定后，才在线让选择器改变采集，并检验它是否强于学习进度采样。如果只有学生表现提高，结论限于数据采集或策略改进。</li>
-</ol>
-</section>
-<section id="platform">
-<h2>平台选择</h2>
-<p><strong>主实验采用 LIBERO 的独立干预扩展，RoboCasa365 做跨平台复验。</strong> 第一阶段优先考虑能否重放干预、能否独立下载动作条件 WM、与现有 VLA 是否兼容，以及成对分支的采集成本。原版 LIBERO 用来测接口与退化，研究效果在有准备动作需求的扩展场景上验证。</p>
-<div class="scroll" tabindex="0" role="region" aria-label="平台比较">
-<table><thead><tr><th scope="col">候选</th><th scope="col">适合验证</th><th scope="col">成本与决策</th></tr></thead><tbody>
-<tr><td>LIBERO 扩展 + π0.5</td><td>单臂成对干预、准备动作、动作条件 WM</td><td>已有 policy server。Prophet 有同域权重。需要新增可控阻碍与事件标签，并验证快照回放。主实验。</td></tr>
-<tr><td>RoboCasa365 + GR00T N1.5</td><td>较长的跨技能组合、场景与任务转移</td><td>有公开策略及官方评测。相机、控制与任务配置需重新对接，且本案尚未核对可直接替换的独立动作条件 WM。主实验过关后，抽 2–3 个组合测移植。</td></tr>
-<tr><td>ManiSkill</td><td>大规模快照分支、可控物理干预</td><td>GPU 并行适合大量生成标签。VLA、WM 和场景配方都要重新对齐。若成对回放吞吐量成为主瓶颈，再用作数据生成对照。</td></tr>
-</tbody></table></div>
-<p class="refs">平台依据　<a href="https://github.com/robocasa/robocasa">RoboCasa</a> · <a href="https://robocasa.ai/docs/build/html/benchmarking/policy_learning_algorithms.html">官方策略文档</a> · <a href="https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/gr00t_n1-5/multitask_learning/checkpoint-120000">GR00T 权重</a> · <a href="https://github.com/mani-skill/ManiSkill">ManiSkill</a></p>
-</section>
-<section id="wm">
-<h2>先下载 Prophet LIBERO</h2>
-<p><strong>首选 <code>Fleurrr/Prophet-World-Model</code> 的 <code>prophet-libero.pt</code>。</strong> 它接收初始画面与外部指定的 20 步动作，可对同一状态比较不同候选。输出单视角未来图像。现有 release 没有可直接使用的 wrist 或未来本体状态，第一版把图像交给 effect head，下一次 π0.5 调用使用实际新观测。4,115,563,141 bytes 的权重文件已核对到 HTTP 200 和相符的 Content-Length。完整下载与 GPU 推理列在实施阶段。</p>
-<p class="refs"><a href="https://huggingface.co/Fleurrr/Prophet-World-Model">官方模型卡</a> · <a href="https://raw.githubusercontent.com/LogosIntelligenceLab/ProphRL/949a381e4df2d5611d51d131e0ca23c12cd244b9/world_model/release/weights.json">官方大小与 SHA-256</a> · <a href="https://arxiv.org/abs/2511.20633">Prophet 论文</a></p>
-<p><strong>备选</strong>是 VLA-MBPO 的 <code>Rhx11111/Bagel-goal-256-2500</code>，适合对照双视角与 reward 输出，但公开的是 LIBERO-Goal 早期 checkpoint，还需要 base config 和 action normalizer。若两个公开 WM 都通不过分支排序验收，使用同域回放训练短视界 latent WM，并保留视觉模型作对照。目标图模型如 τ₀-WM 可用来提议“想达到什么状态”，此处要测的是“指定动作会造成什么结果”。</p>
-<p class="refs"><a href="https://github.com/LAMDA-RL/VLA-MBPO">VLA-MBPO 发布与依赖</a> · <a href="https://github.com/sii-research/tau-0-vla">τ₀-VLA 高层接口</a></p>
-<details open>
-<summary>下载、校验及单分支验收</summary>
-<p>实施时在仓库外的独立 CUDA 环境执行。上游验证组合是 Python 3.10.18、Torch 2.6.0、CUDA 12.6。先依官方安装指引建立环境，在 Hugging Face 接受所需的 NVIDIA 模型条款。以下下载固定版本的 checkpoint、官方列出的两项基础资产与 tokenizer 文件集合。若启用额外 guardrail，依上游指引补相应资产。</p>
-<pre><code>RSI_ROOT="$HOME/rsi-lab"
-mkdir -p "$RSI_ROOT"
-git clone https://github.com/LogosIntelligenceLab/ProphRL "$RSI_ROOT/ProphRL"
-cd "$RSI_ROOT/ProphRL"
-git checkout --detach 949a381e4df2d5611d51d131e0ca23c12cd244b9
-cd world_model
-prophet-env-check --require-cuda
 
-hf download Fleurrr/Prophet-World-Model prophet-libero.pt \
-  --revision 43fab79923a9cf88f87728ca75596b73a80579e0 \
-  --local-dir "$RSI_ROOT/weights"
-hf download nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned model-480p-4fps.pt \
-  --revision 1d2b0a920e76ca913f216427abe5b97633806143 \
-  --local-dir "$RSI_ROOT/base/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned"
-hf download nvidia/Cosmos-Predict2-2B-Video2World --include 'tokenizer/*' \
-  --revision f50c09f5d8ab133a90cac3f4886a6471e9ba3f18 \
-  --local-dir "$RSI_ROOT/base/nvidia/Cosmos-Predict2-2B-Video2World"
-prophet-checkpoint "$RSI_ROOT/weights/prophet-libero.pt" \
-  --manifest release/weights.json --verify-sha256
+<section class="page" id="protocol">
+<div class="page-id">03 / EXPERIMENT DESIGN</div>
+<h2>从可复现的失败开始</h2>
+<p>本地 π0.5 在 LIBERO-10 的 50 条 rollout 中成功 46 条。以失败录像定位候选决策点，以环境谓词确认阶段。历史失败用于开发定位，封存测试使用独立布局与起点。</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="失败用例与干预">
+<table><colgroup><col style="width:25%"><col style="width:36%"><col style="width:39%"></colgroup>
+<thead><tr><th scope="col">Case · 本地基线</th><th scope="col">回放观察</th><th scope="col">待检验的干预与读数</th></tr></thead>
+<tbody>
+<tr><td>双摩卡壶上炉灶<br>3/5 · 主用例</td><td>Init 1：第一只已放好，第二只抓取停滞。Init 2：第一只放得更晚，第二只仍留在桌上。</td><td>从第二次抓取前分支，比较重试、退后换角度和换抓取点。测第二只是否抬起、第一只是否仍在位，以及最终是否完成。</td></tr>
+<tr><td>黑碗入下层抽屉并关闭<br>4/5 · 接触迁移</td><td>Init 3：放碗后在柜前反复尝试，直到超时。</td><td>比较直接推和撤回后重新对齐。测抽屉关合与碗留在抽屉内。</td></tr>
+<tr><td>白杯上盘、布丁放右侧<br>4/5 · 空间关系迁移</td><td>Init 4：后半程夹爪反复停留在杯盘附近，未完成任务。</td><td>在杯子到位后比较原路线和从空侧接近。测布丁右侧谓词与杯子是否保持到位。</td></tr>
+</tbody></table></div>
+<p class="note" id="research-review">预试已完成：LIBERO-Goal 抽屉任务单条在 settle 后第 199 步成功。5 个初始状态重放相同动作前缀后，起点图像一致，重复 5 步分支的记录状态差为 0。该结果验证回放接口，未测干预成功率。</p>
+<h3>实验顺序与判据</h3>
+<ol>
+<li><strong>干预上限。</strong> 先取 30 个独立快照，包含停滞、正常和无可行候选状态。同一快照比较候选、重试和等长保持，再运行同一冻结技能。用独立回放评估候选 oracle，避免同一批数据既选最佳又评最佳。若对重试无稳定收益，先改候选库或任务。</li>
+<li><strong>想象与触发。</strong> 共享候选及执行长度。用真实未来图像作排序上限，比较 WM、action-only 和动作打乱的 WM。整回合再对比直接执行、固定频率、随机、置信度、候选优势门控及全程想象。报告配对成功率、排序 regret、调用数和 P95 延迟。各门控匹配候选预测预算，全程想象单列成本。主对照为固定频率，预设配对成功率差的 95% 置信区间下界需大于 0。</li>
+<li><strong>策略与 RSI。</strong> 比较 SFT、SFT + 环境 RL 和仅推理搜索。评估策略权重时关闭搜索。早期与后期选择器、新学生、学习进度采样及打乱反馈采用同起点和同预算。测未见任务的学习曲线面积（AUC），再对照各自产生的下一轮更新增益。两项均需报告跨种子配对区间。</li>
+</ol>
+<p id="data"><strong>数据。</strong> 从 <a href="https://huggingface.co/datasets/yifengzhu-hf/LIBERO-datasets/tree/main/libero_goal">LIBERO 原始 HDF5</a> 下载一项任务对齐帧与动作，从 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LeRobot 示范</a> 取技能预热数据。核心数据自采：按布局、物体和阻碍机制先分 train/dev/test，再保存快照、原始动作、事件、失败分支和成本。发布场景、回放脚本与固定划分。用开发集方差估算正式样本量，按快照族聚类估计配对区间。</p>
+</section>
 
-# 先以 LIBERO demo 建立 fixtures/obs.png 及 fixtures/actions.npz
-# obs.png 使用 WM 相机方向，NPZ actions 是 20 × 7 的 env 命令
-export COSMOS_PREDICT2_ARGS="--checkpoints $RSI_ROOT/base"
-prophet-rollout --checkpoint "$RSI_ROOT/weights/prophet-libero.pt" \
-  --input "$RSI_ROOT/fixtures/obs.png" --actions "$RSI_ROOT/fixtures/actions.npz" \
-  --action-format libero-servo --output "$RSI_ROOT/fixture-prediction.mp4" --preflight
-# 移除 --preflight，再测同一画面下 demo 动作与反向／保持动作。</code></pre>
-<p class="refs"><a href="https://github.com/LogosIntelligenceLab/ProphRL/blob/949a381e4df2d5611d51d131e0ca23c12cd244b9/world_model/README.md">官方安装及 CLI</a> · <a href="https://github.com/LogosIntelligenceLab/ProphRL/blob/949a381e4df2d5611d51d131e0ca23c12cd244b9/world_model/scripts/download_base_models.py">官方资产版本</a></p>
-</details>
-</section>
-<section id="integration">
-<h2>π0.5 与 WM 的接口</h2>
-<div class="scroll" tabindex="0" role="region" aria-label="系统接口">
-<table><thead><tr><th scope="col">模块</th><th scope="col">输入与输出</th><th scope="col">第一版做法</th></tr></thead><tbody>
-<tr><td>VLA / 候选生成</td><td>真实 RGB 双视角、8 维 state、指令 → 动作 chunk</td><td>原 π0.5 websocket 输出作预设。候选加入 skill library 的 retreat、换进入方向、推开阻挡。以脚本或可测技能 adapter 产生连续命令，同一候选池供各方法共用。后续测 learned proposer 是否能重组技能。</td></tr>
-<tr><td>Controller</td><td>任务阶段、重试、停滞、进展、候选差异、预算 → 分支或直接执行</td><td>先用规则收数据，再以分支真实收益回归 gate。历史只用真实观测。预测收益扣除延迟与 WM 不确定性后才触发。</td></tr>
-<tr><td>WM worker</td><td>当前 agentview、候选 env 命令、seed → 带时间索引的未来图像</td><td>独立常驻服务。WM 相机预处理比对上游 demo converter。使用 <code>libero-servo</code> 一次做位移／旋转缩放 0.05 和夹爪映射，缺臂补零。对照测试夹爪方向、画面翻转、动作与帧对齐。显示视频 FPS 与 env step 对齐分开验证。</td></tr>
-<tr><td>Effect head / 验证</td><td>当前与预测画面、受阻 skill k → 后续 skill 成功概率</td><td>先以实际未来画面和成功标签训练小分类器，再在开发集校准其 WM 输入分数。模拟器物体位姿、接触与任务 success 只供离线标签及 oracle。没有合格候选时退回预设动作。</td></tr>
+<section class="page" id="models">
+<div class="page-id">04 / MODEL AND TRAINING SPECIFICATION</div>
+<h2>模型、接口与状态转移</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="模型输入输出与微调">
+<table><colgroup><col style="width:20%"><col style="width:34%"><col style="width:46%"></colgroup>
+<thead><tr><th scope="col">模块</th><th scope="col">Input → Output</th><th scope="col">初始化与更新</th></tr></thead>
+<tbody>
+<tr><td>Action expert <i>π</i><sub>θ</sub></td><td>双视角 + 8 维本体 + 指令 → 10 × 7 动作段。每次取前 5 步。</td><td>OpenPI <code>pi05_libero</code> 冻结起步。加入退回、换角度等候选原语。通过干预验收后，在已验证动作上做 flow matching SFT，再用 Flow-SDE PPO 更新 action expert 和 value head。训练侧用 <a href="https://huggingface.co/RLinf/RLinf-Pi05-LIBERO-SFT">RLinf-Pi05-LIBERO-SFT</a> 时，所有训练对照从该版本重测。</td></tr>
+<tr><td>World model <i>W</i></td><td>当前 agentview + 20 步候选命令 → 单视角未来帧。</td><td><a href="https://huggingface.co/Fleurrr/Prophet-World-Model">Prophet LIBERO</a>，先冻结。用上游 servo adapter 转动作，5 步候选配共享 15 步尾序列，按帧对齐只读前缀，并检验换尾后排序。若失败，改用短视界 latent predictor，以真实分支监督。</td></tr>
+<tr><td>Effect head <i>Q</i><sub>ψ</sub></td><td>当前及预测帧 + 后续技能 <i>k</i> → <i>k</i> 成功概率。</td><td>冻结 <a href="https://github.com/facebookresearch/dinov2">DINOv2-S</a> encoder，加 MLP。用真实后继帧与技能结果做 BCE，开发集校准预测帧输入。物体真值只用于离线标签。</td></tr>
+<tr><td>Gate <i>g</i><sub>φ</sub></td><td>观测历史 + 进度 + 预算 → Direct / Imagine。</td><td>复用冻结视觉特征，加轻量 GRU 和二分类 head。先回归成对分支收益，再用环境 rollout 做离散 PPO。策略本身可保持冻结，单独验证 Gate。</td></tr>
+<tr><td>Selector <i>q</i><sub>ω</sub></td><td>失败类型、历史收益、预算 → 下一批快照与候选比例。</td><td>用均匀初始化的 softmax 选择采样配方，保留随机探索配额。用同预算学生的开发集增益训练 contextual bandit，每轮保留固定对照。</td></tr>
 </tbody></table></div>
-<p><strong>20 步预测对上 5 步执行。</strong> 先离线检查原生 20 步分支的动作敏感性。上线比较时各组一律执行 5 步。为每个候选前缀拼接同一条合法、开发集确定的 15 步尾序列，effect head 只读取映射至前 5 步的预测。用另一条合法尾序列测排名是否翻转，并与同快照实际执行 5 步后接同一冻结 skill 的结果对照。若短视界事件或排名无法通过验收，换短视界 WM。另可单独测所有组都执行 20 步的条件，标明是不同控制周期的扩展实验。</p>
-<p class="refs">本地接口依据　<code>gui/viewer.py</code> 的 <code>policy.infer(element)</code>、<code>action_plan</code> 和 <code>--replan-steps</code>。<a href="https://github.com/LogosIntelligenceLab/ProphRL/blob/949a381e4df2d5611d51d131e0ca23c12cd244b9/world_model/docs/DATA.md">Prophet 动作转换</a> · <a href="https://github.com/LogosIntelligenceLab/ProphRL/blob/949a381e4df2d5611d51d131e0ca23c12cd244b9/world_model/prophet/rollout.py">公开 rollout 代码</a></p>
-<h3>第一批任务与成对标签</h3>
-<p>先做“抓取入口被可移动物体挡住”。从基础策略失败快照比较直接重试、改接近方向、先移走阻挡，再交回<strong>相同、冻结的抓取 skill</strong>。做无阻挡场景和没有有效干预的场景，检查 controller 能否略过无用的想象或停止。再加入“遮挡需换视角”与“抓取姿态需先调整”两个机制。候选先测独立可执行率，然后以留出的物体、布局和技能组合测新组合。报告以候选库为范围的能力发现，另记录新组合是否由 learned proposer 主动提出。</p>
-<p>保存并验证模拟器、控制器、任务计数、历史和 RNG 状态。对每个快照配对候选与 retry，另设等长 hold，重复使用相同 seed 集和 skill 时限。比较 <code>Δenable = P(success | prep) − P(success | retry)</code>，成本独立记录。对照环境标签先用分支后实际状态与后续 skill 的成功，不从 WM 生成画面写入 ground truth。</p>
+<h3>观测、预测与真实转移</h3>
+<p>令 <i>s</i><sub>t</sub> 为环境隐藏状态，<i>o</i><sub>t</sub> 为双视角与本体状态，<i>h</i><sub>t</sub> 包含近期真实观测、已执行动作、指令与剩余 WM 调用数 <i>b</i><sub>t</sub>。<i>u</i><sup>0</sup> 是默认前缀，<i>u</i><sup>i</sup> 是备选。WM 只预测图像。执行后追加真实观测和实际动作更新历史，预算按真实调用数扣减。</p>
+<div class="formula">
+  s<sub>t+j+1</sub> ∼ P(· | s<sub>t+j</sub>, u<sub>j</sub>), &nbsp; o<sub>t+j+1</sub> ∼ O(· | s<sub>t+j+1</sub>), &nbsp; 0 ≤ j &lt; d ≤ 5<br>
+  Î<sup>i</sup><sub>1:5</sub> = W(I<sub>t</sub>, [u<sup>i</sup>, tail<sub>15</sub>])<sub>1:5</sub>, &nbsp; i* = arg max<sub>i</sub> Q<sub>ψ</sub>(I<sub>t</sub>, Î<sup>i</sup><sub>1:5</sub>, k)<br>
+  Δ<sub>enable</sub>(s,u,k) = Pr(Y<sub>k</sub>=1 | s, do(u)) − Pr(Y<sub>k</sub>=1 | s, do(retry))
+</div>
+<p class="note"><i>d</i> 是本段实际执行步数，提前终止时少于 5。<i>Y</i><sub>k</sub> 表示冻结技能在限定时域内成功且先前目标保持。</p>
+<h3 id="rl">三层更新用不同回报</h3>
+<p><strong>Gate。</strong> 用成对 rollout 估计想象相对直接执行的净收益 <code>ΔR − λ·额外 WM 时间</code> 预热。分支需有剩余预算且预测净收益超过阈值。上线训练用任务成功减实际 WM 成本，冻结候选生成器与评分器。每轮从旧 Gate 采样并记录 log-prob。动作段聚合奖励，跨段折扣为 γ<sup>d</sup>，再用优势更新。</p>
+<p><strong>Action expert。</strong> 环境验证成功的示范用于 SFT。PPO 使用本轮 actor 的 Flow-SDE 采样轨迹与真实奖励，按执行步数聚合回报、计算 GAE。外部筛选或改写的候选只进入蒸馏数据流。</p>
+<p><strong>Selector。</strong> 克隆同一学生初值 <i>θ</i>，用选中数据与对照数据分别做等量更新 <i>U</i>。固定 WM 与 effect head，用开发集回报更新选择器。封存测试集只做最终评估。</p>
+<div class="formula">r<sub>meta</sub> = J<sub>dev</sub>(U(θ,D<sub>sel</sub>)) − J<sub>dev</sub>(U(θ,D<sub>ctrl</sub>)) − λ<sub>m</sub>(C<sub>sel</sub> − C<sub>ctrl</sub>)</div>
+<p class="refs"><a href="https://rlinf.readthedocs.io/en/latest/rst_source/examples/embodied/pi0.html">Flow-SDE PPO 配方</a> · <a href="https://github.com/JoeSun-421/proposal4rsi/blob/84c429077b32bdf52d8b215fcf4ee4a6da3fa436/proposal/verified-rsi.html">固定版本的下载、校验与回放命令</a></p>
 </section>
-<section id="data">
-<h2>数据从哪里来</h2>
-<p><strong>首批只下载一个任务的原始 HDF5，自采其余分支。</strong> 公开示范用于检查动作语义、相机方向和技能预热。自采数据回答“同一个失败状态，换一种准备动作会怎样”，是排序器、触发器和外层 RL 的主要监督来源。</p>
-<div class="scroll" tabindex="0" role="region" aria-label="数据来源与用途">
-<table><thead><tr><th scope="col">数据</th><th scope="col">获取方式</th><th scope="col">用途</th></tr></thead><tbody>
-<tr><td>原始 LIBERO HDF5</td><td><code>yifengzhu-hf/LIBERO-datasets</code>，先取一个 <code>libero_goal/</code> 任务。需要整套时再用官方下载脚本。</td><td>回放示范，校对环境动作、帧与状态。用 <code>prophet-prepare-libero</code> 生成 WM 的视频和动作标注。</td></tr>
-<tr><td>π0.5 示范</td><td><code>physical-intelligence/libero</code>。LeRobot v2.0，四套任务、1,693 条轨迹，数据卡标注 10 FPS 和 CC BY 4.0。</td><td>抽取基础技能示范做 SFT 和遗忘对照。使用原数据转换和统计量，并校验训练表与在线状态的字段顺序和单位。数据卡的 FPS 单独记录。</td></tr>
-<tr><td>自己的分支数据</td><td>在可控干预场景运行冻结 π0.5，采集受阻、正常和无法修复的状态。恢复同一快照，用脚本、策略采样或少量人工示范生成可执行候选，再逐条回放。</td><td>保留成功、失败、无效和直接重试。提供 WM 动力学监督、成对成功标签、SFT 正例及 RL 采样起点。</td></tr>
-<tr><td>在线 RL 轨迹</td><td>训练时从训练场景实时滚动采样。外层每轮重新收集入选数据。</td><td>为 PPO 提供本轮策略的 log-prob、真实环境奖励与终止信号。公共示范作为独立监督批次。</td></tr>
-</tbody></table></div>
-<p class="refs"><a href="https://huggingface.co/datasets/yifengzhu-hf/LIBERO-datasets">HDF5 下载</a> · <a href="https://github.com/Lifelong-Robot-Learning/LIBERO/blob/master/benchmark_scripts/download_libero_datasets.py">官方脚本</a> · <a href="https://huggingface.co/datasets/physical-intelligence/libero">Physical Intelligence 数据卡</a></p>
-<details open>
-<summary>从一份公开示范开始</summary>
-<pre><code>RSI_ROOT="$HOME/rsi-lab"
-mkdir -p "$RSI_ROOT/data"
-hf download yifengzhu-hf/LIBERO-datasets \
-  libero_goal/open_the_top_drawer_and_put_the_bowl_inside_demo.hdf5 \
-  --repo-type dataset --local-dir "$RSI_ROOT/data/libero-hdf5"
 
-# 在 Prophet 环境中执行，产出成对的 clips/*.mp4 与 metadata/*.npz。
-prophet-prepare-libero \
-  --input "$RSI_ROOT/data/libero-hdf5/libero_goal" \
-  --output "$RSI_ROOT/data/prophet-fixture" --clip-length 64 --stride 16
-prophet-validate-data "$RSI_ROOT/data/prophet-fixture"
-
-# 先下载元数据，按任务索引定位 episode，再按需取 parquet。
-hf download physical-intelligence/libero --repo-type dataset \
-  --include 'meta/*' --local-dir "$RSI_ROOT/data/openpi-libero"</code></pre>
-<p>从同一片段取起始帧和对应的连续 20 条 env 命令，保存为前述 <code>obs.png</code> 和带 <code>actions</code> 键的 NPZ。为每次下载记录 Hub revision 和文件哈希。若网络受限，在可访问下载端的机器获取后传入实验机，按同一 manifest 校验。</p>
-</details>
-<h3>自采与开源的最小交付</h3>
-<ol>
-<li>用独立 BDDL 场景和参数配置生成布局族。以抓碗为例，设置无阻挡、可移开阻挡和无法移开的阻挡三类。保存目标物、阻挡物、初始位姿和相机配置。按布局族、物体与机制划分 train、dev 和封存 test，再生成具体快照。</li>
-<li>固定基线模型和触发规则采集 rollout。以两个重规划点没有目标进展、抓取失败或首次碰撞作为候选快照来源，同时从正常轨迹抽样。每个快照回放默认重试、等长保持、退回后接近、换侧接近或推开阻挡等适用动作。每条回放先执行准备前缀，再交给同一冻结技能。保存不可达、超时和无效果记录。教师脚本若用仿真物体坐标，只在训练数据生成和 oracle 对照使用。部署候选从可见观测和模型输出生成。</li>
-<li>保存环境版本、BDDL 与资产 ID、初始快照、仿真控制步长、相机标定、每步 env 动作及时间戳、双视角帧、机器人状态、接触事件、技能成功、分支父子 ID、候选来源和成本。训练侧输出 LeRobot 示例轨迹、Parquet 分支索引和按 episode 分片的 MP4。快照用 NPZ 加 JSON 元数据记录，提供从初始种子和原始动作回放的途径。</li>
-<li>拟发布到独立 Hugging Face Dataset，配套数据卡、场景生成与回放脚本、固定 train/dev/test 清单、资产许可和校验清单。公开同状态的失败和对照，方便复现排序与触发实验。第三方示范默认只记录来源与 ID，由复现者自行获取。用于盲测的种子可在实验锁定后释放。</li>
-</ol>
-</section>
-<section id="protocol">
-<h2>详细实验协议</h2>
-<h3>实验 A · 准备动作有没有因果收益</h3>
-<p>定义主任务为抓取并放置目标物。冻结后续抓取技能与最大步数。令 <code>S(h,u,k,s)</code> 表示从快照 h、随机种子 s 执行准备动作 u 后，同一技能 k 是否成功。对每个 h 使用同一组种子分别评估 prep、retry 和 hold。报告配对差 <code>mean[S(prep) − S(retry)]</code>、prep 对 hold 的差、任务最终成功率及新增动作步数。若仿真与控制完全确定，重复同一条件只做重放检验，统计样本来自独立布局或状态族。</p>
-<p>对一个抓取受阻场景先做 30 个快照。先重放同一动作并核对 EEF 轨迹、关键接触、成功标签及终止步数。预试可以用 20 步的准备动作验证机制确实存在。进入 5 步主实验前，再检查候选 oracle 在 5 步前缀下有足够的区分度。若干预无法在 5 步产生可测效果，设独立的 20 步方案，所有对照共用该周期，按实际动作步数计费。</p>
-<h3>实验 B · WM 会不会按动作改变判断</h3>
-<p>在同一快照生成同一组候选，记录实际分支的关键事件，例如阻挡物是否离开抓取区域，以及后续技能成功。用真实观察训练 effect head。用独立开发快照校准 WM 预测输入。固定相同候选与计算预算，在封存快照上对比真实未来画面上限、WM、同容量 action-only head、复制起始帧和打乱动作的 WM。主指标是非平局配对排序与选中候选的真实 regret。实际收益并列的候选对单列。对其余候选对，模型预测并列计半分。统计按任务与快照聚类。另列接触和物体运动的逐事件准确率、Brier 分数及更换 15 步尾序列后的排序稳定性。</p>
-<h3>实验 C · 什么时候值得分支</h3>
-<p>部署从完整 episode 起点运行，不能跳到已知失败状态。各组共用候选生成器、执行周期和任务上限。固定频率与随机触发先在 dev 匹配可用的 WM calls/episode，按候选预测次数计费。封存测试分别报告实际消耗和不同预算下的成功率曲线。每个初始状态和种子同时测直接执行、固定频率、随机触发、学习触发与仅用 action-only 打分，另用全点想象描出成本上界。增加同预算的候选优势门控和廉价置信度门控，检查学习触发器是否优于接近的已有做法。按训练资源、基础动作候选生成调用和 WM 推理分开报告 GPU 时间。主对照为学习触发对等预算固定频率。</p>
-<h3>实验 D · 学到了技能，还是只靠推理时搜索</h3>
-<p>对比同一 π0.5 起点上的原策略、仅 SFT、SFT + 环境 RL、以及只在推理时使用 controller。SFT 各组使用相同数量的训练动作和优化步数，对比分支排序选出的正例与随机抽样正例。RL 组从同一 SFT 起点出发，在相同训练环境步数下对比有无分支初始化课程。评测时各权重组关闭 WM 和外层控制器，以单次策略调用执行，另报告完整系统成绩。扩展场景和原版 LIBERO 分开计分。</p>
-<p class="note">启动预算建议为 120 个快照、每个最多四条主分支和三组可用种子，约 1,440 次分支，等长 hold 另计。确认性实验按 dev 的配对差、方差与任务内相关性估算样本量，提前锁定主指标。跨任务样本较少时逐任务报告，并把区间和结论限定在实际任务族。</p>
-</section>
-<section id="rl">
-<h2>强化学习流程</h2>
-<p><strong>训练顺序是示范预热 → 触发器 RL → 连续动作 RL → 外层实验选择 RL。</strong> 各层在自己的时间尺度使用环境证据。首轮先冻结 π0.5 验证想象与触发效果。通过 G2 后再动策略权重，才能归因增益来自哪一层。</p>
-<div class="scroll" tabindex="0" role="region" aria-label="强化学习层级">
-<table><thead><tr><th scope="col">层</th><th scope="col">策略与动作</th><th scope="col">环境奖励与更新</th></tr></thead><tbody>
-<tr><td>预热</td><td>π0.5 action expert，学习通过验证的完整动作段</td><td>Flow matching SFT，先混合验证轨迹与原始示范，例如 1:1。失败分支用于打分和触发标签。窗口用实际执行轨迹构造，边界 mask 掉补齐步。</td></tr>
-<tr><td>何时想象</td><td>小型 gate。每个重规划点选 DIRECT 或 IMAGINE，可扩到 K=2/4。</td><td>真实任务成功减调用、延迟与物理失败成本。先在配对数据上预训练，再用离散 PPO 或单点 contextual bandit。</td></tr>
-<tr><td>怎样执行</td><td>π0.5 action expert，以连续动作段控制机器人</td><td>真实仿真成功加可选的事件奖励。使用 RLinf 的 Flow-SDE PPO 更新，独立价值头估计回报。</td></tr>
-<tr><td>学什么</td><td>外层实验选择器，选训练快照、候选类型和样本比例</td><td>等预算训练后，在 dev 测得的学生增益。以随机化实验和 contextual bandit 更新选择器。</td></tr>
+<section class="page" id="related-work">
+<div class="page-id">05 / APPENDIX</div>
+<h2>相关工作、局限与待验证项</h2>
+<h3>可以直接借鉴的设计</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="相关工作与可借鉴的设计">
+<table><colgroup><col style="width:22%"><col style="width:39%"><col style="width:39%"></colgroup>
+<thead><tr><th scope="col">问题</th><th scope="col">最接近的先例</th><th scope="col">借鉴与区分</th></tr></thead>
+<tbody>
+<tr><td>何时想象</td><td><a href="https://tau0-vla.github.io/">τ₀-VLA</a> 按置信度搜索子任务。<a href="https://arxiv.org/abs/2610.26845">Agima</a> 用 RL 学会按需想象。<a href="https://arxiv.org/abs/2607.26789">CheckVLA</a> 用预测偏差触发纠正。</td><td>用置信度作为同预算对照。本文 Gate 学真实配对收益，并在动作执行前决定是否分支。</td></tr>
+<tr><td>比较候选后果</td><td><a href="https://arxiv.org/abs/2610.18650">ForkCast</a> 在共同视界比较 Commit、Reobserve 与 Replan。<a href="https://www.pi.website/blog/pi07">π0.7</a> 可用生成的视觉子目标引导策略。</td><td>沿用共同视界和默认候选。输入具体动作并测相同后续技能的结果，目标图用于表达期望状态。</td></tr>
+<tr><td>从分支学习</td><td><a href="https://arxiv.org/abs/2610.36068">Rollback</a> 回溯并蒸馏反事实经验。<a href="https://arxiv.org/abs/2609.03681">WISE</a> 调度短视界想象。<a href="https://arxiv.org/abs/2602.11075">RISE</a> 用想象估计策略优势。</td><td>借用短视界和分支蒸馏。先用环境确认候选的效果，并把 WM 排序与环境 RL 分开验收。</td></tr>
+<tr><td>改进采样过程</td><td><a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a> 按信息价值选实验。<a href="https://arxiv.org/abs/2610.20474">AdaRSI</a> 用失败回放判断何时微调。<a href="https://proceedings.mlr.press/v100/portelas20a.html">ALP-GMM</a> 按学习进度采样。</td><td>以学习进度作为强基线，并用等预算的新学生和下一轮更新隔离选择器的贡献。<a href="https://arxiv.org/abs/2610.29677">Physical2RSI</a></td></tr>
 </tbody></table></div>
-<h3>阶段一 · 触发器的离散 RL</h3>
+<p>这些先例已覆盖按需想象、反事实恢复与主动采样。待验证的研究贡献是：<strong>同状态干预产生的证据，能否帮助改进器在新任务上挑到更有训练价值的经验。</strong></p>
+<h3>局限与必须补上的证据</h3>
 <ol>
-<li>为每个决策记录实际观测历史、技能进度、剩余预算、旧策略的 action 概率及候选生成成本。由同状态下 DIRECT 和固定 WM 选择结果的真实分支获得 <code>Δgate = return(imagine) − return(direct)</code>。用它预训练门控分数，按 dev 的成本曲线选阈值。</li>
-<li>第一版可用每回合只在一个符合条件的决策点随机化，后续用同一冻结策略完成任务。记录已知采样概率，用 bandit 更新该决策。多个决策点互相影响时，改用完整 episode 的离散 PPO。每次迭代先用旧 gate 采一批完整轨迹，然后按真实 rollout 计算优势和价值目标，再更新 gate。</li>
-<li>可执行的初始奖励定义为 <code>r = 1[首次完成任务] − λwm·WM_calls − λt·extra_seconds − λbad·1[硬失败事件]</code>。系数在 dev 按调用和时延约束确定，训练时可加经消融验证的阶段事件。主评估继续用原始成功率和实际成本。终止、超时与 padding 分开记账，重规划点间按实际经过步数累计回报。</li>
-</ol>
-<h3>阶段二 · π0.5 连续动作 RL</h3>
-<ol>
-<li>先在 RLinf 官方 LIBERO 配方验证训练和评估，再接独立扩展环境。官方配方使用可训练的 <code>RLinf/RLinf-Pi05-LIBERO-SFT</code>。若采用它，所有策略训练对照从同一 checkpoint 起步，并重跑基线。现有 OpenPI websocket 服务用于原版推理基线。迁移其权重到其他训练框架时，先验证动作归一化及相同输入下的输出一致性。</li>
-<li>从同一 SFT checkpoint 初始化 actor 与 critic，固定本轮 rollout actor 版本。每个重规划点从 Flow-SDE 随机去噪采样，存去噪轨迹、旧 log-prob、价值估计、动作维度和有效时间掩码。<code>pi05_libero</code> 的模型动作视界为 10，主实验只执行 5 步。由环境返回每步奖励、首次成功、超时与结束观测。每轮按 RLinf 实现重算相同去噪随机变量的 log-prob，使用一致的截断、掩码和归一化。</li>
-<li>把有效步奖励聚合到动作段，用 GAE 估计优势，再优化 PPO clipped ratio 与价值损失。可从 γ=0.99、GAE λ=0.95、clip=0.2 起步，在 dev 调整，记录 KL、clip fraction、价值误差、动作越界和每批成功率。先只训练 action expert 和 value head。SFT 保持项如要加入，用独立示范批计算并做消融。每轮上线采新数据。固定的离线成功分支用于 SFT 和课程起点。</li>
-<li>第一轮 RL 用真实仿真奖励，WM 在冻结条件下提出候选、决定哪些状态值得补采。用于 actor PPO 的连续动作由本轮 actor 自己采样。若 gate 改写或筛选了动作，该步标为 teacher，进入单独的蒸馏数据流。这样 PPO 的采样策略和 log-prob 定义能对应。后续若做 WM 内 rollout，另设等仿真预算对照、真实验证与模型偏差门槛，单独报告。</li>
-</ol>
-<p class="refs"><a href="https://rlinf.readthedocs.io/en/latest/rst_source/examples/embodied/pi0.html">RLinf π0.5 RL 文档</a> · <a href="https://github.com/RLinf/RLinf/blob/main/examples/embodiment/config/libero_spatial_ppo_openpi_pi05.yaml">官方 PPO 配方</a> · <a href="https://huggingface.co/RLinf/RLinf-Pi05-LIBERO-SFT">训练起点权重</a> · <a href="https://arxiv.org/abs/2510.25889">πRL 论文</a></p>
-<h3>阶段三 · 外层实验选择 RL</h3>
-<p>每次选择一个可审计的实验批次。例如，从失败状态、模型分歧状态或随机状态各抽一组，按策略分配名额。为每个动作保留已知探索概率。由同一学生 checkpoint 克隆实验组与固定采样组，匹配验证步数、训练样本量、优化步数、optimizer 起点和随机种子。各自完成一轮等步数更新，再从相同 dev 起点量学生性能差，扣除额外算力成本。以这项批次回报更新选择器。第一版每批只选一种配方，避免把批级收益错误分给单条轨迹。记录回报方差、动作概率和随机探索覆盖。下一轮由更新过的选择器重新决定采什么，再做新学生移植与递归一跳对照。</p>
-</section>
-<section id="validation">
-<h2>把每个主张拆成验收关卡</h2>
-<p>下列数值是开工门槛草案。先用开发集小样本估计方差、吞吐量与成功率，再冻结门槛与主对照。最终以配对成功率差、分层置信区间及预算曲线报告。</p>
-<div class="scroll" tabindex="0" role="region" aria-label="实验关卡">
-<table><thead><tr><th scope="col">关卡</th><th scope="col">对照与读数</th><th scope="col">进入下一步的条件</th></tr></thead><tbody>
-<tr><td>G0 · 可重放、候选可用</td><td>30 组快照重复回放同命令，检查终点、事件与成功标签。评估无阻碍时原 skill、受阻时 retry，以及候选 oracle 上限。</td><td>成对标签可重现，oracle 对 retry 有正收益。否则先修快照、候选或基础技能。</td></tr>
-<tr><td>G1 · WM 能排序</td><td>同画面换动作、同动作换 seed、动作打乱、冻结画面、action-only head。测事件准确率、校准、tie-aware 配对排名、选择 regret 和尾序列敏感度。</td><td>非平局对的排序准确率提案目标 ≥65%，且相对 action-only 的提升 95% CI 下界 &gt;0。亦需在执行前缀设定下成立。</td></tr>
-<tr><td>G2 · 知道何时想</td><td>同 K、相同候选、相同 evaluator、同一执行前缀。对照直接 π0.5、同候选 action-only、固定频率、随机触发、每点想象、oracle。每点想象另报成本曲线。</td><td>与预先指定的固定频率对照比，于匹配 WM 调用上限有正的配对成功率差。同步报告 P50/P95 延迟、误触发及有益分支漏判。</td></tr>
-<tr><td>G3 · 策略学会干预</td><td>以环境验证轨迹训练 π0.5 adapter，混合原示范。对照等量随机、固定难例与同数据量无成对排序。评估时关闭 WM、使用单次策略调用。</td><td>新组合上成功率增益为正，原版 suite 退化在预先指定容忍范围内。把带 controller 的系统收益另列。</td></tr>
-<tr><td>G4 · 改进器学会改进</td><td>相同新学生起点替换早期／后期选择器。比较等预算学习曲线、AUC、达标环境步数及下轮更新收益。</td><td>后期选择器的 AUC 差 95% CI 下界 &gt;0，并有下一轮反馈优于冻结或打乱反馈的证据。分开报告学生进步与递归证据。</td></tr>
-</tbody></table></div>
-<p>启动规模和样本量估计见实验协议。按任务与快照族群分层 bootstrap，避免把同一快照的多分支当独立样本。任务／布局／物体／快照族先分割，再生成数据。每个方法使用相同起点；报告所有回放、失败、重置、推理、生成帧、GPU 时间与训练步数。</p>
-</section>
-<section id="rsi">
-<h2>验证改进器本身变强</h2>
-<ol>
-<li><strong>选实验。</strong> 第 r 轮在同一训练快照池，以选择器 φᵣ 分配候选验证与数据比例。固定规则／随机探索用相同验证预算。保留探索配额，覆盖预测器没有信心的场景。</li>
-<li><strong>测量学习增益。</strong> 将同一 θᵣ 的 adapter、optimizer 起点及更新步数复制到实验组与对照组。用各自收集的真实数据更新 K 步。保持 WM、effect head 与 evaluator 一致，记录 <code>Rlearn = Jdev(θselected) − Jdev(θcontrol) − λ·额外成本</code>。开发集只提供外层反馈。</li>
-<li><strong>用收益更新选择器。</strong> 第一版用小型 contextual bandit，记录探索概率及每批数据的 <code>Rlearn</code>，更新哪些状态、干预和难度值得验证。执行 gate 由 G2 的决策收益监督。保存 φ₀、φ₁、φ₂ 等 checkpoint 及产生各版的数据路径。</li>
-<li><strong>做新学生移植。</strong> 至少比较三个更新轮、三个独立种子作起点。把 φ₀、φᵣ、冻结规则、学习进度采样与打乱反馈版本各自接到同一全新 θ₀、WM、effect head 和相同初始记忆。在未见任务的 adaptation starts 内用等量预算收数据，在另一批封存的 evaluation starts 测量学习曲线。禁止用封存评测分数更新任一版本或调阈值。</li>
-<li><strong>检查递归一跳。</strong> 让早期与后期选择器各产生一批等量的下一轮实验，采用相同 meta-update 规则更新各自的副本，测各自更新前后对另一批新学生的边际教学增益。冻结选择器与等量、打乱的 meta 反馈是对照。若只有 G3 通过，结果支持策略自改进。若移植通过而递归一跳未通过，结果支持改进器学习，递归仍待证。</li>
+<li><strong>失败原因尚未识别。</strong> 现有录像只用于定位停滞。需以谓词、接触和同状态配对区分姿态、遮挡与执行能力不足。5 次历史回合不能估计总体成功率。</li>
+<li><strong>WM 可用性尚未验证。</strong> Prophet 基础 tokenizer 需要访问权限。需实测动作与帧对齐、5 步排序、换尾稳定性和端到端延迟，检查收益是否超过更便宜的 action-only 方法。</li>
+<li><strong>递归增益尚未观察到。</strong> 模拟器回放和单轮策略变强都不足以说明 RSI。需验证后期选择器对新学生的学习效率及其下一轮更新的额外收益。跨平台、真机和不可恢复接触留待后续评估。</li>
 </ol>
 </section>
-<section id="execution">
-<h2>开工顺序与交付证据</h2>
-<ol>
-<li><strong>资产与 baseline。</strong> 在仓库外建 WM runtime，验 SHA、跑 demo 原动作／替换动作、记录单卡显存及延迟。用既有 π0.5 server 跑原版 smoke，确认 180° 翻转、224 pad resize、8 维 state、10 步 settle、suite step cap 及 5 步重规划。官方结果与自建任务分表。</li>
-<li><strong>干预数据与 shadow mode。</strong> 建一个阻挡场景，做快照回放验收。记录同一状态所有候选的预测与真实对照，先离线给分支排序。保存 <code>snapshot_id</code>、任务／分割、候选命令、模型版本、帧对齐、事件、决策、<code>Δenable</code> 与成本。输出 G0／G1 报告及失败样本。</li>
-<li><strong>闭环消融。</strong> G1 通过才在独立实验 runner 接 controller；接入点是 action queue 补充前的重规划边界。WM timeout、低置信度与预算用尽均记录回退原因。以相同 seeds 完成 G2 对照，再做 G3 adapter 蒸馏。</li>
-<li><strong>改进器验证。</strong> G3 通过后跑外层更新与新学生移植，封存 per-round manifests、数据选择轨迹、成本与学习曲线。RoboCasa365 先以官方 GR00T checkpoint 重做 G0，若采用本地适配 WM 则重做 G1，再复验 G2 与 G4。</li>
-</ol>
-<p class="note">提案中的门槛与样本量需要在开发集预试后固定。公开来源、训练接口和下载路径已核对。已完成接口与分支回放预试。干预数据采集、世界模型排序验证与 RL 训练是后续执行项。</p>
-</section>
-<section id="related-work">
-<h2>相关工作</h2>
-<h3>何时想象</h3>
-<p><strong>Agima</strong> 把提出动作、生成未来图像和执行决策放进同一个模型，并用 RL 训练智能体在关键点分支。<strong>CheckVLA</strong> 用冻结的动作条件世界模型预测已发出的动作段会产生什么观察，再根据实际偏差决定是否介入。我们的门控在执行前选择是否比较准备动作，主对照是同调用预算下的固定频率触发。 <a href="https://arxiv.org/abs/2610.26845">Agima</a> · <a href="https://arxiv.org/abs/2607.26789">CheckVLA</a></p>
-<p><strong>π0.7</strong> 使用语言、动作方式和视觉子目标来描述任务，测试时也可以由世界模型生成视觉子目标。我们的接口输入具体候选动作并预测其后果，实验比较同一状态下不同动作的结果。 <a href="https://www.pi.website/blog/pi07">π0.7 研究报告</a></p>
-<h3>如何验证分支</h3>
-<p><strong>Rollback</strong> 从关键决策点回溯，在世界模型中对比反事实分支，用真实交互校正模型并蒸馏改进策略。这里用物理仿真恢复同一快照，逐个执行准备动作，再用相同的冻结技能测成功。这样能分别测出准备动作的效果、WM 排序误差和触发器的成本收益。 <a href="https://arxiv.org/abs/2610.36068">Rollback</a></p>
-<h3>如何更新策略与改进器</h3>
-<p><strong>RISE</strong> 用多视角世界模型和进度价值模型，在想象轨迹上估计优势并更新策略。<strong>Prophet</strong> 提供可接收指定连续动作的视频模型，<strong>πRL</strong> 提供 flow-based VLA 的在线 RL 方法。本提案先用 Prophet 选分支，用环境结果给连续动作 RL 提供奖励。 <a href="https://arxiv.org/abs/2602.11075">RISE</a> · <a href="https://arxiv.org/abs/2511.20633">Prophet</a> · <a href="https://arxiv.org/abs/2510.25889">πRL</a></p>
-<p><strong>AdaRSI</strong> 从保存的状态重试失败子任务，判断何时调整执行流程、何时微调执行器。<strong>Physical2RSI</strong> 区分行为改善、改进过程改善，以及改进器对自身后续迭代的贡献。这里用等预算的新学生实验检验后期选择器是否更有效，再让它选择下一轮实验，比较更新前后的学习曲线。 <a href="https://arxiv.org/abs/2610.20474">AdaRSI</a> · <a href="https://arxiv.org/abs/2610.29677">Physical2RSI</a></p>
-</section>
-<footer><a href="#top">返回顶部</a></footer>
 </main>
 </body>
 </html>

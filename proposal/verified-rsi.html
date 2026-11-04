@@ -254,6 +254,27 @@ figcaption{font-size:1rem;color:var(--ink)}
   .hero-evidence p{margin-top:.6mm}
 }
 
+.pitch-lead{font-size:clamp(1.08rem,2.4vw,1.28rem);line-height:1.68}
+.pitch-diagram .column-title{font-size:16px;font-weight:700}
+.pitch-diagram .direct-edge{stroke:#3e7769}
+.claim-tests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.claim-tests article{border-top:2px solid var(--line);padding-top:.55rem}
+.claim-tests h3{margin-bottom:.24rem}
+.related-notes{display:grid;gap:.42rem}
+@media(max-width:620px){.claim-tests{grid-template-columns:1fr}}
+@media print{
+  #question .pitch-lead{font-size:11pt;line-height:1.45}
+  #question .hero-figure{width:94%}
+  .claim-tests{gap:4mm}
+  .claim-tests article{padding-top:1.5mm}
+  .related-notes{gap:1mm}
+}
+@media screen{#question h1{max-width:900px;font-size:clamp(2.2rem,5.3vw,3.45rem)}}
+@media print{
+  #data .data-records{display:grid;gap:1mm;font-size:8.2pt}
+  .page#related-work{break-before:auto;margin-top:6mm}
+}
+
 .moka-pilot{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem}
 .pilot-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
 .pilot-videos figure{margin-inline:0}
@@ -285,92 +306,54 @@ figcaption{font-size:1rem;color:var(--ink)}
 <main id="top">
 <header class="sitebar">
 <a class="site-name" href="../">When to Think</a>
-<nav aria-label="目录"><a href="#question">Abstract</a><a href="#flow">System</a><a href="#data">Data</a><a href="#models">Methods</a><a href="#protocol">Workflow</a><a href="#related-work">Appendix</a></nav>
+<nav aria-label="目录"><a href="#question">Idea</a><a href="#data">Data</a><a href="#models">Training</a><a href="#protocol">Validation</a><a href="#related-work">Related work</a></nav>
 </header>
 
 <section class="page" id="question">
 <h1>When to Think: <wbr>Selective Imagination for Self-Improving VLAs</h1>
-<figure class="hero-figure" id="flow" tabindex="0" aria-label="Training and evaluation overview"><svg class="diagram paper-overview" viewBox="0 0 1000 435" role="img" aria-labelledby="overview-title overview-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="overview-title">Data, model architecture and the recovery training loop</title>
-<desc id="overview-desc">Demonstrations, failed rollouts and expert-tagged recoveries feed a shared trace store. The pi-zero-point-five visual-language backbone feeds both the flow action expert and the budgeted gate. Direct ACT bypasses Cosmos through a separate execution route. On THINK, action proposals are evaluated by the action-conditioned world model and effect head before one prefix is executed. Verified successes train the action expert, observed transitions train Cosmos, and matched autonomous comparisons train the gate.</desc>
-<defs><marker id="o-arrow" viewBox="0 0 7 7" refX="6.6" refY="3.5" markerWidth="6.3" markerHeight="6.3" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="16" y="24">a</text>
-<text class="column-title" x="125" y="23">Training data</text>
-<text class="column-title" x="502" y="23">Selective world-model policy</text>
-<text class="column-title" x="882" y="23">Training objectives</text>
-<rect class="architecture-box" x="251" y="43" width="491" height="174" rx="6"/>
-<rect class="think-box" x="260" y="244" width="345" height="68" rx="5"/>
+<p class="pitch-lead" id="abstract">长程操作里，真正需要推演的往往是反复卡住的几步。我们让 VLA 默认直接执行，只有在预期恢复收益足以抵消耗时时，才从当前观测并行预演四条路径。</p>
+<figure class="hero-figure pitch-flow" id="flow" tabindex="0" aria-label="Selective imagination and real execution">
+<svg class="diagram pitch-diagram" viewBox="0 0 1000 304" role="img" aria-labelledby="pitch-title pitch-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="pitch-title">Think selectively, act on the real state</title>
+<desc id="pitch-desc">The Gate uses observation history and remaining budget. The default path executes a policy action chunk directly. When imagination is expected to repay its cost, one SYNC point seeds four separate Pi and Cosmos branches. The Effect head ranks the predicted outcomes. In either path only a short action prefix is executed and a real observation starts the next decision.</desc>
+<defs><marker id="pitch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
+<text class="column-title" x="500" y="25">One decision · two paths · one real execution</text>
+<rect class="act-box" x="370" y="48" width="206" height="36" rx="5"/>
+<text class="label" x="473" y="71">Direct ACT · default</text>
+<path class="edge direct-edge" d="M271 133V66h96" marker-end="url(#pitch-arrow)"/>
+<path class="edge direct-edge" d="M576 66h337v59" marker-end="url(#pitch-arrow)"/>
 
-<g class="edge" marker-end="url(#o-arrow)">
-<path d="M225 76h23"/><path d="M225 163h23"/><path d="M124 207v9"/>
-<path d="M502 83v13"/><path d="M502 134v13H384v15"/><path d="M502 147h118v15"/>
-<path d="M384 207v34"/><path d="M547 207v34"/>
-<path d="M433 312v18"/>
-<path d="M721 350h30V78h20"/><path d="M751 175h20"/><path d="M751 264h20"/>
+<rect class="encoder-box" x="22" y="133" width="144" height="64" rx="5"/>
+<text class="label" x="94" y="158">Real observation</text><text class="sub" x="94" y="179">History + subgoal</text>
+<rect class="gate-box" x="198" y="133" width="147" height="64" rx="5"/>
+<text class="label" x="271" y="157">Gate</text><text class="sub" x="271" y="179">Gain vs. time cost</text>
+<rect class="think-box" x="378" y="133" width="110" height="64" rx="5"/>
+<text class="label" x="433" y="157">THINK</text><text class="sub" x="433" y="179">SYNC once</text>
+<rect class="gate-box" x="728" y="133" width="91" height="64" rx="5"/>
+<text class="label" x="773.5" y="157">SELECT</text><text class="sub" x="773.5" y="179">Effect score</text>
+<rect class="act-box" x="850" y="128" width="126" height="74" rx="5"/>
+<text class="label" x="913" y="152">Execute prefix</text><text class="sub" x="913" y="172">Real environment</text><text class="sub" x="913" y="189">Then reobserve</text>
+
+<g class="edge" marker-end="url(#pitch-arrow)">
+<path d="M166 165h29"/><path d="M345 165h30"/><path d="M819 165h28"/>
+<path d="M510 111h19"/><path d="M510 147h19"/><path d="M510 183h19"/><path d="M510 219h19"/>
+<path d="M708 165h17"/>
 </g>
-<path class="return feedback" d="M503 371v24H123v-90" marker-end="url(#o-arrow)"/>
-<path class="edge" d="M503 371v24h218" marker-end="url(#o-arrow)"/>
-<g class="edge" marker-end="url(#o-arrow)">
-<path d="M372 281h9"/><path d="M488 281h9"/>
-<path class="act-edge" d="M676 207v45"/><path class="act-edge" d="M676 302v28"/>
-</g>
-
-<g class="data-box">
-<rect x="23" y="43" width="202" height="66" rx="5"/>
-<text class="label" x="124" y="70">Expert demonstrations</text>
-<text class="sub" x="124" y="92">Language + native actions</text>
-<rect x="23" y="121" width="202" height="86" rx="5"/>
-<image href="media/moka-stall.jpg" x="33" y="132" width="64" height="64" preserveAspectRatio="xMidYMid slice"/>
-<text class="label" x="157" y="154">Failed rollouts</text>
-<text class="sub" x="160" y="177">Stalled attempts</text>
-<rect x="23" y="219" width="202" height="83" rx="5"/>
-<text class="label" x="124" y="246">Expert corrections</text>
-<text class="sub" x="124" y="268">Tag → VLA recovery</text>
-<text class="sub" x="124" y="286">Verified recovery → SFT</text>
-</g>
-
-<text class="label" x="502" y="62">π0.5 vision–language–action policy</text>
-<text class="sub" x="502" y="81">Cameras · proprioception · instruction</text>
-<rect class="encoder-box" x="283" y="98" width="438" height="36" rx="4"/>
-<text class="label" x="502" y="121">Vision–language backbone</text>
-<rect class="gate-box" x="283" y="165" width="202" height="42" rx="4"/>
-<text class="label" x="384" y="184">Gate</text><text class="sub" x="384" y="201">History + compute budget</text>
-<rect class="expert-box" x="520" y="165" width="201" height="42" rx="4"/>
-<text class="label" x="620" y="184">Flow action expert</text><text class="sub" x="620" y="201">Native action proposals</text>
-
-<text class="smallcaps" x="433" y="262">THINK · only when useful</text>
-<rect class="think-unit" x="272" y="268" width="100" height="27" rx="3"/>
-<rect class="think-unit" x="384" y="268" width="104" height="27" rx="3"/>
-<rect class="think-unit" x="500" y="268" width="93" height="27" rx="3"/>
-<text class="sub" x="322" y="286">Candidates</text>
-<text class="sub" x="436" y="286">Cosmos 2.5</text>
-<text class="sub" x="546.5" y="286">Effect ranker</text>
-<rect class="direct-route" x="620" y="255" width="113" height="47" rx="4"/>
-<text class="label" x="676.5" y="275">Direct ACT</text>
-<text class="sub" x="676.5" y="292">Skip Cosmos</text>
-<rect class="act-box" x="284" y="333" width="432" height="38" rx="5"/>
-<text class="label" x="500" y="356">ACT · execute a short prefix and reobserve</text>
-
+<path class="edge" d="M488 165h22m0-54v108M688 111h20v108h-20M688 147h20m-20 36h20"/>
 <g>
-<rect class="expert-box" x="774" y="43" width="203" height="70" rx="5"/>
-<text class="label" x="875" y="68">Policy SFT</text>
-<text class="sub" x="875" y="89">Expert-corrected VLA traces</text>
-<rect class="world-fill" x="774" y="135" width="203" height="79" rx="5"/>
-<text class="label" x="875" y="161">WM update</text>
-<text class="sub" x="875" y="182">Observed futures</text>
-<text class="sub" x="875" y="200">+ executed commands</text>
-<rect class="gate-box" x="774" y="226" width="203" height="77" rx="5"/>
-<text class="label" x="875" y="250">Gate + online RL</text>
-<text class="sub" x="875" y="270">Matched ACT / THINK</text>
-<text class="sub" x="875" y="288">+ on-policy outcomes</text>
+<rect class="world-fill" x="532" y="96" width="156" height="30" rx="4"/><text class="sub" x="610" y="116">1 · π → Cosmos → π</text>
+<rect class="world-fill" x="532" y="132" width="156" height="30" rx="4"/><text class="sub" x="610" y="152">2 · π → Cosmos → π</text>
+<rect class="world-fill" x="532" y="168" width="156" height="30" rx="4"/><text class="sub" x="610" y="188">3 · π → Cosmos → π</text>
+<rect class="world-fill" x="532" y="204" width="156" height="30" rx="4"/><text class="sub" x="610" y="224">4 · π → Cosmos → π</text>
 </g>
-<text class="edge-label" x="145" y="388">Observed training traces → next round</text>
-<rect class="eval-box" x="724" y="378" width="253" height="34" rx="4"/>
-<text class="smallcaps" x="850" y="391">Held-out evaluation</text>
-<text class="sub" x="850" y="406">LIBERO · RoboDojo · RoboCasa365</text>
-</svg></figure>
+<text class="sub" x="610" y="253">Each predicted observation feeds its own branch</text>
+<path class="return feedback" d="M913 202v74H94v-76" marker-end="url(#pitch-arrow)"/>
+<text class="sub" x="500" y="295">New real observation → next decision</text>
+</svg>
+</figure>
+<p>π0.5 提出动作，Cosmos 预测后继观测，再把预测回传给各自分支。选择后只在真实环境执行一小段。同起点的实测对照教 Gate 何时调用，成功恢复教策略怎样脱困。再用学生的学习增益决定下一轮采什么。</p>
 <figure class="hero-evidence" aria-labelledby="hero-evidence-title">
-<figcaption id="hero-evidence-title"><strong>Recovery in simulation</strong><span>LIBERO-10 · 双摩卡壶，同一快照的两条实测分支</span></figcaption>
+<figcaption id="hero-evidence-title"><strong>What recovery looks like</strong><span>LIBERO-10 · 双摩卡壶，同一快照的两条实测分支</span></figcaption>
 <div class="hero-frames">
 <div class="hero-frame hero-frame-sync">
 <img src="data:image/webp;base64,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" width="420" height="354" alt="第 210 步复位点，第一只摩卡壶已在炉灶上，第二只仍在桌面">
@@ -389,76 +372,44 @@ figcaption{font-size:1rem;color:var(--ink)}
 <div><span>SUCCESS · 498</span><strong>两只上炉，任务完成</strong></div>
 </div>
 </div>
-<p>这次恢复由提示引导，VLA 执行动作。<a href="pilot/moka-pilot.json">配对试跑记录</a></p>
+<p>提示引导的恢复示例。两条分支由同一个 VLA 执行。<a href="pilot/moka-pilot.json">配对试跑记录</a></p>
 </figure>
-<h2 class="abstract-heading" id="abstract">Abstract</h2>
-<p class="deck">在未见布局或技能组合中，视觉–语言–动作模型（VLA）可能在完成部分子目标后反复重试同一动作。世界模型可以预演不同恢复动作的后果，但每个决策点都调用会增加延迟，连续预测也会累积误差。我们提出一种按需预演的方法：门控根据当前观测和近期进展，估计调用世界模型相对于直接执行的收益。预期收益足以抵消调用成本时进入 THINK，其余决策由 π0.5 直接执行（ACT）。</p>
-<p class="deck">当重复失败触发 SYNC，系统记录当前观测和已执行前缀，并以同一观测启动四条候选分支。每条分支交替调用 π0.5 生成动作和动作条件 Cosmos 预测后继观测。系统按预测的子目标进展选择分支，只在真实环境执行短前缀，随后重新观测。采集时，将通过环境成功判定的恢复动作与原轨迹前缀拼接，用于监督微调 π0.5。按时间步配对的预测与实测观测用于校正 Cosmos。</p>
-<p class="deck">后续以真实回报更新门控和策略，再根据同一起点学生在保留任务上的学习增益调整下一轮采样。我们将检验在相同世界模型调用预算下，学习式门控能否提高恢复成功率，以及在相同训练与交互预算下，更新后的采样器能否让新学生学得更快。目前的 LIBERO-90 试验已复现停滞并保存校准记录，四路 Cosmos 预演能否带来实际恢复仍待验证。</p>
-<h3>When a task stalls</h3>
-<p>比如一手已经稳住笔筒，另一手却连续无法插入下一支笔。若连续若干重规划点没有新增进展，Gate 可发出 <strong>THINK</strong>。先检查最近的有效子目标，比较继续尝试、撤回重对齐和换视角；必要时只对高价值候选追加一段预演。回看的是历史观测与决策，部署时的所有候选从当前真实状态开始。选中可行动作后发出 <strong>ACT</strong>，只提交一段并重新观测。没有可信分支时转入可执行的重新观察或停止。</p>
-<p>首版采用<strong>同一个 π0.5 执行器 + Gate + 动作条件 WM</strong>。THINK 路径由候选生成器、Cosmos 和 effect head 组成，提供 WAM 式的提议与预演接口；独立 WAM 只作为候选生成器的对照。</p>
-
 </section>
 <section class="page" id="data">
-<h2>Data and supervision</h2>
+<h2>Data from replayable stalls</h2>
+<p>用训练集示范初始化策略，随后冻结 π0.5 和 Cosmos 采集轨迹，保留成功和失败。每个 SYNC 快照走两条采集路线，专家提示教策略怎样脱困，自动 ACT / THINK 对照教 Gate 何时值得调用。</p>
 <figure class="data-flow-figure" id="recovery-sft">
-<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Paired recovery experiment">
-<svg class="diagram data-flow" viewBox="0 0 940 357" role="img" aria-labelledby="capture-title capture-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="capture-title">a · Collect a paired recovery</title>
-<desc id="capture-desc">The LIBERO two-moka-pot pilot rolled back to step 210. An unassisted run stalled and timed out at step 520. From the same snapshot, a manually written cue helped the VLA lift the second pot. The VLA switched back to the original instruction at step 417 and succeeded at step 498. The planned dataset will require human review of recovery, retained progress and official success.</desc>
-<defs><marker id="capture-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 8 4 0 8Z"/></marker></defs>
-
-<text class="panel" x="20" y="26">a</text><text class="left label" x="49" y="26">Collect a paired recovery</text>
-<text class="right sub" x="920" y="26">LIBERO-10 · two moka pots</text>
+<div class="data-flow-scroll" tabindex="0" role="region" aria-label="How recovery and gate supervision are collected">
+<svg class="diagram data-flow" viewBox="0 0 940 225" role="img" aria-labelledby="capture-title capture-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="capture-title">a · Collect supervision from a replayable stall</title>
+<desc id="capture-desc">Train-only demonstrations initialize the policy. Freeze policy and world model during collection. When a rollout stalls, restore the same SYNC snapshot for expert-guided VLA recovery and for paired automatic ACT and THINK. A reviewer accepts successful recoveries; the automatic pair yields real returns and timing.</desc>
+<defs><marker id="capture-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
+<text class="panel" x="20" y="26">a</text><text class="left label" x="49" y="26">Collect from the same stall</text>
 <path class="rule" d="M20 36H920"/>
-
-<rect class="sync-tint" x="20" y="55" width="235" height="235" rx="5"/>
-<text class="left eyebrow" x="34" y="77">FROZEN π0.5 ROLLOUT</text>
-<image href="media/moka-stall.jpg" x="34" y="88" width="207" height="124" preserveAspectRatio="xMidYMax slice"/>
-<text class="left label" x="34" y="235">Second pot stalls</text>
-<text class="left sub" x="34" y="257">First pot already on the stove</text>
-<text class="left sub" x="34" y="276">Restore sim, controller and RNG</text>
-
-<path class="rail ink-rail" d="M255 171H292M379 171H405M405 114V229"/>
-<path class="rail fail-rail" d="M405 114H729" marker-end="url(#capture-arrow)"/>
-<path class="rail act-rail" d="M405 229H729" marker-end="url(#capture-arrow)"/>
-<rect class="sync-pill" x="292" y="145" width="87" height="52" rx="6"/>
-<text class="label" x="335.5" y="167">SYNC</text>
-<text class="sub" x="335.5" y="186">step 210</text>
-
-<text class="left label" x="428" y="91">Unassisted control</text>
-<text class="left sub" x="428" y="140">Same original instruction</text>
-<text class="left sub" x="428" y="158">Repeated attempts · frame 360</text>
-<rect class="fail-tint" x="740" y="55" width="180" height="112" rx="5"/>
-<image href="pilot/moka-control.jpg" x="748" y="62" width="164" height="74" preserveAspectRatio="xMidYMax slice"/>
-<text class="label" x="830" y="156">Timeout · 520</text>
-
-<text class="left label" x="428" y="204">Hint-guided π0.5</text>
-<circle class="act-node" cx="445" cy="229" r="5.5"/><circle class="act-node" cx="585" cy="229" r="5.5"/>
-<text class="left sub" x="428" y="255">Tag stall + cue</text>
-<text class="left sub" x="575" y="255">Lift · 417</text>
-<text class="left sub" x="575" y="273">Resume original task</text>
-<rect class="act-tint" x="740" y="172" width="180" height="118" rx="5"/>
-<image href="pilot/moka-recovery.jpg" x="748" y="179" width="164" height="79" preserveAspectRatio="xMidYMax slice"/>
-<text class="label" x="830" y="279">Success · 498</text>
-
-<rect class="review-tint" x="20" y="308" width="900" height="35" rx="4"/>
-<text class="left label" x="34" y="331">100 planned</text>
-<text class="left sub" x="164" y="331">Human review requires recovery, preserved progress and official task success</text>
+<rect class="sync-tint" x="20" y="94" width="223" height="69" rx="5"/>
+<text class="left label" x="34" y="118">SYNC · replayable stall</text><text class="left sub" x="34" y="140">Save state, controller and RNG</text>
+<path class="edge" d="M243 128h35m0-39v81"/>
+<g class="edge" marker-end="url(#capture-arrow)"><path d="M278 89h32"/><path d="M278 170h32"/><path d="M577 89h38"/><path d="M577 170h38"/></g>
+<rect class="act-tint" x="313" y="54" width="264" height="70" rx="5"/>
+<text class="left label" x="327" y="79">Expert-guided π0.5</text><text class="left sub" x="327" y="101">Tag stall → guide → resume task</text>
+<rect class="act-tint" x="618" y="54" width="302" height="70" rx="5"/>
+<text class="left label" x="632" y="79">Verified recovery</text><text class="left sub" x="632" y="101">Recovery, progress kept, task success</text>
+<rect class="gate-tint" x="313" y="135" width="264" height="70" rx="5"/>
+<text class="left label" x="327" y="160">Automatic ACT vs. THINK</text><text class="left sub" x="327" y="182">Same snapshot and execution horizon</text>
+<rect class="gate-tint" x="618" y="135" width="302" height="70" rx="5"/>
+<text class="left label" x="632" y="160">Matched real outcomes</text><text class="left sub" x="632" y="182">Return, latency and retained progress</text>
 </svg>
 </div>
-<figcaption>试跑使用人工编写的提示，VLA 执行全部动作。该条尚待专家复核。<a href="pilot/moka-pilot.json">试跑记录</a></figcaption>
 </figure>
 
 <figure class="data-flow-figure" id="supervision-routes">
 <div class="data-flow-scroll" tabindex="0" role="region" aria-label="Trajectory record and model supervision">
-<svg class="diagram data-flow" viewBox="0 0 940 380" role="img" aria-labelledby="record-title record-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="record-title">b · Turn one record into three training signals</title>
-<desc id="record-desc">A frame log synchronizes cameras, proprioception, commands, and measured results by step. An imagined branch is stored separately under its snapshot ID. Intent is available before acting; outcome is post-rollout supervision; provenance identifies the source for filtering and audit. Verified real actions plus demonstrations train pi 0.5, measured transitions including failures train Cosmos, and automatic ACT and THINK executed from the same snapshot provide a latency-adjusted Gate target.</desc>
+<svg class="diagram data-flow" viewBox="0 0 940 255" role="img" aria-labelledby="record-title record-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="record-title">b · Record observations and provenance</title>
+<desc id="record-desc">A frame log synchronizes cameras, proprioception, commands, and measured results by step. An imagined branch is stored separately under its snapshot ID. Intent is available before acting; outcome is post-rollout supervision; provenance identifies the source for filtering and audit. </desc>
 <defs><marker id="record-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
 
-<text class="panel" x="20" y="26">b</text><text class="left label" x="49" y="26">Turn one record into three training signals</text>
+<text class="panel" x="20" y="26">b</text><text class="left label" x="49" y="26">Record observations and provenance</text>
 <path class="rule" d="M20 36H920"/>
 <rect class="record-tint" x="20" y="51" width="602" height="167" rx="5"/>
 <text class="left eyebrow" x="34" y="73">TRAJECTORY RECORD</text>
@@ -483,69 +434,19 @@ figcaption{font-size:1rem;color:var(--ink)}
 <rect class="source-tag" x="644" y="169" width="276" height="50" rx="4"/>
 <text class="left label" x="659" y="190">Provenance</text><text class="left sub" x="659" y="208">Demo / policy / guided / imagined</text>
 
-<path class="edge" d="M321 218v20M163 238H776"/>
-<g class="edge" marker-end="url(#record-arrow)"><path d="M163 238v14"/><path d="M469 238v14"/><path d="M776 238v14"/></g>
-<rect class="act-tint" x="20" y="257" width="286" height="92" rx="5"/>
-<text class="left label" x="34" y="280">π0.5 · SFT</text>
-<text class="left sub" x="34" y="304">Verified real recovery + demos</text>
-<text class="left sub" x="34" y="328">Observation + task → executed action</text>
-
-<rect class="record-tint" x="326" y="257" width="286" height="92" rx="5"/>
-<text class="left label" x="340" y="280">Cosmos · fine-tune</text>
-<text class="left sub" x="340" y="304">All real transitions, including failures</text>
-<text class="left sub" x="340" y="328">Start + commands → measured frames</text>
-
-<rect class="gate-tint" x="632" y="257" width="288" height="92" rx="5"/>
-<text class="left label" x="646" y="280">Gate · predict value of THINK</text>
-<text class="left sub" x="646" y="304">Matched automatic ACT vs. THINK</text>
-<text class="left sub" x="646" y="328">Target: Δ return − λ × Δ latency</text>
-<text class="left sub" x="20" y="371">Split by task and initial state · keep all branches from one snapshot in the same split</text>
+<text class="left sub" x="20" y="244">Split by task and initial state · keep all branches from one snapshot in the same split</text>
 </svg>
 </div>
 <figcaption>示范来源 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO</a> · <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo</a></figcaption>
 </figure>
 <div class="data-records">
-<h3>Data sources, schema and example record</h3>
-<div class="data-record-body">
-<ol>
-<li><strong>Warm start.</strong> 从 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO demonstrations</a> 与 <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo 官方训练示范</a>分别对齐原生动作、相机和任务阶段。RoboDojo 的 Open 与最终评测 seeds 不进入训练。</li>
-<li><strong>Collect.</strong> 每轮冻结 π 与 WM，采集 ACT 顺畅段、频繁 THINK 段、失败与近成功。优先验证想象花费高且确有提升的片段，保留随机对照。先在 LIBERO 收集 100 条专家引导、由 VLA 执行的成功恢复轨迹，再在 RoboDojo 重做回放验收。</li>
-<li><strong>Branch and verify.</strong> 每个快照执行等长的默认动作、准备动作和保持对照；恢复随机数、控制器与物理状态，后续接相同冻结技能与时限。另从同点比较 Direct 与 WM 选出的分支，记录实测回报差、额外时延和此前子目标是否保持。RoboDojo 复位需先通过回放一致性检查。</li>
-</ol>
-<h3>Canonical record</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Canonical dataset schema">
-<table><colgroup><col style="width:23%"><col style="width:77%"></colgroup><thead><tr><th scope="col">Storage</th><th scope="col">Fields</th></tr></thead><tbody>
-<tr><td>Frame rows</td><td><code>episode_id, t_ns, frame_idx, state_f32[Dₛ], action_cmd_f32[Dₐ], mode, reward, terminated, truncated</code>；各相机 MP4 按时间戳和偏移对齐。</td></tr>
-<tr><td>Branch sidecar</td><td><code>pair_id, snapshot_id, parent_episode, start_idx, K, valid_mask, intent, outcome, provenance</code>；同快照的兄弟分支同属一个 split。</td></tr>
-<tr><td>Manifest</td><td><code>embodiment, controller, action_frame, units, control_hz, camera_ids, norm_stats_id, sim_revision, split</code>；按任务族、布局和起点隔离 train/dev/test。</td></tr>
-</tbody></table></div>
-<h3>Three tag families</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Three data tag families">
-<table><colgroup><col style="width:20%"><col style="width:43%"><col style="width:37%"></colgroup><thead><tr><th scope="col">Tag</th><th scope="col">Example fields</th><th scope="col">Consumer</th></tr></thead><tbody>
-<tr><td>Intent</td><td><code>goal, subtask, phase</code>。例：<code>fill_pen_holder → regrasp_pen → recover</code>。</td><td>π 与 Gate 可读当前已知目标与阶段；保留无阶段标签的对照。</td></tr>
-<tr><td>Outcome</td><td><code>success, progress_delta, retained, contact_event, failure_type</code>。</td><td>排序监督、奖励和筛样。未来结果从推理输入移除。</td></tr>
-<tr><td>Provenance</td><td><code>source={demo,policy,intervention,imagined}, policy_rev, wm_rev, branch_role</code>。</td><td>用于采样与审计。THINK 的合成帧另存，WM 目标来自实测环境。</td></tr>
-</tbody></table></div>
-<p>主存储采用 <a href="https://github.com/huggingface/lerobot/blob/main/docs/source/lerobot-dataset-v3.mdx">LeRobot v3</a> 的 Parquet + 分相机 MP4，外加分支索引。为 OpenPI 导出其锁定版本；为 Cosmos 导出首帧、对齐的视频窗口与动作 JSON。实际轨迹按 <code>observation → intent → [THINK] → ACT(command) → observation</code> 记录；括号内为可选模式，预演分支通过 <code>pair_id</code> 单独关联。标签借鉴 <a href="https://arxiv.org/abs/2504.16054">π0.5 的子任务</a>、<a href="https://arxiv.org/abs/2511.14759">RECAP 的经验与优势</a>和 <a href="https://arxiv.org/abs/2604.15483">π0.7 的上下文标注</a>，按逐类去标签消融。</p>
-<h3 id="cold-start">100 expert-verified recoveries</h3>
-<p><strong>Tag → Guide → Verify.</strong> 专家先从失败回放选点，复原并保存快照，标注卡住的阶段、可见症状和恢复子任务。专家给提示，VLA 输出并执行动作；一旦脱困，恢复原指令并继续到终局。只有 <code>recovered=true</code>、<code>retained=true</code> 且官方 <code>episode_success=true</code>，专家复核后才计入 100 条 SFT 正样本。</p>
-<p><strong>Training record.</strong> 保存 <code>snapshot_id, expert_tags, recovery_hint, guided_act.trajectory_ref, executor=VLA</code>，以及恢复帧、三个验收字段和专家复核状态。保留失败尝试。专家引导成功可教恢复动作；Gate 的净收益仍需从同一快照重跑自动 ACT 与自动 THINK，按同一时限和回报标准计算 <code>ΔR − λΔT</code>。专家接管则单独记为示教。</p>
-<h3>Example from a recorded failure</h3>
-<p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。另见<a href="#moka-pilot">已完成的配对恢复试跑</a>。</p>
-<pre class="sample-record" tabindex="0" aria-label="真实失败回合的待专家复核记录"><code>{
-  &quot;sample_id&quot;: &quot;libero10-t08-init01-f311&quot;,
-  &quot;intent&quot;: {&quot;task&quot;: &quot;put both moka pots on the stove&quot;, &quot;phase&quot;: &quot;second pot&quot;},
-  &quot;provenance&quot;: {&quot;source&quot;: &quot;baseline_rollout&quot;, &quot;init_index&quot;: 1, &quot;review_frames&quot;: [311, 519]},
-  &quot;snapshot_id&quot;: null, &quot;expert_tags&quot;: null, &quot;recovery_hint&quot;: null,
-  &quot;act&quot;: {&quot;video&quot;: &quot;media/moka-stall.mp4&quot;, &quot;episode_success&quot;: false},
-  &quot;guided_act&quot;: null, &quot;think&quot;: null, &quot;gate_target&quot;: null,
-  &quot;accept_for_sft&quot;: false, &quot;label_status&quot;: &quot;needs_expert_replay&quot;
-}</code></pre>
-</div>
+<p id="cold-start"><strong>Cold start.</strong> 目标是 100 条专家复核的 VLA 恢复轨迹。只有成功脱困、保留此前进度并通过官方终局判定，才把已执行动作并入 SFT。专家接管单独记为示教。</p>
+<p><strong>Record format.</strong> 按步号对齐原生动作、状态和分相机 MP4。分支索引记录 <code>snapshot_id, pair_id, valid_mask</code> 与三类标签。同一快照的所有分支进入同一划分。记录兼容 <a href="https://github.com/huggingface/lerobot/blob/main/docs/source/lerobot-dataset-v3.mdx">LeRobot v3</a>。</p>
+<p><strong>Recorded example.</strong> 双摩卡壶提示恢复记录含复位快照、标签、原生动作与对齐视频，已通过行为检查，待专家复核。<a href="pilot/moka-recovery-sft.zip">Parquet 样本</a> · <a href="pilot/moka-full-vla-trajectory.zip">完整轨迹</a></p>
 </div>
 </section>
 <section class="page" id="models">
-<h2>Joint training</h2>
+<h2>How each model learns</h2>
 <div class="model-list">
 <article class="model-card model-policy" id="model-policy">
 <h3>a · π0.5 policy</h3>
@@ -701,193 +602,27 @@ X_\tau&amp;=(1-\tau)X+\tau\varepsilon,\qquad\varepsilon\sim\mathcal N(0,I),\\
 <p class="model-round"><strong>Update schedule.</strong> 先拟合并冻结 Cosmos，再用真实回放训练 Effect 和 Gate，更新策略后采集下一轮数据。保留均匀采样和冻结版本对照。</p>
 </section>
 <section class="page" id="protocol">
-<h2>SYNC workflow</h2>
-<figure class="sync-flow-figure" tabindex="0" aria-label="SYNC workflow"><svg class="diagram sync-workflow" viewBox="0 0 1000 365" role="img" aria-labelledby="sync-flow-title sync-flow-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="sync-flow-title">Four imagined branches and the verified ACT trace</title>
-<desc id="sync-flow-desc">A single real SYNC snapshot seeds four independent branches. For each branch pi generates a candidate action chunk, the world model predicts the next observation, and pi receives that branch's predicted observation for another chunk. The selector chooses a branch at predicted success or a budget limit. The simulator restores the real snapshot and executes the selected prefix. Only real observed actions and frames enter SFT; predicted and real keyframes are paired for world-model calibration.</desc>
-<defs><marker id="syncflow-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="14" y="24">d</text><text class="column-title" x="505" y="24">One real checkpoint · four independent imagined futures</text>
-<rect class="architecture-box" x="18" y="115" width="143" height="56" rx="5"/>
-<text class="label" x="89" y="137">SYNC</text><text class="sub" x="89" y="155">Real observation</text>
-<path class="edge" d="M161 143h32m0-78v155"/>
-<g class="edge" marker-end="url(#syncflow-arrow)">
-<path d="M193 65h31"/><path d="M193 116h31"/><path d="M193 168h31"/><path d="M193 220h31"/>
-<path d="M321 65h22"/><path d="M442 65h22"/><path d="M574 65h27"/>
-<path d="M321 116h22"/><path d="M442 116h22"/><path d="M574 116h27"/>
-<path d="M321 168h22"/><path d="M442 168h22"/><path d="M574 168h27"/>
-<path d="M321 220h22"/><path d="M442 220h22"/><path d="M574 220h27"/>
-<path d="M742 65h18v78h27"/><path d="M742 116h18"/><path d="M742 168h18"/><path d="M742 220h18v-77"/>
-<path d="M885 174v94H746"/><path d="M511 298h-65"/>
-</g>
-<g class="source-fill">
-<rect x="227" y="48" width="94" height="34" rx="4"/><rect x="227" y="99" width="94" height="34" rx="4"/>
-<rect x="227" y="151" width="94" height="34" rx="4"/><rect x="227" y="203" width="94" height="34" rx="4"/>
-<text class="sub" x="274" y="70">Branch 1 · π</text><text class="sub" x="274" y="121">Branch 2 · π</text>
-<text class="sub" x="274" y="173">Branch 3 · π</text><text class="sub" x="274" y="225">Branch 4 · π</text>
-</g>
-<g>
-<rect class="think-box" x="346" y="48" width="96" height="34" rx="4"/><rect class="think-box" x="346" y="99" width="96" height="34" rx="4"/>
-<rect class="think-box" x="346" y="151" width="96" height="34" rx="4"/><rect class="think-box" x="346" y="203" width="96" height="34" rx="4"/>
-<text class="sub" x="394" y="70">WM predicts</text><text class="sub" x="394" y="121">WM predicts</text>
-<text class="sub" x="394" y="173">WM predicts</text><text class="sub" x="394" y="225">WM predicts</text>
-<rect class="architecture-box" x="467" y="48" width="107" height="34" rx="4"/><rect class="architecture-box" x="467" y="99" width="107" height="34" rx="4"/>
-<rect class="architecture-box" x="467" y="151" width="107" height="34" rx="4"/><rect class="architecture-box" x="467" y="203" width="107" height="34" rx="4"/>
-<text class="sub" x="520" y="70">π on prediction</text><text class="sub" x="520" y="121">π on prediction</text>
-<text class="sub" x="520" y="173">π on prediction</text><text class="sub" x="520" y="225">π on prediction</text>
-</g>
-<g>
-<rect class="world-fill" x="604" y="48" width="138" height="34" rx="4"/><rect class="world-fill" x="604" y="99" width="138" height="34" rx="4"/>
-<rect class="world-fill" x="604" y="151" width="138" height="34" rx="4"/><rect class="world-fill" x="604" y="203" width="138" height="34" rx="4"/>
-<text class="sub" x="673" y="70">Repeat until stop</text><text class="sub" x="673" y="121">Repeat until stop</text>
-<text class="sub" x="673" y="173">Repeat until stop</text><text class="sub" x="673" y="225">Repeat until stop</text>
-</g>
-<rect class="gate-box" x="790" y="111" width="192" height="63" rx="5"/>
-<text class="label" x="886" y="134">SELECT</text><text class="sub" x="886" y="154">Rank imagined outcomes</text>
-<rect class="act-box" x="514" y="267" width="229" height="63" rx="5"/>
-<text class="label" x="628" y="289">ACT from the real snapshot</text><text class="sub" x="628" y="312">Execute · reobserve · verify</text>
-<rect class="expert-box" x="205" y="267" width="237" height="63" rx="5"/>
-<text class="label" x="323" y="289">Merge only verified execution</text><text class="sub" x="323" y="312">Real prefix + real ACT → SFT</text>
-<path class="return feedback" d="M628 330v20H89V174" marker-end="url(#syncflow-arrow)"/>
-<text class="edge-label" x="273" y="344">Align predicted and observed keyframes for WM updates</text>
-</svg></figure>
-<ol>
-<li><strong>SYNC.</strong> 发现重复停滞后，保存真实观测、已执行前缀、可复位快照和当前子目标。四路从同一状态开始。</li>
-<li><strong>Imagine.</strong> 每路用自己的观测调用 π，WM 根据动作预测后继观测，再回灌给同一路 π。动作步号、预测帧及本体状态必须对齐。直到模型判断成功或达到预算。</li>
-<li><strong>SELECT → ACT.</strong> 选一条路径，从真实快照执行前缀并重观测。模型判断只用于挑路径；官方终局判定决定能否合并。</li>
-<li><strong>Save.</strong> 原前缀与真实执行片段拼成 SFT 记录。想象轨迹单独保存，按步号配对预测与实测关键帧，供 WM 校正。先准备 SFT，之后再做 RL。</li>
-</ol>
-<div class="supplemental-diagrams"><h3>Inference and training diagrams</h3><div class="figures" aria-label="Inference and training diagrams">
-<figure id="inference-diagram">
-<svg class="diagram diagram-detailed" viewBox="0 0 420 535" role="img" aria-labelledby="infer-title infer-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="infer-title">Inference: budgeted imagination</title>
-<desc id="infer-desc">The gate chooses whether to invoke a world model. Direct execution uses the default chunk. Imagination predicts the effects of retry, reapproach and reobserve before selecting a chunk. A bounded action prefix leads to a real observation and the next decision.</desc>
-<defs><marker id="i-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="17" y="27">a</text><text class="label" x="210" y="27">Inference</text>
-<path class="return" d="M372 498H411V69H375" marker-end="url(#i-arrow)"/>
-<g class="edge" marker-end="url(#i-arrow)">
-<path d="M210 97V119"/><path d="M210 171V189H88V219"/><path d="M210 189H290V219"/>
-<path d="M88 298V374H210V394"/><path d="M290 349V374H210" marker-end="none"/>
-<path d="M210 451V477"/>
-</g>
-<g class="node">
-<rect x="48" y="42" width="324" height="55"/>
-<g class="glyph"><rect x="61" y="54" width="24" height="16"/><rect x="67" y="61" width="24" height="16"/><path d="m70 74 5-4 4 3 5-6 4 3"/></g>
-<text class="label" x="222" y="63">Observe the current state</text>
-<text class="sub" x="222" y="83">Cameras · proprioception · history</text>
-</g>
-<g class="node">
-<rect x="48" y="122" width="324" height="49"/>
-<text class="label" x="210" y="143">Estimate the value of imagination</text>
-<text class="sub" x="210" y="162">Expected gain − compute cost</text>
-</g>
-<text class="edge-label" x="96" y="209">Skip</text><text class="edge-label" x="298" y="209">Invoke</text>
-<g class="node">
-<rect x="17" y="222" width="142" height="76"/>
-<text class="label" x="88" y="245">ACT · Direct</text>
-<text class="sub" x="88" y="264">Default chunk</text>
-<path class="edge" d="M48 282H128" marker-end="url(#i-arrow)"/>
-<circle cx="48" cy="282" r="2.7"/><circle cx="68" cy="282" r="2"/><circle cx="88" cy="282" r="2"/><circle cx="108" cy="282" r="2"/>
-</g>
-<g class="node">
-<rect x="181" y="222" width="218" height="127"/>
-<text class="label" x="290" y="243">THINK · Branch</text>
-<path class="edge" d="M290 249v6m0 0h-69v9m69-9v9m0-9h69v9"/>
-<rect x="189" y="265" width="64" height="24"/><rect x="256" y="265" width="68" height="24"/><rect x="327" y="265" width="64" height="24"/>
-<text class="small" x="221" y="281">Retry</text><text class="small" x="290" y="281">Reapproach</text><text class="small" x="359" y="281">Reobserve</text>
-<path class="edge" d="M221 289v9h138v-9m-69 0v9"/><path class="edge" d="M290 298v9" marker-end="url(#i-arrow)"/>
-<text class="label" x="290" y="324">Rank predicted effects</text>
-<text class="sub" x="290" y="341">Common horizon · frozen skill</text>
-</g>
-<g class="node">
-<rect x="48" y="397" width="324" height="54" class="emphasis"/>
-<text class="label" x="210" y="419">ACT · Execute a short prefix</text>
-<text class="sub" x="210" y="439">Use default if no branch is reliable</text>
-</g>
-<g class="node">
-<rect x="48" y="480" width="324" height="36"/>
-<text class="label" x="210" y="503">Observe the actual outcome</text>
-</g>
-</svg>
-
-</figure>
-<figure id="training-diagram">
-<svg class="diagram diagram-detailed" viewBox="0 0 420 535" role="img" aria-labelledby="train-title train-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="train-title">Training: paired replay and recursive experiment selection</title>
-<desc id="train-desc">The selector samples a failure snapshot. Prepare, retry and hold branches share the same initial snapshot and frozen downstream skill. Verified outcomes feed the gate and VLA. Selected and control data train two matched students, whose development gain updates the selector.</desc>
-<defs><marker id="t-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="17" y="27">b</text><text class="label" x="210" y="27">Training</text>
-<path class="return" d="M399 498H411V69H375" marker-end="url(#t-arrow)"/>
-<g class="edge" marker-end="url(#t-arrow)">
-<path d="M210 97V119"/><path d="M210 265V287H98V313"/><path d="M210 287H299V313"/>
-<path d="M299 441V477"/>
-</g>
-<g class="node">
-<rect x="48" y="42" width="324" height="55"/>
-<text class="label" x="210" y="63">Select experiments</text>
-<text class="sub" x="210" y="83">Snapshot pool · exploration quota</text>
-</g>
-<g class="node">
-<rect x="17" y="122" width="382" height="143"/>
-<text class="label" x="210" y="144">Replay the same snapshot</text>
-<circle cx="210" cy="157" r="4" fill="none" stroke="var(--ink)"/>
-<g class="edge" marker-end="url(#t-arrow)"><path d="M206 160 79 183"/><path d="M210 161v22"/><path d="m214 160 126 23"/></g>
-<rect x="35" y="186" width="88" height="24"/><rect x="166" y="186" width="88" height="24"/><rect x="296" y="186" width="88" height="24"/>
-<text class="sub" x="79" y="203">Prepare</text><text class="sub" x="210" y="203">Retry</text><text class="sub" x="340" y="203">Hold</text>
-<path class="edge" d="M79 210v12h261v-12m-130 0v12"/><path class="edge" d="M210 222v11" marker-end="url(#t-arrow)"/>
-<text class="label" x="210" y="250">Same frozen skill → verified outcomes</text>
-</g>
-<text class="edge-label" x="106" y="305">Inner loop</text><text class="edge-label" x="307" y="305">Outer loop</text>
-<g class="node">
-<rect x="17" y="316" width="162" height="125"/>
-<text class="label" x="98" y="340">Update gate + VLA</text>
-<path class="edge" d="M30 352h136"/>
-<text class="sub" x="98" y="372">Paired gain → gate</text>
-<text class="sub" x="98" y="393">Verified actions → SFT</text>
-<text class="sub" x="98" y="414">Real rollouts → PPO</text>
-</g>
-<g class="node">
-<rect x="199" y="316" width="200" height="125"/>
-<text class="label" x="299" y="340">Train matched students</text>
-<path class="edge" d="M299 346v7m0 0h-47v8m47-8h47v8"/>
-<rect x="211" y="363" width="82" height="24"/><rect x="305" y="363" width="82" height="24"/>
-<text class="sub" x="252" y="380">Selected</text><text class="sub" x="346" y="380">Control</text>
-<path class="edge" d="M252 387v10h94v-10"/><path class="edge" d="M299 397v10" marker-end="url(#t-arrow)"/>
-<text class="sub" x="299" y="427">Measure dev learning gain</text>
-</g>
-<g class="node">
-<rect x="199" y="480" width="200" height="36" class="emphasis"/>
-<text class="label" x="299" y="503">Update selector</text>
-</g>
-</svg>
-
-</figure>
-</div><figure class="signal-figure" id="supervision-diagram" tabindex="0" aria-label="Supervision routes"><svg class="diagram signal-diagram" viewBox="0 0 840 145" role="img" aria-labelledby="signals-title signals-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="signals-title">Supervision routes by trainable module</title>
-<desc id="signals-desc">Verified outcomes supervise the effect head and gate. Successful trajectories and on-policy rollouts update the action expert. Development gains update only the selector.</desc>
-<defs><marker id="s-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="17" y="26">c</text>
-<text class="label" x="420" y="25">Supervision routes</text>
-<g>
-<rect x="16" y="40" width="258" height="37"/><text class="label" x="145" y="64">Paired branch outcomes</text>
-<rect x="291" y="40" width="258" height="37"/><text class="label" x="420" y="64">Verified and on-policy actions</text>
-<rect x="566" y="40" width="258" height="37"/><text class="label" x="695" y="64">Paired development gains</text>
-</g>
-<g class="edge" marker-end="url(#s-arrow)"><path d="M145 77V99"/><path d="M420 77V99"/><path d="M695 77V99"/></g>
-<g class="accent">
-<rect x="16" y="102" width="258" height="31"/><text class="label" x="145" y="123">Effect head + gate</text>
-<rect x="291" y="102" width="258" height="31"/><text class="label" x="420" y="123">Action expert + critic</text>
-<rect x="566" y="102" width="258" height="31"/><text class="label" x="695" y="123">Experiment selector</text>
-</g>
-</svg></figure></div>
+<h2>What would validate it?</h2>
+<div class="claim-tests">
+<article><h3>01 · Is THINK worth the call?</h3><p>在未见任务上固定 π0.5、Cosmos、候选数和调用预算。比较学习式 Gate、固定频率和置信度触发，报告恢复率、任务成功率和耗时。先核验同起点分支的排序与短时接触预测。</p></article>
+<article><h3>02 · Does the system get better at learning?</h3><p>从同一起点训练两组学生，匹配环境交互、更新步数与计算预算。比较 Selector 和均匀采样在保留任务上的学习增益，再复验下一轮收益。用冻结／更新 π 和 Cosmos 的 2×2 对照定位增益来源。</p></article>
+</div>
+<p><strong>Benchmarks.</strong> LIBERO-90 用于单臂恢复，RoboDojo 用于双臂协作，RoboCasa365 用于新布局和长任务。按任务族、布局与初始条件隔离训练和测试，同一快照的分支留在同一划分。</p>
 <div class="moka-pilot" id="sync-pilot">
-<h3 id="failure-videos">Current pilot</h3>
-<p>LIBERO-90 抽屉任务在 400 步内未完成。第 200 步的 <code>SYNC</code> 已精确恢复，四个 π 动作前缀与第 205 步的真实观测已保存。<a href="sync-pilot-assets/libero90-sync-calibration.zip">下载校准记录</a>。试验进度到此为止。下一步验证 Cosmos 的预测能否驱动分支动作，并由环境确认恢复结果。</p>
+<h3 id="failure-videos">Calibration case</h3>
+<p>LIBERO-90 抽屉任务已复现失败并保存四个动作前缀及实测后继帧，可用于校验预测和实测的时间对齐。<a href="sync-pilot-assets/libero90-sync-calibration.zip">校准记录</a></p>
 <figure class="sync-video"><video controls playsinline preload="none" width="640" height="540" poster="sync-pilot-assets/libero90-sync200.png" aria-label="LIBERO-90 抽屉任务失败录像"><source src="sync-pilot-assets/libero90-drawer-baseline.mp4" type="video/mp4"></video></figure>
-<p id="moka-pilot"><a href="pilot/moka-pilot.json">双摩卡壶回溯试跑记录</a> · <a href="pilot/moka-recovery-sft.zip">历史提示恢复样本</a></p>
+<p id="moka-pilot"><a href="pilot/moka-pilot.json">双摩卡壶试跑记录</a> · <a href="pilot/moka-recovery-sft.zip">恢复样本</a></p>
 </div>
 </section>
 <section class="page" id="related-work">
-<h2>Appendix</h2>
+<h2>Related work and limits</h2>
+<div class="related-notes">
+<p><strong>World models.</strong> <a href="https://arxiv.org/abs/2602.12063">VLAW</a> 和 <a href="https://arxiv.org/abs/2602.06508">World-VLA-Loop</a> 以执行经验交替更新策略和动力学。我们的实验将分别测量两个模型更新带来的增益。</p>
+<p><strong>Recovery and search.</strong> <a href="https://arxiv.org/abs/2610.36068">Rollback</a> 研究失败回溯和分支蒸馏。<a href="https://tau0-vla.github.io/">τ₀-VLA</a>、<a href="https://arxiv.org/abs/2610.18650">ForkCast</a> 和 <a href="https://arxiv.org/abs/2609.03681">WISE</a> 探索候选搜索和预演调度。这里用同起点真实回报和时延监督是否调用预演。</p>
+<p><strong>Experiment selection.</strong> <a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a> 探索用信息价值挑实验。这里用等预算学生的实测学习增益评估采样选择。</p>
+<p><strong>Limits.</strong> 接触预测误差可能让排序失效。双臂实验依赖快照复位一致性和动作对齐，需单独验证。</p>
+</div>
 <h3 id="rl-objectives">Policy reinforcement learning</h3>
 <div class="loss-panel"><p><strong>Actor + critic.</strong> <code>ℓnew</code>、<code>ℓold</code> 是同一已采样决策的新旧 log-prob。动作使用 Flow-SDE，Gate 使用离散决策概率。<code>ρₜ</code> 为概率比，<code>ρ̄ₜ</code> 按半径 <code>η</code> 裁剪，限制策略更新幅度。<code>Âₜ</code> 是环境回报估计的优势，<code>V(hₜ)</code> 是 critic，<code>V̂ₜ</code> 是价值目标，<code>cV</code> 加权价值损失 <code>ℒV</code>。</p><div class="equation" aria-label="ppo loss"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>ρ</mi><mi>t</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal">ℓ</mi><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">w</mi></mrow></msub><mo>−</mo><msub><mi mathvariant="normal">ℓ</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">d</mi></mrow></msub><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mover accent="true"><mi>ρ</mi><mo>ˉ</mo></mover><mi>t</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">clip</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>t</mi></msub><mo separator="true">,</mo><mn>1</mn><mo>−</mo><mi>η</mi><mo separator="true">,</mo><mn>1</mn><mo>+</mo><mi>η</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="script">L</mi><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">O</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>t</mi></msub><msub><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub><mo separator="true">,</mo><msub><mover accent="true"><mi>ρ</mi><mo>ˉ</mo></mover><mi>t</mi></msub><msub><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>c</mi><mi>V</mi></msub><msub><mi mathvariant="script">L</mi><mi>V</mi></msub><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="script">L</mi><mi>V</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mi>V</mi><mo stretchy="false">(</mo><msub><mi>h</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mover accent="true"><mi>V</mi><mo>^</mo></mover><mi>t</mi></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">]</mo><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
 \rho_t&amp;=\exp(\ell_{\rm new}-\ell_{\rm old}),\\
@@ -896,21 +631,6 @@ X_\tau&amp;=(1-\tau)X+\tau\varepsilon,\qquad\varepsilon\sim\mathcal N(0,I),\\
 +c_V\mathcal L_V,\\
 \mathcal L_V&amp;=\mathbb E[(V(h_t)-\hat V_t)^2].
 \end{aligned}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:5.9135em;vertical-align:-2.7068em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2068em;"><span style="top:-5.3668em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8668em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">ρ</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.26em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">PPO</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-0.6532em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7068em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2068em;"><span style="top:-5.3668em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop">exp</span><span class="mopen">(</span><span class="mord"><span class="mord">ℓ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight" style="margin-right:0.0139em;">new</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord">ℓ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">old</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span></span></span><span style="top:-3.8668em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop"><span class="mord mathrm">clip</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mclose">)</span><span class="mpunct">,</span></span></span><span style="top:-2.26em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">−</span><span class="mord mathbb">E</span><span class="mopen">[</span><span class="mop">min</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9468em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">A</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">ρ</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9468em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">A</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.2222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span></span></span><span style="top:-0.6532em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbb">E</span><span class="mopen">[(</span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9468em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">]</span><span class="mord">.</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7068em;"><span></span></span></span></span></span></span></span></span></span></span></span></div></div>
-<h3>Related work and limits</h3>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Prior art and overlap">
-<table><colgroup><col style="width:31%"><col style="width:35%"><col style="width:34%"></colgroup><thead><tr><th scope="col">Closest work</th><th scope="col">Already implemented</th><th scope="col">What to test here</th></tr></thead><tbody>
-<tr><td><a href="https://arxiv.org/abs/2602.12063">VLAW</a> · <a href="https://arxiv.org/abs/2602.06508">World-VLA-Loop</a></td><td>策略与动作条件 WM 交替更新，在线和失败数据修正动力学，合成 rollout 帮助策略训练。</td><td>与 <a href="https://arxiv.org/abs/2602.11075">RISE</a> 的固定动力学想象阶段分开；本案用 2×2 区分更新 π 与 WM 的收益。</td></tr>
-<tr><td><a href="https://arxiv.org/abs/2610.36068">Rollback</a></td><td>关键点回溯、反事实分支、分支蒸馏与真实转移更新 WM，覆盖本案大部分内环。</td><td>用同一物理快照实测 Direct / Imagine 的净回报，检验学习 Gate 的调用分配与迁移。</td></tr>
-<tr><td><a href="https://tau0-vla.github.io/">τ₀-VLA</a> · <a href="https://arxiv.org/abs/2610.18650">ForkCast</a> · <a href="https://arxiv.org/abs/2609.03681">WISE</a> · <a href="https://arxiv.org/abs/2608.14822">CoRe</a></td><td>按需搜索、同视界恢复、短视界调度和推理时反事实纠错。</td><td>匹配候选与调用预算，比较置信度和候选优势门控。加入 <a href="https://arxiv.org/abs/2610.26845">Agima</a> 的想象／执行切换作概念对照，区分推理和权重增益。</td></tr>
-<tr><td><a href="https://arxiv.org/abs/2610.35604">RoboDoctor</a> · <a href="https://github.com/OpenSenseNova/SenseNova-RoboRSI">SenseNova-RoboRSI</a> · <a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a></td><td>RoboDojo 已有干预和跨回合经验复用；也已有 harness／模型联合复验与信息价值选实验。</td><td>同预算新学生对照与下一轮更新试验，隔离“改进器更会挑实验”的增量。加入学习进度采样基线。</td></tr>
-</tbody></table></div>
-<p><strong>Claim boundary.</strong> π + WM 共训、分支和失败采集均有先例。待证的贡献是：<strong>真实配对净收益能否训练出跨任务的预算门控，且反馈能否让实验选择器持续提高新学生的学习效率。</strong> 截至 2026-11-04，尚未在核对的公开结果中找到同时报告这两项对照的实现。</p>
-<h3>Validation risks</h3>
-<ul>
-<li><strong>Contact and time.</strong> Cosmos 2.5 action-cond 的公开权重需授权访问。先测动作交换、双臂同步和短视界接触，再考虑 <a href="https://nvidia.github.io/cosmos-framework/skills/cookbooks/cosmos3/generator/action/">Cosmos 3 forward dynamics</a> 或蒸馏。画质指标不替代动作可控性。</li>
-<li><strong>Protocol.</strong> 先验证 Isaac Sim 的快照恢复、控制器状态和重放一致性。跨平台需要原生动作、相机与归一化适配，官方测试不能用于更新任何模型。</li>
-<li><strong>Evidence.</strong> 现有试跑只覆盖失败复现、快照恢复和提示引导。先用实测结果验证分支排序，再测 Gate 和等预算学习曲线。</li>
-</ul>
 </section>
 </main>
 </body>

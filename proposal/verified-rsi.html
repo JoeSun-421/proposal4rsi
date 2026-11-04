@@ -161,6 +161,9 @@ figcaption{font-size:1rem;color:var(--ink)}
 .pilot-videos video{display:block;width:100%;height:auto;aspect-ratio:32/27;background:var(--ink);border:1px solid var(--line)}
 @media(max-width:570px){.pilot-videos{grid-template-columns:1fr}}
 @media print{.moka-pilot{display:none}}
+
+.sync-video{margin:0;max-width:560px}
+.sync-video video{display:block;width:100%;height:auto;aspect-ratio:32/27;background:var(--ink)}
 </style>
 </head>
 <body>
@@ -529,22 +532,19 @@ r_{\rm sel}&amp;=\Delta J_{\rm dev}-\lambda_m\Delta C,\\
 <div class="moka-pilot" id="moka-pilot">
 <h3>Double moka pot · recovery pilot</h3>
 <p>在 LIBERO-10 Task 08、Init 1 复现了第二只壶的抓取停滞。第 300 步换提示未脱困，随后回溯到第一只壶已放好的第 <strong>210</strong> 步。两条下方回放共享快照和 π0.5 采样种子 42。用保存的动作前缀恢复后，MuJoCo 状态与模型输入画面一致。</p>
-<div class="pilot-videos">
-<figure><video controls playsinline preload="none" width="640" height="540" poster="pilot/moka-control.jpg" aria-label="同快照无恢复提示对照，520 步超时"><source src="pilot/moka-control.mp4" type="video/mp4"></video><figcaption><strong>Control</strong> · 原指令，520 步超时</figcaption></figure>
-<figure><video controls playsinline preload="none" width="640" height="540" poster="pilot/moka-recovery.jpg" aria-label="VLA 受提示恢复并在 498 步完成"><source src="pilot/moka-recovery.mp4" type="video/mp4"></video><figcaption><strong>Guided VLA</strong> · 第 498 步官方成功</figcaption></figure>
-</div>
+<p><a href="pilot/moka-control.mp4">历史双摩卡壶对照</a> · <a href="pilot/moka-recovery.mp4">历史提示恢复</a></p>
 <p>提示为 <code>turn on the stove and put the moka pot on it</code>。π0.5 自己生成全部动作；第 <strong>417</strong> 步抓住并抬起第二只壶后，切回原指令，第一只壶全程保持在炉灶上。没有手动接管电机。</p>
 <p><strong>SFT candidate.</strong> <a href="pilot/moka-recovery-sft.zip" download>下载样本与快照（ZIP）</a> · <a href="pilot/moka-pilot.json">运行记录（JSON）</a>。样本含 <strong>288</strong> 条执行转移（207 条恢复、81 条原任务）、每视角 <strong>289</strong> 帧、逐步提示与 7 维动作。标签由 Codex 看画面手工填写，尚未经人类专家复核，暂不计入 100 条。</p>
 <p><strong>WM check.</strong> 本地动作条件状态模型在执行前预报第 210–215 步，末端位置增量误差为 <strong>0.73 mm</strong>。加入这条恢复轨迹的实测转移重拟合后，在两个独立初始状态的留出回放上，5 步壶位移平均误差从 <strong>5.70</strong> 降到 <strong>3.85 mm</strong>。该模型读取仿真真值，未参与动作选择；Cosmos 权重访问返回 HTTP 401，未加载。</p>
 </div>
-<h3 id="failure-videos" class="rollout-note">Long-horizon failure</h3>
-<div class="long-case rollout-note">
-<figure><video controls playsinline preload="none" aria-label="RoboDojo Fill Pen Holder, failed episode">
-<source src="https://huggingface.co/datasets/Agent-as-Policy/agent-as-policy-robodojo/resolve/main/videos/s0_l000_fill_pen_holder/head.mp4" type="video/mp4"><a href="https://huggingface.co/datasets/Agent-as-Policy/agent-as-policy-robodojo/resolve/main/videos/s0_l000_fill_pen_holder/head.mp4">Open video</a></video>
-<figcaption><strong>Fill Pen Holder · 42 s</strong> · <a href="https://huggingface.co/datasets/Agent-as-Policy/agent-as-policy-robodojo">Agent as Policy, layout 0, failed</a> · <a href="https://huggingface.co/datasets/Agent-as-Policy/agent-as-policy-robodojo/resolve/main/videos/s0_l000_fill_pen_holder/head.mp4">Open clip</a></figcaption></figure>
-<figure><video controls playsinline preload="none" width="1280" height="1080" poster="media/moka-stall.jpg" aria-label="LIBERO double moka pot failure"><source src="media/moka-stall.mp4" type="video/mp4"></video><figcaption><strong>LIBERO local diagnostic</strong> · 双摩卡壶放置停滞</figcaption></figure>
+<div class="moka-pilot" id="sync-pilot">
+<h3 id="failure-videos">LIBERO-90 · SYNC pilot</h3>
+<p>任务是把前面的黄油放入上层抽屉并关上。π0.5 基线在 <strong>400 步</strong>内两项官方子目标都未达成。已在第 <strong>200 步</strong>打 <code>SYNC</code>，复位重放后物理状态和双视角画面完全一致。</p>
+<figure class="sync-video"><video controls playsinline preload="none" width="640" height="540" poster="sync-pilot-assets/libero90-sync200.png" aria-label="LIBERO-90 抽屉任务失败录像"><source src="sync-pilot-assets/libero90-drawer-baseline.mp4" type="video/mp4"></video></figure>
+<p><strong>四路校准。</strong> 从同一快照取四组 π0.5 候选，每组 5 条 7 维动作。分别恢复快照并实跑这 5 步，保存第 205 步的真实图像和本体状态。四路在这一时点均未达到子目标。<a href="sync-pilot-assets/libero90-sync-calibration.zip" download>下载快照、动作与实测关键帧</a>。</p>
+<p><strong>回灌与合并。</strong> 四路各自将预测观测回灌给 π，保存候选动作、预测帧和对应的步号。模型的成功判断用于挑分支；执行时从真实快照用 <code>ACT</code> 重跑。SFT 只保存真实执行且通过官方终局判定的轨迹。<a href="https://huggingface.co/vla-manan/cosmos-robotics">外部 Cosmos 检查点</a>仍在下载，尚未生成想象帧，也没有可合并的 SFT 正样本。</p>
 </div>
-<p><strong>Failure hypotheses.</strong> <a href="https://robodojo-benchmark.com/doc/sim-tasks/fill-pen-holder/">Fill Pen Holder</a> 需一手持筒，另一手逐支插入四支笔，再放下笔筒。针对插入停滞比较重试、换视角与重新对齐，检查已插入的笔是否保持。<a href="https://robodojo-benchmark.com/doc/sim-tasks/fill-egg-holder/">Fill Egg Holder</a> 检验逐个放蛋后的关盖转移；<a href="https://robodojo-benchmark.com/doc/sim-tasks/organize-table/">Organize Table</a> 检验恢复时是否破坏先前整理结果。公开录像是第三方失败样本，本方法尚未在这些任务上运行。</p>
+<p><strong>Failure hypotheses.</strong> <a href="https://robodojo-benchmark.com/doc/sim-tasks/fill-pen-holder/">Fill Pen Holder</a> 需一手持筒，另一手逐支插入四支笔，再放下笔筒。针对插入停滞比较重试、换视角与重新对齐，检查已插入的笔是否保持。<a href="https://robodojo-benchmark.com/doc/sim-tasks/fill-egg-holder/">Fill Egg Holder</a> 检验逐个放蛋后的关盖转移；<a href="https://robodojo-benchmark.com/doc/sim-tasks/organize-table/">Organize Table</a> 检验恢复时是否破坏先前整理结果。本方法尚未在这些 RoboDojo 任务上运行。</p>
 <h3>Ablations</h3>
 <figure class="signal-figure gate-figure" id="gate-target-diagram" tabindex="0" aria-label="Matched gate target">
 <svg class="diagram" viewBox="0 0 840 154" role="img" aria-labelledby="gate-figure-title gate-figure-desc" xmlns="http://www.w3.org/2000/svg">

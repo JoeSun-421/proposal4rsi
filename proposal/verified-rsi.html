@@ -135,9 +135,9 @@ figcaption{font-size:1rem;color:var(--ink)}
 .sample-record:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media print{#data{gap:1.1mm}#data th,#data td{padding:1.02mm 1.55mm}.sample-record{display:none}.record-print{display:block}}
 
-.paper-overview .column-title,.recovery-diagram .column-title{font-size:15.5px;font-weight:700}
-.paper-overview .smallcaps,.recovery-diagram .smallcaps{font-size:12px;font-weight:700;letter-spacing:.03em}
-.paper-overview .data-box rect,.recovery-diagram .data-box{fill:#f4e8cf;stroke:#ba9d61}
+.paper-overview .column-title{font-size:15.5px;font-weight:700}
+.paper-overview .smallcaps{font-size:12px;font-weight:700;letter-spacing:.03em}
+.paper-overview .data-box rect{fill:#f4e8cf;stroke:#ba9d61}
 .diagram .architecture-box{fill:#e0ebf4;stroke:#7196b3}
 .diagram .encoder-box{fill:#f4f8fc;stroke:#9caec3}
 .diagram .gate-box{fill:#e9e1f3;stroke:#9575b1}
@@ -149,11 +149,18 @@ figcaption{font-size:1rem;color:var(--ink)}
 .diagram .eval-box{fill:#f1ece3;stroke:#ae9e84}
 .diagram .failure-box{fill:#f3e2df;stroke:#b98077}
 .diagram .feedback{stroke:#3e7769}
-.recovery-figure{max-width:100%;overflow-x:auto;margin:0 auto}
-.recovery-figure svg{display:block;width:100%;height:auto;min-width:710px;border-block:1px solid var(--line)}
-.recovery-figure:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.recovery-figure figcaption{max-width:768px;margin:.55rem auto 0}
-@media print{.recovery-figure{display:none}}
+.data-flow-figure{max-width:100%}
+.data-flow-scroll{overflow-x:auto;border-block:1px solid var(--line)}
+.data-flow-scroll svg{display:block;width:100%;height:auto;min-width:740px}
+.data-flow-scroll:focus-visible,.data-records summary:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.data-flow .left{text-anchor:start}
+.data-flow .label{font-size:16px}
+.data-flow .sub{font-size:14px}
+.data-flow .column{font-size:13px;font-weight:700;letter-spacing:.065em}
+.data-flow .rule{stroke:var(--line);stroke-width:1}
+.data-records summary{cursor:pointer;font-weight:650}
+.data-records[open] .data-record-body{display:grid;gap:.8rem;margin-top:.8rem}
+@media print{.data-flow-scroll{overflow:visible}.data-flow-scroll svg{min-width:0}.data-records{display:none}}
 
 .moka-pilot{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem}
 .pilot-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
@@ -398,6 +405,81 @@ figcaption{font-size:1rem;color:var(--ink)}
 </section>
 <section class="page" id="data">
 <h2>Data and supervision</h2>
+<figure class="data-flow-figure" id="recovery-sft">
+<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Data collection and supervision diagram">
+<svg class="diagram data-flow" viewBox="0 0 940 441" role="img" aria-labelledby="data-flow-title data-flow-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="data-flow-title">One failure snapshot, three training signals</title>
+<desc id="data-flow-desc">A recorded two-moka-pot failure supplies a SYNC snapshot. Expert guidance makes the VLA try a recovery; success, recovery, and preserved progress admit real actions to policy SFT. Automatic ACT and THINK run from the same snapshot with the same horizon, and their measured return difference less latency cost supervises the gate. All real action and observation pairs, including failures, train Cosmos; predictions are compared against corresponding real frames. Intent, outcome, and provenance are logged separately.</desc>
+<defs><marker id="data-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
+
+<rect class="failure-box" x="22" y="17" width="255" height="85" rx="4"/>
+<image href="media/moka-stall.jpg" x="30" y="25" width="74" height="69" preserveAspectRatio="xMidYMid slice"/>
+<text class="left label" x="115" y="44">Recorded failure</text>
+<text class="left sub" x="115" y="65">First pot placed</text>
+<text class="left sub" x="115" y="83">Second pot stalls</text>
+<rect class="eval-box" x="339" y="17" width="274" height="85" rx="4"/>
+<text class="label" x="476" y="44">SYNC · save replay point</text>
+<text class="sub" x="476" y="65">Real observation + executed prefix</text>
+<text class="sub" x="476" y="83">Simulator, controller and RNG state</text>
+<text class="left label" x="681" y="44">Three tag families</text>
+<text class="left sub" x="681" y="65">Intent · goal / phase</text>
+<text class="left sub" x="681" y="83">Outcome · result   /   Provenance · source</text>
+<path class="edge" d="M277 59H335" marker-end="url(#data-arrow)"/>
+<path class="edge" d="M476 102v18H31v263"/>
+
+<text class="left column" x="61" y="147">COLLECT</text>
+<text class="left column" x="374" y="147">VERIFY AND SAVE</text>
+<text class="left column" x="720" y="147">UPDATE</text>
+<path class="rule" d="M61 155H918"/>
+
+<g class="edge" marker-end="url(#data-arrow)">
+<path d="M31 201h26"/><path d="M31 292h26"/><path d="M31 383h26"/>
+<path d="M316 201h54"/><path d="M316 292h54"/><path d="M316 383h54"/>
+<path d="M663 201h53"/><path d="M663 292h53"/><path d="M663 383h53"/>
+</g>
+
+<rect class="expert-box" x="61" y="164" width="255" height="74" rx="4"/>
+<text class="left label" x="73" y="188">Expert-guided recovery</text>
+<text class="left sub" x="73" y="209">Expert tags stall and gives cue</text>
+<text class="left sub" x="73" y="227">π0.5 executes and resumes task</text>
+<text class="left label" x="374" y="188">Recovered · progress kept · success</text>
+<text class="left sub" x="374" y="209">Reviewer admits verified real actions</text>
+<text class="left sub" x="374" y="227">Join with the original executed prefix</text>
+<rect class="expert-box" x="720" y="164" width="198" height="74" rx="4"/>
+<text class="left label" x="732" y="188">π0.5 · SFT</text>
+<text class="left sub" x="732" y="209">100 recoveries planned</text>
+<text class="left sub" x="732" y="227">Mix with original demos</text>
+
+<rect class="gate-box" x="61" y="255" width="255" height="74" rx="4"/>
+<text class="left label" x="73" y="279">Matched ACT / THINK</text>
+<text class="left sub" x="73" y="300">Restore the same SYNC twice</text>
+<text class="left sub" x="73" y="318">Direct vs. WM-selected action</text>
+<text class="left label" x="374" y="279">Same horizon · real rollouts</text>
+<text class="left sub" x="374" y="300">Compare returns and added latency</text>
+<text class="left sub" x="374" y="318">Target: Δ return − λ × Δ latency</text>
+<rect class="gate-box" x="720" y="255" width="198" height="74" rx="4"/>
+<text class="left label" x="732" y="279">Gate · supervision</text>
+<text class="left sub" x="732" y="300">Learn when THINK</text>
+<text class="left sub" x="732" y="318">is worth its cost</text>
+
+<rect class="world-fill" x="61" y="346" width="255" height="74" rx="4"/>
+<text class="left label" x="73" y="370">Measured transitions</text>
+<text class="left sub" x="73" y="391">Log every executed action</text>
+<text class="left sub" x="73" y="409">Keep both successes and failures</text>
+<text class="left label" x="374" y="370">Action-aligned observations</text>
+<text class="left sub" x="374" y="391">Real start + commands → real future</text>
+<text class="left sub" x="374" y="409">Pair predictions with measured frames</text>
+<rect class="world-fill" x="720" y="346" width="198" height="74" rx="4"/>
+<text class="left label" x="732" y="370">Cosmos · fine-tune</text>
+<text class="left sub" x="732" y="391">Train on real frames</text>
+<text class="left sub" x="732" y="409">Audit prediction error</text>
+</svg>
+</div>
+<figcaption>画面来自双摩卡壶的失败回放。三条路径说明拟采集的训练信号。</figcaption>
+</figure>
+<details class="data-records">
+<summary>Data sources, schema and example record</summary>
+<div class="data-record-body">
 <ol>
 <li><strong>Warm start.</strong> 从 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO demonstrations</a> 与 <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo 官方训练示范</a>分别对齐原生动作、相机和任务阶段。RoboDojo 的 Open 与最终评测 seeds 不进入训练。</li>
 <li><strong>Collect.</strong> 每轮冻结 π 与 WM，采集 ACT 顺畅段、频繁 THINK 段、失败与近成功。优先验证想象花费高且确有提升的片段，保留随机对照。先在 LIBERO 收集 100 条专家引导、由 VLA 执行的成功恢复轨迹，再在 RoboDojo 重做回放验收。</li>
@@ -421,68 +503,6 @@ figcaption{font-size:1rem;color:var(--ink)}
 <h3 id="cold-start">100 expert-verified recoveries</h3>
 <p><strong>Tag → Guide → Verify.</strong> 专家先从失败回放选点，复原并保存快照，标注卡住的阶段、可见症状和恢复子任务。专家给提示，VLA 输出并执行动作；一旦脱困，恢复原指令并继续到终局。只有 <code>recovered=true</code>、<code>retained=true</code> 且官方 <code>episode_success=true</code>，专家复核后才计入 100 条 SFT 正样本。</p>
 <p><strong>Training record.</strong> 保存 <code>snapshot_id, expert_tags, recovery_hint, guided_act.trajectory_ref, executor=VLA</code>，以及恢复帧、三个验收字段和专家复核状态。保留失败尝试。专家引导成功可教恢复动作；Gate 的净收益仍需从同一快照重跑自动 ACT 与自动 THINK，按同一时限和回报标准计算 <code>ΔR − λΔT</code>。专家接管则单独记为示教。</p>
-<figure class="recovery-figure" id="recovery-sft" tabindex="0" aria-label="从失败轨迹到 SFT 的详细流程"><svg class="diagram recovery-diagram" viewBox="0 0 1000 407" role="img" aria-labelledby="recovery-title recovery-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="recovery-title">From a failed rollout to a verified SFT trajectory</title>
-<desc id="recovery-desc">An actual failed LIBERO rollout identifies a decision point. A replayable simulator snapshot is required. An expert tags the phase and observed failure, then gives a recovery instruction. The VLA executes all actions; after recovery it resumes the original instruction and finishes the episode. A reviewer checks recovery, preservation of progress and native task success. Only passing real transitions become positive SFT examples. Unsuccessful and original failed traces remain available to train the world model. The actual image depicts the original failure, not a successful recovery.</desc>
-<defs><marker id="r-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6.2" markerHeight="6.2" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="16" y="25">b</text>
-<text class="column-title" x="502" y="25">Failure correction → verified VLA trajectory → SFT</text>
-<g class="edge" marker-end="url(#r-arrow)">
-<path d="M227 127h25"/><path d="M477 127h24"/><path d="M728 127h24"/>
-<path d="M867 209v25"/>
-<path d="M751 270h-83"/><path d="M867 305v34"/>
-<path d="M552 309v30"/>
-</g>
-<path class="return" d="M123 209v154h280" marker-end="url(#r-arrow)"/>
-<text class="edge-label" x="145" y="354">Keep original failure as observed data</text>
-<text class="edge-label" x="693" y="261">Pass</text><text class="edge-label" x="876" y="327">Fail</text>
-<g>
-<rect class="failure-box" x="20" y="44" width="207" height="165" rx="5"/>
-<text class="label" x="124" y="66">01 · Original failure</text>
-<image href="media/moka-stall.jpg" x="31" y="76" width="185" height="98" preserveAspectRatio="xMidYMid slice"/>
-<text class="sub" x="124" y="195">Second pot not placed</text>
-
-<rect class="data-box" x="255" y="44" width="222" height="165" rx="5"/>
-<text class="label" x="366" y="66">02 · Restore and tag</text>
-<text class="sub" x="366" y="91">Save a replayable snapshot</text>
-<path class="edge" d="M272 103h188"/>
-<text class="sub" x="366" y="123">Phase: second pot</text>
-<text class="sub" x="366" y="147">Symptom: repeated grasp stall</text>
-<text class="sub" x="366" y="173">Cue: retreat and realign</text>
-<text class="smallcaps" x="366" y="196">Human expert annotation</text>
-
-<rect class="architecture-box" x="504" y="44" width="224" height="165" rx="5"/>
-<text class="label" x="616" y="66">03 · Guided VLA recovery</text>
-<text class="sub" x="616" y="94">Real image + recovery cue</text>
-<text class="sub" x="616" y="119">π0.5 → executed commands</text>
-<text class="sub" x="616" y="144">Observe whether grasp recovers</text>
-<path class="edge" d="M522 157h188"/>
-<text class="smallcaps" x="616" y="182">Executor = VLA</text>
-<text class="sub" x="616" y="199">Log real actions and frames</text>
-
-<rect class="act-box" x="755" y="44" width="222" height="165" rx="5"/>
-<text class="label" x="866" y="66">04 · Resume original task</text>
-<text class="sub" x="866" y="96">Return to the full instruction</text>
-<text class="sub" x="866" y="121">Put the second pot on the stove</text>
-<text class="sub" x="866" y="146">Preserve the first pot</text>
-<path class="edge" d="M773 159h186"/>
-<text class="smallcaps" x="866" y="184">Run to episode termination</text>
-</g>
-
-<g>
-<rect class="expert-box" x="406" y="236" width="259" height="73" rx="5"/>
-<text class="label" x="535" y="259">06 · Admit to SFT</text>
-<text class="sub" x="535" y="281">Observation + subtask → actual action</text>
-<text class="sub" x="535" y="299">Mix with original demonstrations</text>
-<rect class="gate-box" x="755" y="237" width="222" height="68" rx="5"/>
-<text class="label" x="866" y="258">05 · Expert verification</text>
-<text class="sub" x="866" y="280">Recovered · prior progress kept</text>
-<text class="sub" x="866" y="298">Official task success</text>
-<rect class="world-fill" x="406" y="342" width="571" height="43" rx="5"/>
-<text class="label" x="691" y="368">Actual transitions → WM training · Failed attempts stay out of positive SFT</text>
-</g>
-</svg>
-<figcaption>左侧为真实失败回放。后续步骤是采集流程，尚未获得该回合的成功修正轨迹。</figcaption></figure>
 <h3>Example from a recorded failure</h3>
 <p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。另见<a href="#moka-pilot">已完成的配对恢复试跑</a>。</p>
 <pre class="sample-record" tabindex="0" aria-label="真实失败回合的待专家复核记录"><code>{
@@ -494,7 +514,8 @@ figcaption{font-size:1rem;color:var(--ink)}
   &quot;guided_act&quot;: null, &quot;think&quot;: null, &quot;gate_target&quot;: null,
   &quot;accept_for_sft&quot;: false, &quot;label_status&quot;: &quot;needs_expert_replay&quot;
 }</code></pre>
-<p class="record-print"><code>ACT.success=false · guided_act=null · accept_for_sft=false</code>。<a href="https://joesun-421.github.io/proposal4rsi/proposal/verified-rsi.html#cold-start">完整 JSON</a></p>
+</div>
+</details>
 </section>
 <section class="page" id="models">
 <h2>Joint training</h2>

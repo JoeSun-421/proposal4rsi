@@ -76,83 +76,179 @@ li+li{margin-top:.25rem}
 }
 @media screen and (max-width:520px){.formula{font-size:clamp(.75rem,3.55vw,1rem)}}
 @media screen and (max-width:340px){.formula{padding-inline:.45rem 0}}
+
+.diagram-detailed .small{font-size:11.7px}
+.diagram-detailed .glyph{fill:none;stroke:var(--ink);stroke-width:1.1}
+.diagram-detailed .emphasis{stroke-width:1.6}
+.rollout-media{max-width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.rollout-media figure{margin-inline:0;min-width:0}
+.rollout-media video{display:block;width:100%;height:auto;aspect-ratio:32/27;background:var(--ink);border:1px solid var(--line)}
+.print-rollout-note{display:none}
+@media(max-width:680px){.rollout-media{grid-template-columns:1fr;max-width:470px}}
+@media print{.rollout-media,.rollout-note{display:none}.print-rollout-note{display:block}}
+
+.abstract-heading{font:700 1.1rem/1.5 var(--sans);margin-top:1rem}
+.diagram-detailed .return,.diagram .accent rect{stroke:#41655e}
+.diagram .accent rect{fill:color-mix(in srgb,#41655e 8%,var(--paper))}
+.signal-figure{max-width:100%;overflow-x:auto;margin-top:.1rem}
+.signal-figure:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.signal-figure svg{display:block;width:100%;height:auto;min-width:590px;border-block:1px solid var(--line)}
+.loss-panel{border-inline-start:1px solid var(--line);padding-inline-start:.65rem;overflow-x:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:.14rem}
+.loss-panel .formula{border:0;padding:0}
+.loss-panel .equation{font-size:.94rem}
+.loss-panel .note{margin-bottom:.16rem}
+@media screen and (max-width:520px){.loss-panel .equation{font-size:clamp(.74rem,3.55vw,.87rem)}}
+@media print{.signal-figure svg{min-width:0}.loss-panel{overflow:visible;gap:.03rem}.loss-panel .equation{font-size:8.2pt}.loss-panel .note{font-size:7.8pt}.abstract-heading{margin-top:2.5mm}#models{gap:1.5mm}#models .formula{font-size:8.4pt}}
 </style>
 </head>
 <body>
 <main id="top">
 <header class="sitebar">
-<a class="site-name" href="../">具身智能研究笔记</a>
-<nav aria-label="目录"><a href="#question">问题</a><a href="#flow">流程图</a><a href="#protocol">实验</a><a href="#models">模型</a><a href="#related-work">附录</a></nav>
+<a class="site-name" href="../">Embodied Learning</a>
+<nav aria-label="目录"><a href="#question">Abstract</a><a href="#flow">System</a><a href="#protocol">Experiments</a><a href="#models">Methods</a><a href="#related-work">Appendix</a></nav>
 </header>
 
 <section class="page" id="question">
-<div class="kicker">01 / RESEARCH QUESTION</div>
+<div class="kicker">01 / RESEARCH PROPOSAL</div>
 <h1>视觉语言动作模型的<wbr><span style="white-space:nowrap">按需想象</span>与<span style="white-space:nowrap">递归自我改进</span></h1>
-<p class="deck">复杂任务里，已经掌握的技能也可能在错误的时机失效。我们让 VLA 在可能改变结果的决策点预演不同动作，并用真实执行的结果训练它何时值得多想一步。</p>
-<dl class="meta"><dt>报告类型</dt><dd>实验提案 · 含本机基线预试</dd><dt>执行器</dt><dd>π0.5 · LIBERO 干预扩展</dd><dt>主要比较</dt><dd>同预算下的成功率与学习效率</dd></dl>
-<h3>Zero-shot 执行卡在哪里</h3>
-<p>在未见布局或技能组合中，VLA 需要保持已经完成的进度、识别当前受阻的技能，并判断要不要先改变视角、抓取姿态或物体摆放。直接执行的动作段可能反复沿着同一失败路径尝试。世界模型可以比较这些准备动作的后果，但每个重规划点都生成多条未来，会增加推理时延，预测偏差也会放大。<a href="https://tau0-vla.github.io/">τ₀-VLA</a> · <a href="https://arxiv.org/abs/2610.18650">ForkCast</a></p>
-<h3>切入点：学习想象的边际价值</h3>
-<p>每个决策点默认保留 π0.5 的动作。Gate 先用当前观测和失败历史估计<strong>调用世界模型能增加多少真实回报</strong>。收益盖过成本时才预测并比较候选，否则直接执行。执行同样长度的动作前缀后，重新读取真实观测。</p>
-<p>训练时从同一快照分支，比较准备动作、重试和保持，再交给同一个冻结技能。用这种成对轨迹训练 Gate、蒸馏有效动作，并用环境 rollout 继续做 RL。外层选择器根据学生实际学到多少来调整下一轮采样。</p>
-<p class="callout"><strong>两项主张分别验收。</strong> ① 相同 WM 调用预算下，训练后的 Gate 优于固定频率和置信度触发。② 相同交互与训练预算下，后期选择器在未见任务上能更快教会同一起点的新学生，其选出的下一轮实验也能带来额外收益。</p>
-<p class="note">评测术语。原版 LIBERO 日志是已在该 benchmark 上微调过的 checkpoint 的推理基线。本文的 zero-shot 指对封存的新布局、阻碍条件或技能组合直接部署，和允许少量交互的新学生适应实验分开报告。</p>
+<h2 class="abstract-heading">Abstract</h2>
+<p class="deck">视觉语言动作模型在未见的长程操作中，容易在受阻子任务上反复尝试。世界模型可比较恢复动作，但每步推演会增加延迟，并引入预测误差。本文提出按需想象，以同状态的实测分支回报训练门控，仅在预期收益超过成本时预测候选。验证轨迹用于动作蒸馏与环境 RL，等预算的学生学习增益用于更新下一轮实验选择。评估分别检验等预算成功率和新学生学习效率。目前只验证了基线执行与分支回放，想象收益与递归增益仍待实测。</p>
+<p class="note">Zero-shot 指直接部署到封存的新布局或技能组合。允许收集适应轨迹的新学生实验另行计分。</p>
 </section>
 
 <section class="page" id="flow">
 <div class="page-id">02 / SYSTEM OVERVIEW</div>
-<h2>推理与训练</h2>
+<h2>System overview</h2>
 <div class="figures" aria-label="Inference and training diagrams">
 <figure id="inference-diagram">
-<svg class="diagram" viewBox="0 0 400 440" role="img" aria-labelledby="infer-title infer-desc" xmlns="http://www.w3.org/2000/svg">
+<svg class="diagram diagram-detailed" viewBox="0 0 420 535" role="img" aria-labelledby="infer-title infer-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="infer-title">Inference: budgeted imagination</title>
-<desc id="infer-desc">A gate uses observed history to decide whether to run a world model. It executes the default action or the ranked candidate, then observes the actual outcome.</desc>
+<desc id="infer-desc">The gate chooses whether to invoke a world model. Direct execution uses the default chunk. Imagination predicts the effects of retry, reapproach and reobserve before selecting a chunk. Five real steps lead to a new observation and the next decision.</desc>
 <defs><marker id="i-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="17" y="28">a</text><text class="label" x="192" y="27">Inference</text>
+<text class="panel" x="17" y="27">a</text><text class="label" x="210" y="27">Inference</text>
+<path class="return" d="M372 498H411V69H375" marker-end="url(#i-arrow)"/>
 <g class="edge" marker-end="url(#i-arrow)">
-<path d="M192 92V114"/><path d="M192 168V187H93V214"/><path d="M192 187H290V214"/>
-<path d="M93 283V304H192V326"/><path d="M290 283V304H192" marker-end="none"/><path d="M192 378V398"/>
+<path d="M210 97V119"/><path d="M210 171V189H88V219"/><path d="M210 189H290V219"/>
+<path d="M88 298V374H210V394"/><path d="M290 349V374H210" marker-end="none"/>
+<path d="M210 451V477"/>
 </g>
-<path class="return" d="M329 414H385V66H332" marker-end="url(#i-arrow)"/>
-<g class="node"><rect x="55" y="40" width="274" height="52"/><text class="label" x="192" y="62">Observe</text><text class="sub" x="192" y="80">Images, proprioception, goal and history</text></g>
-<g class="node"><rect x="55" y="117" width="274" height="51"/><text class="label" x="192" y="139">Estimate value of imagination</text><text class="sub" x="192" y="157">Expected gain, cost and remaining budget</text></g>
-<text class="edge-label" x="100" y="205">Skip</text><text class="edge-label" x="297" y="205">Invoke</text>
-<g class="node"><rect x="17" y="217" width="152" height="66"/><text class="label" x="93" y="242">Direct execution</text><text class="sub" x="93" y="264">Use default action</text></g>
-<g class="node"><rect x="209" y="217" width="162" height="66"/><text class="label" x="290" y="240">Imagine branches</text><text class="sub" x="290" y="259">Predict candidate effects</text><text class="sub" x="290" y="275">Rank with effect head</text></g>
-<g class="node"><rect x="55" y="329" width="274" height="49"/><text class="label" x="192" y="349">Execute five steps</text><text class="sub" x="192" y="367">Fall back if no branch is reliable</text></g>
-<g class="node"><rect x="55" y="401" width="274" height="27"/><text class="sub" x="192" y="419">Read actual outcome</text></g>
+<g class="node">
+<rect x="48" y="42" width="324" height="55"/>
+<g class="glyph"><rect x="61" y="54" width="24" height="16"/><rect x="67" y="61" width="24" height="16"/><path d="m70 74 5-4 4 3 5-6 4 3"/></g>
+<text class="label" x="222" y="63">Observe the current state</text>
+<text class="sub" x="222" y="83">Cameras · proprioception · history</text>
+</g>
+<g class="node">
+<rect x="48" y="122" width="324" height="49"/>
+<text class="label" x="210" y="143">Estimate the value of imagination</text>
+<text class="sub" x="210" y="162">Expected gain − compute cost</text>
+</g>
+<text class="edge-label" x="96" y="209">Skip</text><text class="edge-label" x="298" y="209">Invoke</text>
+<g class="node">
+<rect x="17" y="222" width="142" height="76"/>
+<text class="label" x="88" y="245">Direct execution</text>
+<text class="sub" x="88" y="264">Default chunk</text>
+<path class="edge" d="M48 282H128" marker-end="url(#i-arrow)"/>
+<circle cx="48" cy="282" r="2.7"/><circle cx="68" cy="282" r="2"/><circle cx="88" cy="282" r="2"/><circle cx="108" cy="282" r="2"/>
+</g>
+<g class="node">
+<rect x="181" y="222" width="218" height="127"/>
+<text class="label" x="290" y="243">Imagine alternatives</text>
+<path class="edge" d="M290 249v6m0 0h-69v9m69-9v9m0-9h69v9"/>
+<rect x="189" y="265" width="64" height="24"/><rect x="256" y="265" width="68" height="24"/><rect x="327" y="265" width="64" height="24"/>
+<text class="small" x="221" y="281">Retry</text><text class="small" x="290" y="281">Reapproach</text><text class="small" x="359" y="281">Reobserve</text>
+<path class="edge" d="M221 289v9h138v-9m-69 0v9"/><path class="edge" d="M290 298v9" marker-end="url(#i-arrow)"/>
+<text class="label" x="290" y="324">Rank predicted effects</text>
+<text class="sub" x="290" y="341">Common horizon · frozen skill</text>
+</g>
+<g class="node">
+<rect x="48" y="397" width="324" height="54" class="emphasis"/>
+<text class="label" x="210" y="419">Execute the first five real steps</text>
+<text class="sub" x="210" y="439">Use default if no branch is reliable</text>
+</g>
+<g class="node">
+<rect x="48" y="480" width="324" height="36"/>
+<text class="label" x="210" y="503">Observe the actual outcome</text>
+</g>
 </svg>
 <figcaption><strong>a</strong>　实线为当前决策，虚线为下一次决策。WM 预测用于选动作，π0.5 下一轮仍以真实观测为输入。</figcaption>
 </figure>
 <figure id="training-diagram">
-<svg class="diagram" viewBox="0 0 400 440" role="img" aria-labelledby="train-title train-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="train-title">Training: environment verification and recursive improvement</title>
-<desc id="train-desc">The selector chooses branch experiments. Matched environment trials train the gate and the VLA. A matched student experiment measures learning gain and updates the selector for the next round.</desc>
+<svg class="diagram diagram-detailed" viewBox="0 0 420 535" role="img" aria-labelledby="train-title train-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="train-title">Training: paired replay and recursive experiment selection</title>
+<desc id="train-desc">The selector samples a failure snapshot. Prepare, retry and hold branches share the same initial snapshot and frozen downstream skill. Verified outcomes feed the gate and VLA. Selected and control data train two matched students, whose development gain updates the selector.</desc>
 <defs><marker id="t-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="17" y="28">b</text><text class="label" x="192" y="27">Training</text>
+<text class="panel" x="17" y="27">b</text><text class="label" x="210" y="27">Training</text>
+<path class="return" d="M399 498H411V69H375" marker-end="url(#t-arrow)"/>
 <g class="edge" marker-end="url(#t-arrow)">
-<path d="M192 92V114"/><path d="M192 168V187H93V214"/><path d="M192 187H290V214"/>
-<path d="M93 283V326"/><path d="M290 283V326"/><path d="M290 378V398"/>
+<path d="M210 97V119"/><path d="M210 265V287H98V313"/><path d="M210 287H299V313"/>
+<path d="M299 441V477"/>
 </g>
-<path class="return" d="M371 414H385V66H332" marker-end="url(#t-arrow)"/>
-<g class="node"><rect x="55" y="40" width="274" height="52"/><text class="label" x="192" y="62">Select experiments</text><text class="sub" x="192" y="80">Snapshots, candidate types and controls</text></g>
-<g class="node"><rect x="55" y="117" width="274" height="51"/><text class="label" x="192" y="139">Verify paired branches</text><text class="sub" x="192" y="157">Same snapshot and frozen skill</text></g>
-<text class="edge-label" x="100" y="205">Inner loop</text><text class="edge-label" x="297" y="205">Outer loop</text>
-<g class="node"><rect x="17" y="217" width="152" height="66"/><text class="label" x="93" y="242">Verified experience</text><text class="sub" x="93" y="264">Actions and outcomes</text></g>
-<g class="node"><rect x="209" y="217" width="162" height="66"/><text class="label" x="290" y="242">Train paired students</text><text class="sub" x="290" y="264">Same init and budget</text></g>
-<g class="node"><rect x="17" y="329" width="152" height="49"/><text class="label" x="93" y="349">Update gate + VLA</text><text class="sub" x="93" y="367">SFT + online RL</text></g>
-<g class="node"><rect x="209" y="329" width="162" height="49"/><text class="label" x="290" y="349">Test learning gain</text><text class="sub" x="290" y="367">Held-out dev rollouts</text></g>
-<g class="node"><rect x="209" y="401" width="162" height="27"/><text class="sub" x="290" y="419">Update selector</text></g>
+<g class="node">
+<rect x="48" y="42" width="324" height="55"/>
+<text class="label" x="210" y="63">Select experiments</text>
+<text class="sub" x="210" y="83">Snapshot pool · exploration quota</text>
+</g>
+<g class="node">
+<rect x="17" y="122" width="382" height="143"/>
+<text class="label" x="210" y="144">Replay the same snapshot</text>
+<circle cx="210" cy="157" r="4" fill="none" stroke="var(--ink)"/>
+<g class="edge" marker-end="url(#t-arrow)"><path d="M206 160 79 183"/><path d="M210 161v22"/><path d="m214 160 126 23"/></g>
+<rect x="35" y="186" width="88" height="24"/><rect x="166" y="186" width="88" height="24"/><rect x="296" y="186" width="88" height="24"/>
+<text class="sub" x="79" y="203">Prepare</text><text class="sub" x="210" y="203">Retry</text><text class="sub" x="340" y="203">Hold</text>
+<path class="edge" d="M79 210v12h261v-12m-130 0v12"/><path class="edge" d="M210 222v11" marker-end="url(#t-arrow)"/>
+<text class="label" x="210" y="250">Same frozen skill → verified outcomes</text>
+</g>
+<text class="edge-label" x="106" y="305">Inner loop</text><text class="edge-label" x="307" y="305">Outer loop</text>
+<g class="node">
+<rect x="17" y="316" width="162" height="125"/>
+<text class="label" x="98" y="340">Update gate + VLA</text>
+<path class="edge" d="M30 352h136"/>
+<text class="sub" x="98" y="372">Paired gain → gate</text>
+<text class="sub" x="98" y="393">Verified actions → SFT</text>
+<text class="sub" x="98" y="414">Real rollouts → PPO</text>
+</g>
+<g class="node">
+<rect x="199" y="316" width="200" height="125"/>
+<text class="label" x="299" y="340">Train matched students</text>
+<path class="edge" d="M299 346v7m0 0h-47v8m47-8h47v8"/>
+<rect x="211" y="363" width="82" height="24"/><rect x="305" y="363" width="82" height="24"/>
+<text class="sub" x="252" y="380">Selected</text><text class="sub" x="346" y="380">Control</text>
+<path class="edge" d="M252 387v10h94v-10"/><path class="edge" d="M299 397v10" marker-end="url(#t-arrow)"/>
+<text class="sub" x="299" y="427">Measure dev learning gain</text>
+</g>
+<g class="node">
+<rect x="199" y="480" width="200" height="36" class="emphasis"/>
+<text class="label" x="299" y="503">Update selector</text>
+</g>
 </svg>
 <figcaption><strong>b</strong>　真实分支监督内层策略。两组同起点学生的学习增益更新外层选择器，并反馈到下一轮采样。</figcaption>
 </figure>
 </div>
-<p class="note">图示采用可编辑矢量与英文标签，以箭头、分面字母和线型区分关系。<a href="https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/">Nature Research figure guide</a> · <a href="https://www.nature.com/articles/s42256-025-00983-2">Nature Machine Intelligence 图示参考</a></p>
+<figure class="signal-figure" id="supervision-diagram" tabindex="0" aria-label="Supervision routes"><svg class="diagram signal-diagram" viewBox="0 0 840 145" role="img" aria-labelledby="signals-title signals-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="signals-title">Supervision routes by trainable module</title>
+<desc id="signals-desc">Verified outcomes supervise the effect head and gate. Successful trajectories and on-policy rollouts update the action expert. Development gains update only the selector.</desc>
+<defs><marker id="s-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
+<text class="panel" x="17" y="26">c</text>
+<text class="label" x="420" y="25">Supervision routes</text>
+<g>
+<rect x="16" y="40" width="258" height="37"/><text class="label" x="145" y="64">Paired branch outcomes</text>
+<rect x="291" y="40" width="258" height="37"/><text class="label" x="420" y="64">Verified and on-policy actions</text>
+<rect x="566" y="40" width="258" height="37"/><text class="label" x="695" y="64">Paired development gains</text>
+</g>
+<g class="edge" marker-end="url(#s-arrow)"><path d="M145 77V99"/><path d="M420 77V99"/><path d="M695 77V99"/></g>
+<g class="accent">
+<rect x="16" y="102" width="258" height="31"/><text class="label" x="145" y="123">Effect head + gate</text>
+<rect x="291" y="102" width="258" height="31"/><text class="label" x="420" y="123">Action expert + critic</text>
+<rect x="566" y="102" width="258" height="31"/><text class="label" x="695" y="123">Experiment selector</text>
+</g>
+</svg><figcaption><strong>c</strong>　每种监督只更新对应模块。初版 World model 与视觉 encoder 保持冻结。</figcaption></figure>
+<p class="note">Figure conventions. <a href="https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/">Nature Research figure guide</a> · <a href="https://www.nature.com/articles/s42256-025-00983-2">Nature Machine Intelligence 图示参考</a></p>
 </section>
 
 <section class="page" id="protocol">
 <div class="page-id">03 / EXPERIMENT DESIGN</div>
-<h2>从可复现的失败开始</h2>
+<h2>Experiments</h2>
 <p>本地 π0.5 在 LIBERO-10 的 50 条 rollout 中成功 46 条。以失败录像定位候选决策点，以环境谓词确认阶段。历史失败用于开发定位，封存测试使用独立布局与起点。</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="失败用例与干预">
 <table><colgroup><col style="width:25%"><col style="width:36%"><col style="width:39%"></colgroup>
@@ -162,8 +258,25 @@ li+li{margin-top:.25rem}
 <tr><td>黑碗入下层抽屉并关闭<br>4/5 · 接触迁移</td><td>Init 3：放碗后在柜前反复尝试，直到超时。</td><td>比较直接推和撤回后重新对齐。测抽屉关合与碗留在抽屉内。</td></tr>
 <tr><td>白杯上盘、布丁放右侧<br>4/5 · 空间关系迁移</td><td>Init 4：后半程夹爪反复停留在杯盘附近，未完成任务。</td><td>在杯子到位后比较原路线和从空侧接近。测布丁右侧谓词与杯子是否保持到位。</td></tr>
 </tbody></table></div>
+<h3 class="rollout-note" id="failure-videos">Failure rollouts</h3>
+<div class="rollout-media" aria-label="仿真失败录像">
+<figure>
+<video controls playsinline preload="none" width="1280" height="1080" poster="media/moka-stall.jpg" aria-label="双摩卡壶上炉灶的失败回合"><source src="media/moka-stall.mp4" type="video/mp4"><a href="media/moka-stall.mp4">打开录像</a></video>
+<figcaption><strong>双摩卡壶上炉灶</strong><br>LIBERO-10 · Task 08 · Init 1 · 第二只壶抓取停滞 · <a href="media/moka-stall.mp4">打开高清视频</a></figcaption>
+</figure>
+<figure>
+<video controls playsinline preload="none" width="1280" height="1080" poster="media/drawer-stall.jpg" aria-label="黑碗入抽屉并关闭的失败回合"><source src="media/drawer-stall.mp4" type="video/mp4"><a href="media/drawer-stall.mp4">打开录像</a></video>
+<figcaption><strong>黑碗入抽屉并关闭</strong><br>LIBERO-10 · Task 03 · Init 3 · 柜前反复尝试 · <a href="media/drawer-stall.mp4">打开高清视频</a></figcaption>
+</figure>
+<figure>
+<video controls playsinline preload="none" width="1280" height="1080" poster="media/pudding-stall.jpg" aria-label="白杯上盘，布丁放右侧的失败回合"><source src="media/pudding-stall.mp4" type="video/mp4"><a href="media/pudding-stall.mp4">打开录像</a></video>
+<figcaption><strong>白杯上盘，布丁放右侧</strong><br>LIBERO-10 · Task 06 · Init 4 · 第二目标未完成 · <a href="media/pudding-stall.mp4">打开高清视频</a></figcaption>
+</figure>
+</div>
+<p class="note rollout-note">真实基线回放 · 1280 × 1080，20 fps。三段均因达到步数上限而结束，画面用于定位停滞，原因须通过配对分支验证。</p>
+<p class="note print-rollout-note">三段基线失败录像见 <a href="https://joesun-421.github.io/proposal4rsi/proposal/verified-rsi.html#failure-videos">在线实验记录</a>。</p>
 <p class="note" id="research-review">预试已完成：LIBERO-Goal 抽屉任务单条在 settle 后第 199 步成功。5 个初始状态重放相同动作前缀后，起点图像一致，重复 5 步分支的记录状态差为 0。该结果验证回放接口，未测干预成功率。</p>
-<h3>实验顺序与判据</h3>
+<h3>Protocol and acceptance criteria</h3>
 <ol>
 <li><strong>干预上限。</strong> 先取 30 个独立快照，包含停滞、正常和无可行候选状态。同一快照比较候选、重试和等长保持，再运行同一冻结技能。用独立回放评估候选 oracle，避免同一批数据既选最佳又评最佳。若对重试无稳定收益，先改候选库或任务。</li>
 <li><strong>想象与触发。</strong> 共享候选及执行长度。用真实未来图像作排序上限，比较 WM、action-only 和动作打乱的 WM。整回合再对比直接执行、固定频率、随机、置信度、候选优势门控及全程想象。报告配对成功率、排序 regret、调用数和 P95 延迟。各门控匹配候选预测预算，全程想象单列成本。主对照为固定频率，预设配对成功率差的 95% 置信区间下界需大于 0。</li>
@@ -174,19 +287,18 @@ li+li{margin-top:.25rem}
 
 <section class="page" id="models">
 <div class="page-id">04 / MODEL AND TRAINING SPECIFICATION</div>
-<h2>模型、接口与状态转移</h2>
+<h2>Models and objectives</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="模型输入输出与微调">
-<table><colgroup><col style="width:20%"><col style="width:34%"><col style="width:46%"></colgroup>
-<thead><tr><th scope="col">模块</th><th scope="col">Input → Output</th><th scope="col">初始化与更新</th></tr></thead>
-<tbody>
-<tr><td>Action expert <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>π</mi><mi>θ</mi></msub></mrow><annotation encoding="application/x-tex">\pi_\theta</annotation></semantics></math></span></td><td>双视角 + 8 维本体 + 指令 → <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mo>×</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">10\times 7</annotation></semantics></math></span> 动作段。每次取前 5 步。</td><td>OpenPI <code>pi05_libero</code> 冻结起步。加入退回、换角度等候选原语。通过干预验收后，在已验证动作上做 flow matching SFT，再用 Flow-SDE PPO 更新 action expert 和 value head。训练侧用 <a href="https://huggingface.co/RLinf/RLinf-Pi05-LIBERO-SFT">RLinf-Pi05-LIBERO-SFT</a> 时，所有训练对照从该版本重测。</td></tr>
-<tr><td>World model <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span></td><td>当前 agentview + 20 步候选命令 → 单视角未来帧。</td><td><a href="https://huggingface.co/Fleurrr/Prophet-World-Model">Prophet LIBERO</a>，先冻结。用上游 servo adapter 转动作，5 步候选配共享 15 步尾序列，按帧对齐只读前缀，并检验换尾后排序。若失败，改用短视界 latent predictor，以真实分支监督。</td></tr>
-<tr><td>Effect head <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mi>ψ</mi></msub></mrow><annotation encoding="application/x-tex">Q_\psi</annotation></semantics></math></span></td><td>当前及预测帧 + 后续技能 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span> → <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span> 成功概率。</td><td>冻结 <a href="https://github.com/facebookresearch/dinov2">DINOv2-S</a> encoder，加 MLP。用真实后继帧与技能结果做 BCE，开发集校准预测帧输入。物体真值只用于离线标签。</td></tr>
-<tr><td>Gate <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>ϕ</mi></msub></mrow><annotation encoding="application/x-tex">g_\phi</annotation></semantics></math></span></td><td>观测历史 + 进度 + 预算 → Direct / Imagine。</td><td>复用冻结视觉特征，加轻量 GRU 和二分类 head。先回归成对分支收益，再用环境 rollout 做离散 PPO。策略本身可保持冻结，单独验证 Gate。</td></tr>
-<tr><td>Selector <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mi>ω</mi></msub></mrow><annotation encoding="application/x-tex">q_\omega</annotation></semantics></math></span></td><td>失败类型、历史收益、预算 → 下一批快照与候选比例。</td><td>用均匀初始化的 softmax 选择采样配方，保留随机探索配额。用同预算学生的开发集增益训练 contextual bandit，每轮保留固定对照。</td></tr>
+<table><colgroup><col style="width:21%"><col style="width:37%"><col style="width:42%"></colgroup>
+<thead><tr><th scope="col">Module</th><th scope="col">Input → Output</th><th scope="col">Initialization / update</th></tr></thead><tbody>
+<tr><td>Action expert <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>π</mi><mi>θ</mi></msub></mrow><annotation encoding="application/x-tex">\pi_\theta</annotation></semantics></math></span></td><td>双视角、8 维状态、指令 → <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mo>×</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">10\times 7</annotation></semantics></math></span> 动作段，执行前 5 步。</td><td><a href="https://huggingface.co/RLinf/RLinf-Pi05-LIBERO-SFT">π0.5 LIBERO SFT</a>。冻结 VLM，训练 action expert 与 critic。训练对照共享起点。</td></tr>
+<tr><td>World model <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span></td><td>当前 agentview、20 步候选动作 → 单视角未来帧。</td><td><a href="https://huggingface.co/Fleurrr/Prophet-World-Model">Prophet LIBERO</a>，冻结。5 步前缀接共享 15 步尾序列，用官方 servo adapter 转动作。</td></tr>
+<tr><td>Effect head <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mi>ψ</mi></msub></mrow><annotation encoding="application/x-tex">Q_\psi</annotation></semantics></math></span></td><td>当前与候选帧、技能 → 后续技能成功概率。</td><td>冻结 <a href="https://github.com/facebookresearch/dinov2">DINOv2-S</a>，训练 MLP。拟合真实后继帧，开发集校准预测帧。</td></tr>
+<tr><td>Gate <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>ϕ</mi></msub></mrow><annotation encoding="application/x-tex">g_\phi</annotation></semantics></math></span></td><td>视觉历史、任务进度、预算 → Direct / Imagine。</td><td>训练 GRU 与门控 head。先用配对净收益监督，再用离散 PPO。</td></tr>
+<tr><td>Selector <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mi>ω</mi></msub></mrow><annotation encoding="application/x-tex">q_\omega</annotation></semantics></math></span></td><td>失败类型、历史收益、预算 → 采样配方分布。</td><td>均匀初始化，保留探索配额，用配对学生的开发集收益更新。</td></tr>
 </tbody></table></div>
-<h3>观测、预测与真实转移</h3>
-<p>令 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">s_t</annotation></semantics></math></span> 为环境隐藏状态，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">o_t</annotation></semantics></math></span> 为双视角与本体状态，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span> 包含近期真实观测、已执行动作、指令与剩余 WM 调用数 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">b_t</annotation></semantics></math></span>。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mn>0</mn></msup></mrow><annotation encoding="application/x-tex">u^0</annotation></semantics></math></span> 是默认前缀，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">u^i</annotation></semantics></math></span> 是备选。WM 只预测图像。执行后追加真实观测和实际动作更新历史，预算按真实调用数扣减。</p>
+<h3>State transitions</h3>
+<p>令 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">s_t</annotation></semantics></math></span> 为环境隐藏状态，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">o_t</annotation></semantics></math></span> 为双视角与本体状态，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span> 包含近期真实观测、已执行动作、指令与剩余 WM 调用数 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">b_t</annotation></semantics></math></span>。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mn>0</mn></msup></mrow><annotation encoding="application/x-tex">u^0</annotation></semantics></math></span> 是默认前缀，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">u^i</annotation></semantics></math></span> 是备选。WM 只预测图像；真实观测更新历史，预算按实际调用扣减。</p>
 <div class="formula" tabindex="0" role="region" aria-label="状态转移、分支预测与干预收益">
 <div class="equation"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>∼</mo><mi>P</mi><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mtext> </mtext><mo>⋅</mo><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>j</mi></mrow></msub><mo separator="true">,</mo><msub><mi>u</mi><mi>j</mi></msub><mo fence="true">)</mo></mrow><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>o</mi><mrow><mi>t</mi><mo>+</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>∼</mo><mi>O</mi><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mtext> </mtext><mo>⋅</mo><mo>∣</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mn>0</mn><mo>≤</mo><mi>j</mi><mo>&lt;</mo><mi>d</mi><mo>≤</mo><mn>5.</mn></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
 s_{t+j+1} &amp;\sim P\!\left(\,\cdot\mid s_{t+j},u_j\right), \\
@@ -204,24 +316,43 @@ Q_\psi\!\left(I_t,\widehat I^i_{1:5},k\right).
 \end{aligned}</annotation></semantics></math></span></div>
 </div>
 <p class="note"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span> 是本段实际执行步数，提前终止时少于 5。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">Y_k</annotation></semantics></math></span> 表示冻结技能在限定时域内成功且先前目标保持。</p>
-<h3 id="rl">三层更新用不同回报</h3>
-<p><strong>Gate。</strong> 用成对 rollout 估计想象相对直接执行的净收益 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>R</mi><mo>−</mo><mi>λ</mi><mtext> </mtext><mi mathvariant="normal">Δ</mi><msub><mi>T</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">M</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta R-\lambda\,\Delta T_{\mathrm{WM}}</annotation></semantics></math></span> 预热，其中 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>T</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">M</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta T_{\mathrm{WM}}</annotation></semantics></math></span> 是额外 WM 耗时。分支需有剩余预算且预测净收益超过阈值。上线训练用任务成功减实际 WM 成本，冻结候选生成器与评分器。每轮从旧 Gate 采样并记录 log-prob。动作段聚合奖励，跨段折扣为 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>γ</mi><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">\gamma^d</annotation></semantics></math></span>，再用优势更新。</p>
-<p><strong>Action expert。</strong> 环境验证成功的示范用于 SFT。PPO 使用本轮 actor 的 Flow-SDE 采样轨迹与真实奖励，按执行步数聚合回报、计算 GAE。外部筛选或改写的候选只进入蒸馏数据流。</p>
-<p><strong>Selector。</strong> 克隆同一学生初值 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span>，用选中数据与对照数据分别做等量更新 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi></mrow><annotation encoding="application/x-tex">U</annotation></semantics></math></span>。固定 WM 与 effect head，用开发集回报更新选择器。封存测试集只做最终评估。</p>
-<div class="formula" tabindex="0" role="region" aria-label="实验选择器的回报">
-<div class="equation"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>r</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>J</mi><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">v</mi></mrow></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mi>U</mi><mo stretchy="false">(</mo><mi>θ</mi><mo separator="true">,</mo><msub><mi>D</mi><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo>−</mo><msub><mi>J</mi><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">v</mi></mrow></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mi>U</mi><mo stretchy="false">(</mo><mi>θ</mi><mo separator="true">,</mo><msub><mi>D</mi><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">l</mi></mrow></msub><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mspace width="1em"/><mo>−</mo><msub><mi>λ</mi><mi>m</mi></msub><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><msub><mi>C</mi><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>−</mo><msub><mi>C</mi><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">l</mi></mrow></msub><mo fence="true">)</mo></mrow><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
-r_{\mathrm{meta}} &amp;= J_{\mathrm{dev}}\!\left(U(\theta,D_{\mathrm{sel}})\right)
-  - J_{\mathrm{dev}}\!\left(U(\theta,D_{\mathrm{ctrl}})\right) \\
-  &amp;\quad-\lambda_m\!\left(C_{\mathrm{sel}}-C_{\mathrm{ctrl}}\right).
+<h3 id="rl">Training objectives</h3>
+<div class="loss-panel" aria-label="Effect head and gate loss">
+<p class="note"><strong>Effect head / gate.</strong> <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">Y_k</annotation></semantics></math></span> 来自环境。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>R</mi></mrow><annotation encoding="application/x-tex">\Delta R</annotation></semantics></math></span> 为想象相对直接执行的配对回报差，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>T</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">M</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta T_{\rm WM}</annotation></semantics></math></span> 为额外时延。Gate 仅在有预算且预测净收益过阈值时调用。</p>
+<div class="equation" aria-label="Effect head loss"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mi>Q</mi></msub><mo>=</mo><mi mathvariant="normal">BCE</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>Y</mi><mi>k</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>Q</mi><mi>ψ</mi></msub><mo stretchy="false">(</mo><msub><mi>I</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>I</mi><mrow><mi>t</mi><mo>+</mo><mi>d</mi></mrow></msub><mo separator="true">,</mo><mi>k</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\mathcal L_Q=\operatorname{BCE}(Y_k,\,Q_\psi(I_t,I_{t+d},k)).</annotation></semantics></math></span></div>
+<div class="equation" aria-label="Gate warm-up loss"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>G</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mi mathvariant="normal">Δ</mi><mi>R</mi><mo>−</mo><mi>λ</mi><mi mathvariant="normal">Δ</mi><msub><mi>T</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">M</mi></mrow></msub><mo>∣</mo><mi>h</mi><mo stretchy="false">]</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="script">L</mi><mrow><mi mathvariant="normal">g</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>g</mi><mi>ϕ</mi></msub><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><mo>−</mo><mi>G</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">]</mo><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+G(h)&amp;=\mathbb E[\Delta R-\lambda\Delta T_{\rm WM}\mid h],\\
+\mathcal L_{\rm gate}&amp;=\mathbb E[(g_\phi(h)-G(h))^2].
 \end{aligned}</annotation></semantics></math></span></div>
 </div>
-<p class="refs"><a href="https://rlinf.readthedocs.io/en/latest/rst_source/examples/embodied/pi0.html">Flow-SDE PPO 配方</a> · <a href="https://github.com/JoeSun-421/proposal4rsi/blob/84c429077b32bdf52d8b215fcf4ee4a6da3fa436/proposal/verified-rsi.html">固定版本的下载、校验与回放命令</a></p>
+<div class="loss-panel" aria-label="Action expert and PPO loss">
+<p class="note"><strong>Action expert.</strong> SFT 用成功轨迹，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span> 为有效步 mask，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>∼</mo><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mi>I</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\varepsilon\sim\mathcal N(0,I)</annotation></semantics></math></span>。PPO 使用本轮采样，分别记录 Gate 的离散 log-prob 和 action expert 的 Flow-SDE log-prob。<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">L</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">\mathcal L_V</annotation></semantics></math></span> 为价值回归误差。外部挑选动作只进 SFT。</p>
+<div class="equation" aria-label="Flow matching loss"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>x</mi><mi>τ</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>A</mi><mo>+</mo><mi>τ</mi><mi>ε</mi><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>e</mi><mi>τ</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>v</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>τ</mi></msub><mo separator="true">,</mo><mi>τ</mi><mo separator="true">,</mo><mi>h</mi><mo stretchy="false">)</mo><mo>−</mo><mo stretchy="false">(</mo><mi>ε</mi><mo>−</mo><mi>A</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="script">L</mi><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">M</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="double-struck">E</mi><mi mathvariant="normal">∥</mi><mi>M</mi><mo>⊙</mo><msub><mi>e</mi><mi>τ</mi></msub><msubsup><mi mathvariant="normal">∥</mi><mn>2</mn><mn>2</mn></msubsup><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+x_\tau&amp;=(1-\tau)A+\tau\varepsilon,\\
+e_\tau&amp;=v_\theta(x_\tau,\tau,h)-(\varepsilon-A),\\
+\mathcal L_{\rm FM}&amp;=\mathbb E\|M\odot e_\tau\|_2^2.
+\end{aligned}</annotation></semantics></math></span></div>
+<div class="equation" aria-label="PPO loss"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>ρ</mi><mi>t</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>exp</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi mathvariant="normal">ℓ</mi><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">w</mi></mrow></msub><mo>−</mo><msub><mi mathvariant="normal">ℓ</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">d</mi></mrow></msub><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mover accent="true"><mi>ρ</mi><mo>ˉ</mo></mover><mi>t</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi mathvariant="normal">clip</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>t</mi></msub><mo separator="true">,</mo><mn>1</mn><mo>−</mo><mi>η</mi><mo separator="true">,</mo><mn>1</mn><mo>+</mo><mi>η</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi mathvariant="script">L</mi><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">P</mi><mi mathvariant="normal">O</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mo>−</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mi>min</mi><mo>⁡</mo><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>t</mi></msub><msub><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub><mo separator="true">,</mo><msub><mover accent="true"><mi>ρ</mi><mo>ˉ</mo></mover><mi>t</mi></msub><msub><mover accent="true"><mi>A</mi><mo>^</mo></mover><mi>t</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo>+</mo><msub><mi>c</mi><mi>V</mi></msub><msub><mi mathvariant="script">L</mi><mi>V</mi></msub><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+\rho_t&amp;=\exp(\ell_{\rm new}-\ell_{\rm old}),\\
+\bar\rho_t&amp;=\operatorname{clip}(\rho_t,1-\eta,1+\eta),\\
+\mathcal L_{\rm PPO}&amp;=-\mathbb E[\min(\rho_t\hat A_t,\bar\rho_t\hat A_t)] + c_V\mathcal L_V .
+\end{aligned}</annotation></semantics></math></span></div>
+</div>
+<div class="loss-panel" aria-label="Selector objective">
+<p class="note"><strong>Selector.</strong> <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span> 是采样配方，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span> 是失败统计，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span> 是回报基线。两组学生从相同权重等量更新，两项差值均按选择组减对照组计算。</p>
+<div class="equation" aria-label="Matched student learning gain"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left right" columnspacing="0em 1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>J</mi><mi>j</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>J</mi><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">v</mi></mrow></msub><mo stretchy="false">(</mo><mi>U</mi><mo stretchy="false">(</mo><mi>θ</mi><mo separator="true">,</mo><msub><mi>D</mi><mi>j</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><msub><mi>r</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi></mrow></msub></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mo>=</mo><mi mathvariant="normal">Δ</mi><mi>J</mi><mo>−</mo><msub><mi>λ</mi><mi>m</mi></msub><mi mathvariant="normal">Δ</mi><mi>C</mi><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+J_j &amp;= J_{\rm dev}(U(\theta,D_j)),\
+r_{\rm meta}&amp;=\Delta J-\lambda_m\Delta C .
+\end{aligned}</annotation></semantics></math></span></div>
+<div class="equation" aria-label="Selector policy-gradient loss"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi></mrow></msub><mo>=</mo><mo>−</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>r</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi></mrow></msub><mo>−</mo><mi>b</mi><mo stretchy="false">)</mo><mi>log</mi><mo>⁡</mo><msub><mi>q</mi><mi>ω</mi></msub><mo stretchy="false">(</mo><mi>c</mi><mo>∣</mo><mi>f</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\mathcal L_{\rm sel}=-\mathbb E[(r_{\rm meta}-b)\log q_\omega(c\mid f)].</annotation></semantics></math></span></div>
+</div>
+<p class="refs"><a href="https://arxiv.org/abs/1707.06347">PPO</a> · <a href="https://arxiv.org/abs/2510.25889">Flow-SDE</a> · <a href="https://github.com/JoeSun-421/proposal4rsi/blob/84c429077b32bdf52d8b215fcf4ee4a6da3fa436/proposal/verified-rsi.html">Checkpoint and replay commands</a></p>
 </section>
 
 <section class="page" id="related-work">
 <div class="page-id">05 / APPENDIX</div>
-<h2>相关工作、局限与待验证项</h2>
-<h3>可以直接借鉴的设计</h3>
+<h2>Appendix</h2>
+<h3>Related work</h3>
 <div class="table-wrap" tabindex="0" role="region" aria-label="相关工作与可借鉴的设计">
 <table><colgroup><col style="width:22%"><col style="width:39%"><col style="width:39%"></colgroup>
 <thead><tr><th scope="col">问题</th><th scope="col">最接近的先例</th><th scope="col">借鉴与区分</th></tr></thead>
@@ -232,7 +363,7 @@ r_{\mathrm{meta}} &amp;= J_{\mathrm{dev}}\!\left(U(\theta,D_{\mathrm{sel}})\righ
 <tr><td>改进采样过程</td><td><a href="https://arxiv.org/abs/2610.10498">EmbodiedRSI</a> 按信息价值选实验。<a href="https://arxiv.org/abs/2610.20474">AdaRSI</a> 用失败回放判断何时微调。<a href="https://proceedings.mlr.press/v100/portelas20a.html">ALP-GMM</a> 按学习进度采样。</td><td>以学习进度作为强基线，并用等预算的新学生和下一轮更新隔离选择器的贡献。<a href="https://arxiv.org/abs/2610.29677">Physical2RSI</a></td></tr>
 </tbody></table></div>
 <p>这些先例已覆盖按需想象、反事实恢复与主动采样。待验证的研究贡献是：<strong>同状态干预产生的证据，能否帮助改进器在新任务上挑到更有训练价值的经验。</strong></p>
-<h3>局限与必须补上的证据</h3>
+<h3>Limitations and validation</h3>
 <ol>
 <li><strong>失败原因尚未识别。</strong> 现有录像只用于定位停滞。需以谓词、接触和同状态配对区分姿态、遮挡与执行能力不足。5 次历史回合不能估计总体成功率。</li>
 <li><strong>WM 可用性尚未验证。</strong> Prophet 基础 tokenizer 需要访问权限。需实测动作与帧对齐、5 步排序、换尾稳定性和端到端延迟，检查收益是否超过更便宜的 action-only 方法。</li>

@@ -87,7 +87,7 @@ li+li{margin-top:.25rem}
 @media(max-width:680px){.rollout-media{grid-template-columns:1fr;max-width:470px}}
 @media print{.rollout-media,.rollout-note{display:none}.print-rollout-note{display:block}}
 
-.abstract-heading{font:700 1.1rem/1.5 var(--sans);margin-top:1rem}
+.abstract-heading{font:700 1rem/1.45 var(--sans)}
 .diagram-detailed .return,.diagram .accent rect{stroke:#41655e}
 .diagram .accent rect{fill:color-mix(in srgb,#41655e 8%,var(--paper))}
 .signal-figure{max-width:100%;overflow-x:auto;margin-top:.1rem}
@@ -277,7 +277,6 @@ figcaption{font-size:1rem;color:var(--ink)}
   .data-step-track,.data-step-routes{gap:1mm}
   .data-step-track>div,.data-step-routes>div{padding:1mm 1.4mm}
 }
-.pitch-lead{font-size:clamp(1.08rem,2.4vw,1.28rem);line-height:1.68}
 .pitch-diagram .column-title{font-size:16px;font-weight:700}
 .pitch-diagram .direct-edge{stroke:#3e7769}
 .claim-tests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
@@ -286,7 +285,6 @@ figcaption{font-size:1rem;color:var(--ink)}
 .related-notes{display:grid;gap:.42rem}
 @media(max-width:620px){.claim-tests{grid-template-columns:1fr}}
 @media print{
-  #question .pitch-lead{font-size:11pt;line-height:1.45}
   #question .hero-figure{width:94%}
   .claim-tests{gap:4mm}
   .claim-tests article{padding-top:1.5mm}
@@ -334,7 +332,8 @@ figcaption{font-size:1rem;color:var(--ink)}
 
 <section class="page" id="question">
 <h1>When to Think: <wbr>Selective Imagination for Self-Improving VLAs</h1>
-<p class="pitch-lead" id="abstract">长程操作里，真正需要推演的往往是反复卡住的几步。我们让 VLA 默认直接执行，只有在预期恢复收益足以抵消耗时时，才从当前观测并行预演四条路径。</p>
+<h2 class="abstract-heading" id="abstract">Abstract</h2>
+<p id="abstract-text">长程机器人操作中的局部停滞会使视觉–语言–动作模型（VLA）反复执行无效动作，而频繁调用世界模型会增加推理时延。我们提出一种按需预演方法，用同起点的真实回放比较直接执行与预演后执行的回报和耗时，并据此训练门控。系统默认直接执行 π0.5 的动作，预期净收益超过阈值时才调用动作条件 Cosmos，推演四条候选路径。系统选择一条，在真实环境执行短前缀并重新观测。验收通过的恢复动作监督策略，实测后继帧监督世界模型，学生在保留任务上的学习增益指导下一轮采样。</p>
 <figure class="hero-figure pitch-flow" id="flow" tabindex="0" aria-label="Selective imagination and real execution">
 <svg class="diagram pitch-diagram" viewBox="0 0 1000 304" role="img" aria-labelledby="pitch-title pitch-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="pitch-title">Think selectively, act on the real state</title>
@@ -374,7 +373,6 @@ figcaption{font-size:1rem;color:var(--ink)}
 <text class="sub" x="500" y="295">New real observation → next decision</text>
 </svg>
 </figure>
-<p>π0.5 提出动作，Cosmos 预测后继观测，再把预测回传给各自分支。选择后只在真实环境执行一小段。同起点的实测对照教 Gate 何时调用，成功恢复教策略怎样脱困。再用学生的学习增益决定下一轮采什么。</p>
 <figure class="hero-evidence" aria-labelledby="hero-evidence-title">
 <figcaption id="hero-evidence-title"><strong>What recovery looks like</strong><span>LIBERO-10 · 双摩卡壶，同一快照的两条实测分支</span></figcaption>
 <div class="hero-frames">

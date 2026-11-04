@@ -154,6 +154,13 @@ figcaption{font-size:1rem;color:var(--ink)}
 .recovery-figure:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .recovery-figure figcaption{max-width:768px;margin:.55rem auto 0}
 @media print{.recovery-figure{display:none}}
+
+.moka-pilot{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem}
+.pilot-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.pilot-videos figure{margin-inline:0}
+.pilot-videos video{display:block;width:100%;height:auto;aspect-ratio:32/27;background:var(--ink);border:1px solid var(--line)}
+@media(max-width:570px){.pilot-videos{grid-template-columns:1fr}}
+@media print{.moka-pilot{display:none}}
 </style>
 </head>
 <body>
@@ -456,7 +463,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 </svg>
 <figcaption>左侧为真实失败回放。后续步骤是采集流程，尚未获得该回合的成功修正轨迹。</figcaption></figure>
 <h3>Example from a recorded failure</h3>
-<p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。</p>
+<p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。另见<a href="#moka-pilot">已完成的配对恢复试跑</a>。</p>
 <pre class="sample-record" tabindex="0" aria-label="真实失败回合的待专家复核记录"><code>{
   &quot;sample_id&quot;: &quot;libero10-t08-init01-f311&quot;,
   &quot;intent&quot;: {&quot;task&quot;: &quot;put both moka pots on the stove&quot;, &quot;phase&quot;: &quot;second pot&quot;},
@@ -519,6 +526,17 @@ r_{\rm sel}&amp;=\Delta J_{\rm dev}-\lambda_m\Delta C,\\
 <tr><td>RoboDojo · primary</td><td><a href="https://robodojo-benchmark.com/doc/sim-tasks/">Long-Horizon + Open</a>，用原生 ARX X5 双臂接口、官方 SR / Score 和同起点预算。报告 Long-Horizon 按阶段的保持率与恢复率，Open 不用任务专属示范。</td></tr>
 <tr><td>RoboCasa365</td><td><a href="https://robocasa.ai/leaderboard">Composite-Unseen</a> 独立复验。先验证该平台的动作和相机适配；适配数据与正式评测分开。逐平台汇报，避免混合分数。</td></tr>
 </tbody></table></div>
+<div class="moka-pilot" id="moka-pilot">
+<h3>Double moka pot · recovery pilot</h3>
+<p>在 LIBERO-10 Task 08、Init 1 复现了第二只壶的抓取停滞。第 300 步换提示未脱困，随后回溯到第一只壶已放好的第 <strong>210</strong> 步。两条下方回放共享快照和 π0.5 采样种子 42。用保存的动作前缀恢复后，MuJoCo 状态与模型输入画面一致。</p>
+<div class="pilot-videos">
+<figure><video controls playsinline preload="none" width="640" height="540" poster="pilot/moka-control.jpg" aria-label="同快照无恢复提示对照，520 步超时"><source src="pilot/moka-control.mp4" type="video/mp4"></video><figcaption><strong>Control</strong> · 原指令，520 步超时</figcaption></figure>
+<figure><video controls playsinline preload="none" width="640" height="540" poster="pilot/moka-recovery.jpg" aria-label="VLA 受提示恢复并在 498 步完成"><source src="pilot/moka-recovery.mp4" type="video/mp4"></video><figcaption><strong>Guided VLA</strong> · 第 498 步官方成功</figcaption></figure>
+</div>
+<p>提示为 <code>turn on the stove and put the moka pot on it</code>。π0.5 自己生成全部动作；第 <strong>417</strong> 步抓住并抬起第二只壶后，切回原指令，第一只壶全程保持在炉灶上。没有手动接管电机。</p>
+<p><strong>SFT candidate.</strong> <a href="pilot/moka-recovery-sft.zip" download>下载样本与快照（ZIP）</a> · <a href="pilot/moka-pilot.json">运行记录（JSON）</a>。样本含 <strong>288</strong> 条执行转移（207 条恢复、81 条原任务）、每视角 <strong>289</strong> 帧、逐步提示与 7 维动作。标签由 Codex 看画面手工填写，尚未经人类专家复核，暂不计入 100 条。</p>
+<p><strong>WM check.</strong> 本地动作条件状态模型在执行前预报第 210–215 步，末端位置增量误差为 <strong>0.73 mm</strong>。加入这条恢复轨迹的实测转移重拟合后，在两个独立初始状态的留出回放上，5 步壶位移平均误差从 <strong>5.70</strong> 降到 <strong>3.85 mm</strong>。该模型读取仿真真值，未参与动作选择；Cosmos 权重访问返回 HTTP 401，未加载。</p>
+</div>
 <h3 id="failure-videos" class="rollout-note">Long-horizon failure</h3>
 <div class="long-case rollout-note">
 <figure><video controls playsinline preload="none" aria-label="RoboDojo Fill Pen Holder, failed episode">

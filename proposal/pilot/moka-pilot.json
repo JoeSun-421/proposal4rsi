@@ -1,0 +1,221 @@
+{
+  "run_id": "libero10-task08-init01-rollback210-seed42",
+  "suite": "libero_10",
+  "task_index": 8,
+  "init_index": 1,
+  "settle_steps": 10,
+  "max_steps": 520,
+  "baseline": {
+    "suite": "libero_10",
+    "task_index": 8,
+    "init_index": 1,
+    "env_seed": 7,
+    "policy_seed": 7,
+    "policy": "openpi pi05_libero",
+    "original_prompt": "put both moka pots on the stove",
+    "hint": null,
+    "snapshot_step": null,
+    "prefix_verified": null,
+    "recovery_switch": null,
+    "retained": null,
+    "lifted": null,
+    "episode_success": false,
+    "steps": 520,
+    "last_on_stove": [
+      false,
+      true
+    ],
+    "wall_seconds": 21.433976169093512
+  },
+  "matched_control": {
+    "suite": "libero_10",
+    "task_index": 8,
+    "init_index": 1,
+    "env_seed": 7,
+    "policy_seed": 42,
+    "policy": "openpi pi05_libero",
+    "original_prompt": "put both moka pots on the stove",
+    "hint": null,
+    "snapshot_step": 210,
+    "prefix_verified": true,
+    "recovery_switch": null,
+    "retained": true,
+    "lifted": false,
+    "episode_success": false,
+    "steps": 520,
+    "last_on_stove": [
+      false,
+      true
+    ],
+    "wall_seconds": 10.376381520996802
+  },
+  "guided": {
+    "suite": "libero_10",
+    "task_index": 8,
+    "init_index": 1,
+    "env_seed": 7,
+    "policy_seed": 42,
+    "policy": "openpi pi05_libero",
+    "original_prompt": "put both moka pots on the stove",
+    "hint": "turn on the stove and put the moka pot on it",
+    "snapshot_step": 210,
+    "prefix_verified": true,
+    "recovery_switch": 417,
+    "retained": true,
+    "lifted": true,
+    "episode_success": true,
+    "steps": 498,
+    "last_on_stove": [
+      true,
+      true
+    ],
+    "wall_seconds": 10.315893704071641
+  },
+  "annotation": {
+    "annotator": "Codex, manual visual review",
+    "human_expert_verified": false,
+    "task": "put both moka pots on the stove",
+    "failure_evidence_step": 300,
+    "restore_step": 210,
+    "phase": "first moka pot placed; transition to the remaining pot",
+    "observed_failure": "Repeated approach to the second moka pot without a stable grasp in the unassisted run.",
+    "recovery_hint": "turn on the stove and put the moka pot on it",
+    "resume_event": "The remaining pot lifts more than 0.024 m from its height at the restored snapshot.",
+    "resume_prompt": "put both moka pots on the stove",
+    "action_executor": "frozen OpenPI pi05_libero",
+    "motor_intervention": false
+  },
+  "trajectory": {
+    "schema": "parquet+mp4 recovery segment v1",
+    "frame_rows": 288,
+    "video_frames_per_camera": 289,
+    "guided_actions": 207,
+    "resumed_actions": 81,
+    "control_hz": 20,
+    "camera_resolution": [
+      256,
+      256
+    ],
+    "state_dim": 8,
+    "action_dim": 7,
+    "terminal_frame_index": 288,
+    "preprocessing": "Frames stored after the official 180-degree rotation. Resize with padding to 224 for OpenPI. State is xyz, axis-angle, and two gripper joint positions.",
+    "acceptance": "passes behavior checks; pending human expert review",
+    "included_in_100_expert_accepted": false
+  },
+  "wm": {
+    "model": "five-step action-conditioned ridge state predictor (privileged simulator object poses)",
+    "cosmos_access_http_status": 401,
+    "forecast_runs": {
+      "control": {
+        "step": 210,
+        "horizon": 5,
+        "predicted_delta_mm": [
+          [
+            12.151,
+            28.262,
+            28.751
+          ],
+          [
+            0.934,
+            0.076,
+            0.146
+          ],
+          [
+            1.904,
+            1.643,
+            -0.808
+          ]
+        ],
+        "forecast_before_execution": true,
+        "controls_action": false,
+        "state_source": "privileged MuJoCo object poses",
+        "observed_delta_mm": [
+          [
+            11.498,
+            28.542,
+            28.667
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "error_norm_mm": [
+          0.716,
+          0.948,
+          2.641
+        ]
+      },
+      "recovery": {
+        "step": 210,
+        "horizon": 5,
+        "predicted_delta_mm": [
+          [
+            11.762,
+            26.379,
+            28.39
+          ],
+          [
+            0.718,
+            0.285,
+            -0.028
+          ],
+          [
+            1.738,
+            1.708,
+            -1.613
+          ]
+        ],
+        "forecast_before_execution": true,
+        "controls_action": false,
+        "state_source": "privileged MuJoCo object poses",
+        "observed_delta_mm": [
+          [
+            11.152,
+            26.721,
+            28.199
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "error_norm_mm": [
+          0.725,
+          0.773,
+          2.922
+        ]
+      }
+    },
+    "used_to_select_actions": false,
+    "trained_from_observed_recovery": true,
+    "train_windows_before": 1395,
+    "train_windows_after": 1679,
+    "held_out_runs": [
+      "probe-i3-s7",
+      "probe-i4-s19"
+    ],
+    "held_out_windows": 899,
+    "held_out_eef_mean_error_mm": [
+      6.8132996428725505,
+      5.041913096539813
+    ],
+    "held_out_pot_mean_error_mm": [
+      5.699394293802665,
+      3.8544016096483604
+    ]
+  }
+}

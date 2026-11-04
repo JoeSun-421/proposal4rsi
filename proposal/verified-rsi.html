@@ -323,7 +323,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 <h2>Data and supervision</h2>
 <ol>
 <li><strong>Warm start.</strong> 从 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO demonstrations</a> 与 <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo 官方训练示范</a>分别对齐原生动作、相机和任务阶段。RoboDojo 的 Open 与最终评测 seeds 不进入训练。</li>
-<li><strong>Collect.</strong> 每轮冻结 π 与 WM，采集 ACT 顺畅段、频繁 THINK 段、失败与近成功。优先验证想象花费高且确有提升的片段，保留随机对照。先在 LIBERO 建 100 个成对决策点的冷启动集，再按开发集方差扩容，并在 RoboDojo 重做回放验收。</li>
+<li><strong>Collect.</strong> 每轮冻结 π 与 WM，采集 ACT 顺畅段、频繁 THINK 段、失败与近成功。优先验证想象花费高且确有提升的片段，保留随机对照。先在 LIBERO 收集 100 条专家引导、由 VLA 执行的成功恢复轨迹，再在 RoboDojo 重做回放验收。</li>
 <li><strong>Branch and verify.</strong> 每个快照执行等长的默认动作、准备动作和保持对照；恢复随机数、控制器与物理状态，后续接相同冻结技能与时限。另从同点比较 Direct 与 WM 选出的分支，记录实测回报差、额外时延和此前子目标是否保持。RoboDojo 复位需先通过回放一致性检查。</li>
 </ol>
 <h3>Canonical record</h3>
@@ -341,20 +341,21 @@ figcaption{font-size:1rem;color:var(--ink)}
 <tr><td>Provenance</td><td><code>source={demo,policy,intervention,imagined}, policy_rev, wm_rev, branch_role</code>。</td><td>用于采样与审计。THINK 的合成帧另存，WM 目标来自实测环境。</td></tr>
 </tbody></table></div>
 <p>主存储采用 <a href="https://github.com/huggingface/lerobot/blob/main/docs/source/lerobot-dataset-v3.mdx">LeRobot v3</a> 的 Parquet + 分相机 MP4，外加分支索引。为 OpenPI 导出其锁定版本；为 Cosmos 导出首帧、对齐的视频窗口与动作 JSON。实际轨迹按 <code>observation → intent → [THINK] → ACT(command) → observation</code> 记录；括号内为可选模式，预演分支通过 <code>pair_id</code> 单独关联。标签借鉴 <a href="https://arxiv.org/abs/2504.16054">π0.5 的子任务</a>、<a href="https://arxiv.org/abs/2511.14759">RECAP 的经验与优势</a>和 <a href="https://arxiv.org/abs/2604.15483">π0.7 的上下文标注</a>，按逐类去标签消融。</p>
-<h3 id="cold-start">100-pair cold start</h3>
-<p><strong>一条数据 = 一个决策点和两次配对回放。</strong> 先人工挑 40 个顺畅点、40 个重复停滞点和 20 个难判点，标注当前子目标并提出恢复动作。固定 π 与 WM，同快照执行 <strong>ACT</strong> 默认动作与 <strong>THINK</strong> 选中动作，两路共享步数和后续策略。100 对至少 200 次回放，按原始回合或布局分组做 70/15/15 划分。</p>
-<p><strong>Pair record.</strong> 共用 <code>snapshot_id, intent, budget_steps</code>；<code>act</code> 和 <code>think</code> 各存 <code>trajectory_ref, R, latency_ms</code>，THINK 另存 <code>candidate_ids, selected_id</code>。保留真实动作与后继观测。在同一时限内，新子目标达成且旧进度保持时 <code>R=1</code>，否则为 0。用秒计时，计算 <code>gate_target = R_think − R_act − λ·(T_think − T_act)</code>。人工选点和提议动作，回放确定正负标签。</p>
+<h3 id="cold-start">100 expert-verified recoveries</h3>
+<p><strong>Tag → Guide → Verify.</strong> 专家先从失败回放选点，复原并保存快照，标注卡住的阶段、可见症状和恢复子任务。专家给提示，VLA 输出并执行动作；一旦脱困，恢复原指令并继续到终局。只有 <code>recovered=true</code>、<code>retained=true</code> 且官方 <code>episode_success=true</code>，专家复核后才计入 100 条 SFT 正样本。</p>
+<p><strong>Training record.</strong> 保存 <code>snapshot_id, expert_tags, recovery_hint, guided_act.trajectory_ref, executor=VLA</code>，以及恢复帧、三个验收字段和专家复核状态。保留失败尝试。专家引导成功可教恢复动作；Gate 的净收益仍需从同一快照重跑自动 ACT 与自动 THINK，按同一时限和回报标准计算 <code>ΔR − λΔT</code>。专家接管则单独记为示教。</p>
 <h3>Example from a recorded failure</h3>
-<p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶回放 · Init 1</a>。第 311 至 519 帧中，第一只壶已上炉灶，第二只仍留在桌上，最终超时。录像可用于选点，但没有该帧的快照和 THINK 回放，训练标签留空。</p>
-<pre class="sample-record" tabindex="0" aria-label="真实失败回合的标注记录"><code>{
+<p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。</p>
+<pre class="sample-record" tabindex="0" aria-label="真实失败回合的待专家复核记录"><code>{
   &quot;sample_id&quot;: &quot;libero10-t08-init01-f311&quot;,
   &quot;intent&quot;: {&quot;task&quot;: &quot;put both moka pots on the stove&quot;, &quot;phase&quot;: &quot;second pot&quot;},
   &quot;provenance&quot;: {&quot;source&quot;: &quot;baseline_rollout&quot;, &quot;init_index&quot;: 1, &quot;review_frames&quot;: [311, 519]},
-  &quot;snapshot_id&quot;: null,
-  &quot;act&quot;: {&quot;video&quot;: &quot;media/moka-stall.mp4&quot;, &quot;episode_success&quot;: false, &quot;R&quot;: null},
-  &quot;think&quot;: null, &quot;gate_target&quot;: null,
-  &quot;label_status&quot;: &quot;needs_paired_replay&quot;
-}</code></pre><p class="record-print"><code>ACT.success=false · THINK=null · gate_target=null</code>。<a href="https://joesun-421.github.io/proposal4rsi/proposal/verified-rsi.html#cold-start">完整 JSON</a></p>
+  &quot;snapshot_id&quot;: null, &quot;expert_tags&quot;: null, &quot;recovery_hint&quot;: null,
+  &quot;act&quot;: {&quot;video&quot;: &quot;media/moka-stall.mp4&quot;, &quot;episode_success&quot;: false},
+  &quot;guided_act&quot;: null, &quot;think&quot;: null, &quot;gate_target&quot;: null,
+  &quot;accept_for_sft&quot;: false, &quot;label_status&quot;: &quot;needs_expert_replay&quot;
+}</code></pre>
+<p class="record-print"><code>ACT.success=false · guided_act=null · accept_for_sft=false</code>。<a href="https://joesun-421.github.io/proposal4rsi/proposal/verified-rsi.html#cold-start">完整 JSON</a></p>
 </section>
 <section class="page" id="models">
 <h2>Joint training</h2>
@@ -366,7 +367,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 <tr><td>Selector</td><td>失败统计、学习进展、预算 → 下一批采样配方。</td><td>从均匀配额起步，训练 contextual bandit；两组学生共享起点和更新步数。</td></tr>
 </tbody></table></div>
 <h3>Update schedule</h3>
-<p><strong>WM → π → collect.</strong> ① 以示范和本轮全部真实转移拟合 WM，包含失败。开发集验证动作敏感性、接触事件、分支排序及延迟后才进入下一步。② 冻结新版 WM，比较候选并在环境验证；成功轨迹与原示范混合做 SFT，真实 on-policy rollout 做 <a href="https://arxiv.org/abs/2510.25889">Flow-SDE PPO</a>。③ 部署新版 π 重新采样，补充新失败并重训 WM。每轮保留均匀采样对照与冻结旧版本。</p>
+<p><strong>WM → π → collect.</strong> ① 以示范和本轮全部真实转移拟合 WM，包含失败。开发集验证动作敏感性、接触事件、分支排序及延迟后才进入下一步。② 冻结新版 WM，比较候选并在环境验证；专家引导的成功恢复与原示范混合做 SFT，真实 on-policy rollout 做 <a href="https://arxiv.org/abs/2510.25889">Flow-SDE PPO</a>。③ 部署新版 π 重新采样，补充新失败并重训 WM。每轮保留均匀采样对照与冻结旧版本。</p>
 <p><strong>Action adapter.</strong> LIBERO 与 RoboDojo 的单臂 EEF、双臂 joint 指令分别保留。单臂条件是局部 Δxyz、Δrpy 和夹爪命令。RoboDojo 由关节命令目标的正运动学构造逐臂增量，训练双臂 conditioner；未来实测位姿只作监督。原版 Cosmos action-cond 为单视角 4 FPS，按时间戳匹配候选与输出；没有对齐帧时跳过打分，短接触另训高时间分辨率 latent WM 对照。单卡先做 100 步显存与重放检查。</p>
 <h3>Dynamics and losses</h3>
 <div class="formula" aria-label="Environment and world model transitions"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mi>d</mi></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>∼</mo><msup><mi>P</mi><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></msup><mo stretchy="false">(</mo><mo>⋅</mo><mo>∣</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>u</mi><mrow><mn>1</mn><mo>:</mo><mi>d</mi></mrow></msub><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msubsup><mover accent="true"><mi>I</mi><mo>^</mo></mover><mrow><mi>t</mi><mo>+</mo><mi>d</mi></mrow><mi>i</mi></msubsup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>W</mi><mi>ψ</mi></msub><mo stretchy="false">(</mo><msub><mi>I</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi mathvariant="script">A</mi><mi>e</mi></msub><mo stretchy="false">(</mo><msubsup><mi>u</mi><mrow><mn>1</mn><mo>:</mo><mi>K</mi></mrow><mi>i</mi></msubsup><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>d</mi><mo stretchy="false">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msup><mi>i</mi><mo>∗</mo></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mrow><mi mathvariant="normal">arg max</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mi>Q</mi><mo stretchy="false">(</mo><msub><mi>I</mi><mi>t</mi></msub><mo separator="true">,</mo><msubsup><mover accent="true"><mi>I</mi><mo>^</mo></mover><mrow><mi>t</mi><mo>+</mo><mi>d</mi></mrow><mi>i</mi></msubsup><mo separator="true">,</mo><mi>k</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="1em"/><mi>d</mi><mo>≤</mo><mi>K</mi><mi mathvariant="normal">.</mi></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}

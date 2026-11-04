@@ -134,6 +134,26 @@ figcaption{font-size:1rem;color:var(--ink)}
 .record-print{display:none}
 .sample-record:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 @media print{#data{gap:1.1mm}#data th,#data td{padding:1.02mm 1.55mm}.sample-record{display:none}.record-print{display:block}}
+
+.paper-overview .column-title,.recovery-diagram .column-title{font-size:15.5px;font-weight:700}
+.paper-overview .smallcaps,.recovery-diagram .smallcaps{font-size:12px;font-weight:700;letter-spacing:.03em}
+.paper-overview .data-box rect,.recovery-diagram .data-box{fill:#f4e8cf;stroke:#ba9d61}
+.diagram .architecture-box{fill:#e0ebf4;stroke:#7196b3}
+.diagram .encoder-box{fill:#f4f8fc;stroke:#9caec3}
+.diagram .gate-box{fill:#e9e1f3;stroke:#9575b1}
+.diagram .expert-box{fill:#e1efe2;stroke:#709a72}
+.diagram .world-fill{fill:#e6e9f6;stroke:#7b8eb4}
+.diagram .think-box{fill:#f8eadf;stroke:#bc8764}
+.diagram .think-unit{fill:#fff8f1;stroke:#c3997d}
+.diagram .act-box{fill:#dcece5;stroke:#659680}
+.diagram .eval-box{fill:#f1ece3;stroke:#ae9e84}
+.diagram .failure-box{fill:#f3e2df;stroke:#b98077}
+.diagram .feedback{stroke:#3e7769}
+.recovery-figure{max-width:100%;overflow-x:auto;margin:0 auto}
+.recovery-figure svg{display:block;width:100%;height:auto;min-width:710px;border-block:1px solid var(--line)}
+.recovery-figure:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.recovery-figure figcaption{max-width:768px;margin:.55rem auto 0}
+@media print{.recovery-figure{display:none}}
 </style>
 </head>
 <body>
@@ -145,50 +165,79 @@ figcaption{font-size:1rem;color:var(--ink)}
 
 <section class="page" id="question">
 <h1>When to Think: <wbr>Selective Imagination for Self-Improving VLAs</h1>
-<figure class="hero-figure" id="flow" tabindex="0" aria-label="Training and evaluation overview"><svg class="diagram hero-diagram" viewBox="0 0 930 380" role="img" aria-labelledby="overview-title overview-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="overview-title">Data, alternating training and evaluation</title>
-<desc id="overview-desc">Demonstrations, current policy rollouts and paired interventions produce one timestamped, tagged episode store. Verified actions train the policy and observed transitions train Cosmos. The policy uses its gate to choose direct execution or short-horizon imagination. Outcomes return to training; held-out tasks are evaluated separately.</desc>
-<defs><marker id="o-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
-<text class="panel" x="15" y="24">a</text>
-<text class="label" x="134" y="25">Data sources</text>
-<text class="label" x="461" y="25">Shared episode store</text>
-<text class="label" x="784" y="25">Alternating updates</text>
-<path class="edge" d="M246 66h22v173h-22m0-88h22"/><path class="edge" d="M268 173h31" marker-end="url(#o-arrow)"/>
-<g class="edge" marker-end="url(#o-arrow)"><path d="M621 141h24V93h25"/><path d="M621 205h24v33h25"/><path d="M778 139v54"/><path d="M778 275v18"/></g>
-<path class="edge" d="M899 93h17v228h-14" marker-end="url(#o-arrow)"/><text class="edge-label" transform="translate(902 159) rotate(90)">Fast path</text>
-<path class="edge" d="M573 321h-22" marker-end="url(#o-arrow)"/>
-<path class="return" d="M736 347v18H135v-84" marker-end="url(#o-arrow)"/>
-<g class="source-fill">
-<rect x="22" y="41" width="224" height="51" rx="3"/><text class="label" x="134" y="63">Expert demonstrations</text><text class="sub" x="134" y="80">Skill and action alignment</text>
-<rect x="22" y="106" width="224" height="92" rx="3"/><image href="media/moka-stall.jpg" x="31" y="115" width="72" height="72" preserveAspectRatio="xMidYMid slice"/><text class="label" x="169" y="143">Policy rollouts</text><text class="sub" x="169" y="164">Successes + failures</text>
-<rect x="22" y="211" width="224" height="67" rx="3"/><text class="label" x="134" y="235">Paired interventions</text><text class="sub" x="134" y="258">Prepare / retry / hold</text>
+<figure class="hero-figure" id="flow" tabindex="0" aria-label="Training and evaluation overview"><svg class="diagram paper-overview" viewBox="0 0 1000 435" role="img" aria-labelledby="overview-title overview-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="overview-title">Data, model architecture and the recovery training loop</title>
+<desc id="overview-desc">Demonstrations, failed rollouts and expert-tagged recoveries feed a shared trace store. The pi-zero-point-five visual-language backbone feeds both the flow action expert and the budgeted gate. Direct actions bypass Cosmos. On THINK, action proposals are evaluated by the action-conditioned world model and effect head before one prefix is executed. Verified successes train the action expert, observed transitions train Cosmos, and matched autonomous comparisons train the gate.</desc>
+<defs><marker id="o-arrow" viewBox="0 0 7 7" refX="6.6" refY="3.5" markerWidth="6.3" markerHeight="6.3" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
+<text class="panel" x="16" y="24">a</text>
+<text class="column-title" x="125" y="23">Training data</text>
+<text class="column-title" x="502" y="23">Selective world-model policy</text>
+<text class="column-title" x="882" y="23">Training objectives</text>
+<rect class="architecture-box" x="251" y="43" width="491" height="174" rx="6"/>
+<rect class="think-box" x="260" y="244" width="474" height="68" rx="5"/>
+
+<g class="edge" marker-end="url(#o-arrow)">
+<path d="M225 76h23"/><path d="M225 163h23"/><path d="M124 207v9"/>
+<path d="M502 83v13"/><path d="M502 134v13H384v15"/><path d="M502 147h118v15"/>
+<path d="M384 207v34"/><path d="M620 207v34"/><path d="M620 228h111v122h-12"/>
+<path d="M497 312v18"/>
+<path d="M721 350h30V78h20"/><path d="M751 175h20"/><path d="M751 264h20"/>
 </g>
+<path class="return feedback" d="M503 371v24H123v-90" marker-end="url(#o-arrow)"/>
+<path class="edge" d="M503 371v24h218" marker-end="url(#o-arrow)"/>
+<path class="edge flow-inner" d="M413 279h13m146 0h13" marker-end="url(#o-arrow)"/>
+
+<g class="data-box">
+<rect x="23" y="43" width="202" height="66" rx="5"/>
+<text class="label" x="124" y="70">Expert demonstrations</text>
+<text class="sub" x="124" y="92">Language + native actions</text>
+<rect x="23" y="121" width="202" height="86" rx="5"/>
+<image href="media/moka-stall.jpg" x="33" y="132" width="64" height="64" preserveAspectRatio="xMidYMid slice"/>
+<text class="label" x="157" y="154">Failed rollouts</text>
+<text class="sub" x="160" y="177">Stalled attempts</text>
+<rect x="23" y="219" width="202" height="83" rx="5"/>
+<text class="label" x="124" y="246">Expert corrections</text>
+<text class="sub" x="124" y="268">Tag → VLA recovery</text>
+<text class="sub" x="124" y="286">Verified recovery → SFT</text>
+</g>
+
+<text class="label" x="502" y="62">π0.5 vision–language–action policy</text>
+<text class="sub" x="502" y="81">Cameras · proprioception · instruction</text>
+<rect class="encoder-box" x="283" y="98" width="438" height="36" rx="4"/>
+<text class="label" x="502" y="121">Vision–language backbone</text>
+<rect class="gate-box" x="283" y="165" width="202" height="42" rx="4"/>
+<text class="label" x="384" y="184">Gate</text><text class="sub" x="384" y="201">History + compute budget</text>
+<rect class="expert-box" x="520" y="165" width="201" height="42" rx="4"/>
+<text class="label" x="620" y="184">Flow action expert</text><text class="sub" x="620" y="201">Native action proposals</text>
+
+<text class="smallcaps" x="497" y="262">THINK · only when useful</text>
+<rect class="think-unit" x="274" y="268" width="139" height="27" rx="3"/>
+<rect class="think-unit" x="428" y="268" width="144" height="27" rx="3"/>
+<rect class="think-unit" x="587" y="268" width="133" height="27" rx="3"/>
+<text class="sub" x="343" y="286">Candidate actions</text>
+<text class="sub" x="500" y="286">Cosmos 2.5 WM</text>
+<text class="sub" x="653" y="286">Effect ranker</text>
+<text class="edge-label" x="629" y="237">Direct if ACT</text>
+<rect class="act-box" x="284" y="333" width="432" height="38" rx="5"/>
+<text class="label" x="500" y="356">ACT · execute a short prefix and reobserve</text>
+
 <g>
-<rect x="302" y="54" width="319" height="215" rx="3"/>
-<text class="label" x="461" y="81">Synchronized trajectories</text>
-<text class="sub" x="461" y="103">Cameras · states · commands · events</text>
-<path class="edge" d="M323 120h276"/>
-<rect x="329" y="134" width="264" height="30" rx="2" class="tag"/>
-<rect x="329" y="171" width="264" height="30" rx="2" class="tag"/>
-<rect x="329" y="208" width="264" height="30" rx="2" class="tag"/>
-<text class="label" x="461" y="154">Intent</text>
-<text class="label" x="461" y="191">Outcome</text>
-<text class="label" x="461" y="228">Provenance</text>
+<rect class="expert-box" x="774" y="43" width="203" height="70" rx="5"/>
+<text class="label" x="875" y="68">Policy SFT</text>
+<text class="sub" x="875" y="89">Expert-corrected VLA traces</text>
+<rect class="world-fill" x="774" y="135" width="203" height="79" rx="5"/>
+<text class="label" x="875" y="161">WM update</text>
+<text class="sub" x="875" y="182">Observed futures</text>
+<text class="sub" x="875" y="200">+ executed commands</text>
+<rect class="gate-box" x="774" y="226" width="203" height="77" rx="5"/>
+<text class="label" x="875" y="250">Gate + online RL</text>
+<text class="sub" x="875" y="270">Matched ACT / THINK</text>
+<text class="sub" x="875" y="288">+ on-policy outcomes</text>
 </g>
-<g>
-<rect class="policy-fill" x="673" y="47" width="226" height="92" rx="3"/>
-<text class="label" x="786" y="73">π0.5 policy</text><text class="sub" x="786" y="96">Verified actions → SFT</text><text class="sub" x="786" y="119">On-policy rollouts → RL</text>
-<rect class="world-fill" x="673" y="196" width="226" height="79" rx="3"/>
-<text class="label" x="786" y="221">THINK · Cosmos 2.5 WM</text><text class="sub" x="786" y="242">Propose · predict · rank</text><text class="sub" x="786" y="261">Fit observed action effects</text>
-<text class="sub" x="834" y="166">When stuck</text>
-<rect class="eval-fill" x="573" y="296" width="326" height="51" rx="3"/>
-<text class="label" x="736" y="316">ACT in the environment</text>
-<text class="sub" x="736" y="336">Execute a prefix · observe again</text>
-<rect class="eval-fill" x="302" y="296" width="246" height="51" rx="3"/>
-<text class="label" x="425" y="316">Held-out evaluation</text>
-<text class="sub" x="425" y="336">LIBERO · RoboDojo · RoboCasa365</text>
-<text class="edge-label" x="159" y="358">Training split only → next collection round</text>
-</g>
+<text class="edge-label" x="145" y="388">Observed training traces → next round</text>
+<rect class="eval-box" x="724" y="378" width="253" height="34" rx="4"/>
+<text class="smallcaps" x="850" y="391">Held-out evaluation</text>
+<text class="sub" x="850" y="406">LIBERO · RoboDojo · RoboCasa365</text>
 </svg></figure>
 <h2 class="abstract-heading">Abstract</h2>
 <p class="deck">长程操作中，VLA 在顺畅阶段只需执行下一段动作；一旦进展停滞，它容易重复同一失败。始终调用世界模型又增加时延。我们让门控选择 ACT 或 THINK：前者直接执行 π0.5，后者短视界预演多个恢复候选，选中后从当前状态执行一段，再回到 ACT。真实执行后的观测和动作分别用于校正 Cosmos 与训练 π0.5。我们将比较等调用预算下的固定频率和置信度门控，并检验更新后的采样器能否提高新学生的学习效率和下一轮更新收益。</p>
@@ -344,6 +393,68 @@ figcaption{font-size:1rem;color:var(--ink)}
 <h3 id="cold-start">100 expert-verified recoveries</h3>
 <p><strong>Tag → Guide → Verify.</strong> 专家先从失败回放选点，复原并保存快照，标注卡住的阶段、可见症状和恢复子任务。专家给提示，VLA 输出并执行动作；一旦脱困，恢复原指令并继续到终局。只有 <code>recovered=true</code>、<code>retained=true</code> 且官方 <code>episode_success=true</code>，专家复核后才计入 100 条 SFT 正样本。</p>
 <p><strong>Training record.</strong> 保存 <code>snapshot_id, expert_tags, recovery_hint, guided_act.trajectory_ref, executor=VLA</code>，以及恢复帧、三个验收字段和专家复核状态。保留失败尝试。专家引导成功可教恢复动作；Gate 的净收益仍需从同一快照重跑自动 ACT 与自动 THINK，按同一时限和回报标准计算 <code>ΔR − λΔT</code>。专家接管则单独记为示教。</p>
+<figure class="recovery-figure" id="recovery-sft" tabindex="0" aria-label="从失败轨迹到 SFT 的详细流程"><svg class="diagram recovery-diagram" viewBox="0 0 1000 407" role="img" aria-labelledby="recovery-title recovery-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="recovery-title">From a failed rollout to a verified SFT trajectory</title>
+<desc id="recovery-desc">An actual failed LIBERO rollout identifies a decision point. A replayable simulator snapshot is required. An expert tags the phase and observed failure, then gives a recovery instruction. The VLA executes all actions; after recovery it resumes the original instruction and finishes the episode. A reviewer checks recovery, preservation of progress and native task success. Only passing real transitions become positive SFT examples. Unsuccessful and original failed traces remain available to train the world model. The actual image depicts the original failure, not a successful recovery.</desc>
+<defs><marker id="r-arrow" viewBox="0 0 7 7" refX="6.5" refY="3.5" markerWidth="6.2" markerHeight="6.2" orient="auto"><path d="M0 0 7 3.5 0 7Z"/></marker></defs>
+<text class="panel" x="16" y="25">b</text>
+<text class="column-title" x="502" y="25">Failure correction → verified VLA trajectory → SFT</text>
+<g class="edge" marker-end="url(#r-arrow)">
+<path d="M227 127h25"/><path d="M477 127h24"/><path d="M728 127h24"/>
+<path d="M867 209v25"/>
+<path d="M751 270h-83"/><path d="M867 305v34"/>
+<path d="M552 309v30"/>
+</g>
+<path class="return" d="M123 209v154h280" marker-end="url(#r-arrow)"/>
+<text class="edge-label" x="145" y="354">Keep original failure as observed data</text>
+<text class="edge-label" x="693" y="261">Pass</text><text class="edge-label" x="876" y="327">Fail</text>
+<g>
+<rect class="failure-box" x="20" y="44" width="207" height="165" rx="5"/>
+<text class="label" x="124" y="66">01 · Original failure</text>
+<image href="media/moka-stall.jpg" x="31" y="76" width="185" height="98" preserveAspectRatio="xMidYMid slice"/>
+<text class="sub" x="124" y="195">Second pot not placed</text>
+
+<rect class="data-box" x="255" y="44" width="222" height="165" rx="5"/>
+<text class="label" x="366" y="66">02 · Restore and tag</text>
+<text class="sub" x="366" y="91">Save a replayable snapshot</text>
+<path class="edge" d="M272 103h188"/>
+<text class="sub" x="366" y="123">Phase: second pot</text>
+<text class="sub" x="366" y="147">Symptom: repeated grasp stall</text>
+<text class="sub" x="366" y="173">Cue: retreat and realign</text>
+<text class="smallcaps" x="366" y="196">Human expert annotation</text>
+
+<rect class="architecture-box" x="504" y="44" width="224" height="165" rx="5"/>
+<text class="label" x="616" y="66">03 · Guided VLA recovery</text>
+<text class="sub" x="616" y="94">Real image + recovery cue</text>
+<text class="sub" x="616" y="119">π0.5 → executed commands</text>
+<text class="sub" x="616" y="144">Observe whether grasp recovers</text>
+<path class="edge" d="M522 157h188"/>
+<text class="smallcaps" x="616" y="182">Executor = VLA</text>
+<text class="sub" x="616" y="199">Log real actions and frames</text>
+
+<rect class="act-box" x="755" y="44" width="222" height="165" rx="5"/>
+<text class="label" x="866" y="66">04 · Resume original task</text>
+<text class="sub" x="866" y="96">Return to the full instruction</text>
+<text class="sub" x="866" y="121">Put the second pot on the stove</text>
+<text class="sub" x="866" y="146">Preserve the first pot</text>
+<path class="edge" d="M773 159h186"/>
+<text class="smallcaps" x="866" y="184">Run to episode termination</text>
+</g>
+
+<g>
+<rect class="expert-box" x="406" y="236" width="259" height="73" rx="5"/>
+<text class="label" x="535" y="259">06 · Admit to SFT</text>
+<text class="sub" x="535" y="281">Observation + subtask → actual action</text>
+<text class="sub" x="535" y="299">Mix with original demonstrations</text>
+<rect class="gate-box" x="755" y="237" width="222" height="68" rx="5"/>
+<text class="label" x="866" y="258">05 · Expert verification</text>
+<text class="sub" x="866" y="280">Recovered · prior progress kept</text>
+<text class="sub" x="866" y="298">Official task success</text>
+<rect class="world-fill" x="406" y="342" width="571" height="43" rx="5"/>
+<text class="label" x="691" y="368">Actual transitions → WM training · Failed attempts stay out of positive SFT</text>
+</g>
+</svg>
+<figcaption>左侧为真实失败回放。后续步骤是采集流程，尚未获得该回合的成功修正轨迹。</figcaption></figure>
 <h3>Example from a recorded failure</h3>
 <p><a href="media/moka-stall.mp4#t=15.55">双摩卡壶 · Init 1</a>。第一只已上炉灶，第二只未完成。专家下一步复跑并标注抓取停滞，可先提示撤回重对齐，再让 VLA 完成剩余任务。原回合未恢复，暂不计入正样本。</p>
 <pre class="sample-record" tabindex="0" aria-label="真实失败回合的待专家复核记录"><code>{

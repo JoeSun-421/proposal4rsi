@@ -151,13 +151,31 @@ figcaption{font-size:1rem;color:var(--ink)}
 .diagram .feedback{stroke:#3e7769}
 .data-flow-figure{max-width:100%}
 .data-flow-scroll{overflow-x:auto;border-block:1px solid var(--line)}
-.data-flow-scroll svg{display:block;width:100%;height:auto;min-width:740px}
+.data-flow-scroll svg{display:block;width:100%;height:auto;min-width:730px}
 .data-flow-scroll:focus-visible,.data-records summary:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .data-flow .left{text-anchor:start}
+.data-flow .right{text-anchor:end}
 .data-flow .label{font-size:16px}
 .data-flow .sub{font-size:14px}
-.data-flow .column{font-size:13px;font-weight:700;letter-spacing:.065em}
+.data-flow .eyebrow{font-size:12px;font-weight:700;letter-spacing:.075em;text-anchor:start}
 .data-flow .rule{stroke:var(--line);stroke-width:1}
+.data-flow .rail{fill:none;stroke-width:2.4;stroke-linejoin:round}
+.data-flow .ink-rail{stroke:#62584b}
+.data-flow .fail-rail{stroke:#a64f4a;stroke-dasharray:7 4}
+.data-flow .act-rail{stroke:#27806a}
+.data-flow .act-node{fill:#27806a;stroke:var(--paper);stroke-width:2}
+.data-flow .sync-tint,.data-flow .sync-pill{fill:#f5e6c8;stroke:#b18440}
+.data-flow .sync-pill{fill:#efd19b}
+.data-flow .fail-tint{fill:#f7dcd7;stroke:#b76861}
+.data-flow .act-tint,.data-flow .action-chip{fill:#d9eee4;stroke:#4c927c}
+.data-flow .review-tint{fill:#eee9de;stroke:#a79a83}
+.data-flow .record-tint{fill:#e2edf9;stroke:#6c8eb5}
+.data-flow .frame-box{fill:#f6fbff;stroke:#829fbc}
+.data-flow .imagine-box,.data-flow .gate-tint{fill:#eee4f7;stroke:#926ba9}
+.data-flow .imagine-box{stroke-dasharray:5 3}
+.data-flow .intent-tag{fill:#f9e7c0;stroke:#b18440}
+.data-flow .outcome-tag{fill:#d9eee4;stroke:#4c927c}
+.data-flow .source-tag{fill:#e2edf9;stroke:#6c8eb5}
 .data-records summary{cursor:pointer;font-weight:650}
 .data-records[open] .data-record-body{display:grid;gap:.8rem;margin-top:.8rem}
 @media print{.data-flow-scroll{overflow:visible}.data-flow-scroll svg{min-width:0}.data-records{display:none}}
@@ -406,76 +424,106 @@ figcaption{font-size:1rem;color:var(--ink)}
 <section class="page" id="data">
 <h2>Data and supervision</h2>
 <figure class="data-flow-figure" id="recovery-sft">
-<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Data collection and supervision diagram">
-<svg class="diagram data-flow" viewBox="0 0 940 441" role="img" aria-labelledby="data-flow-title data-flow-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="data-flow-title">One failure snapshot, three training signals</title>
-<desc id="data-flow-desc">A recorded two-moka-pot failure supplies a SYNC snapshot. Expert guidance makes the VLA try a recovery; success, recovery, and preserved progress admit real actions to policy SFT. Automatic ACT and THINK run from the same snapshot with the same horizon, and their measured return difference less latency cost supervises the gate. All real action and observation pairs, including failures, train Cosmos; predictions are compared against corresponding real frames. Intent, outcome, and provenance are logged separately.</desc>
-<defs><marker id="data-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
+<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Paired recovery experiment">
+<svg class="diagram data-flow" viewBox="0 0 940 357" role="img" aria-labelledby="capture-title capture-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="capture-title">a · Collect a paired recovery</title>
+<desc id="capture-desc">The LIBERO two-moka-pot pilot rolled back to step 210. An unassisted run stalled and timed out at step 520. From the same snapshot, a manually written cue helped the VLA lift the second pot. The VLA switched back to the original instruction at step 417 and succeeded at step 498. The planned dataset will require human review of recovery, retained progress and official success.</desc>
+<defs><marker id="capture-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 8 4 0 8Z"/></marker></defs>
 
-<rect class="failure-box" x="22" y="17" width="255" height="85" rx="4"/>
-<image href="media/moka-stall.jpg" x="30" y="25" width="74" height="69" preserveAspectRatio="xMidYMid slice"/>
-<text class="left label" x="115" y="44">Recorded failure</text>
-<text class="left sub" x="115" y="65">First pot placed</text>
-<text class="left sub" x="115" y="83">Second pot stalls</text>
-<rect class="eval-box" x="339" y="17" width="274" height="85" rx="4"/>
-<text class="label" x="476" y="44">SYNC · save replay point</text>
-<text class="sub" x="476" y="65">Real observation + executed prefix</text>
-<text class="sub" x="476" y="83">Simulator, controller and RNG state</text>
-<text class="left label" x="681" y="44">Three tag families</text>
-<text class="left sub" x="681" y="65">Intent · goal / phase</text>
-<text class="left sub" x="681" y="83">Outcome · result   /   Provenance · source</text>
-<path class="edge" d="M277 59H335" marker-end="url(#data-arrow)"/>
-<path class="edge" d="M476 102v18H31v263"/>
+<text class="panel" x="20" y="26">a</text><text class="left label" x="49" y="26">Collect a paired recovery</text>
+<text class="right sub" x="920" y="26">LIBERO-10 · two moka pots</text>
+<path class="rule" d="M20 36H920"/>
 
-<text class="left column" x="61" y="147">COLLECT</text>
-<text class="left column" x="374" y="147">VERIFY AND SAVE</text>
-<text class="left column" x="720" y="147">UPDATE</text>
-<path class="rule" d="M61 155H918"/>
+<rect class="sync-tint" x="20" y="55" width="235" height="235" rx="5"/>
+<text class="left eyebrow" x="34" y="77">FROZEN π0.5 ROLLOUT</text>
+<image href="media/moka-stall.jpg" x="34" y="88" width="207" height="124" preserveAspectRatio="xMidYMax slice"/>
+<text class="left label" x="34" y="235">Second pot stalls</text>
+<text class="left sub" x="34" y="257">First pot already on the stove</text>
+<text class="left sub" x="34" y="276">Restore sim, controller and RNG</text>
 
-<g class="edge" marker-end="url(#data-arrow)">
-<path d="M31 201h26"/><path d="M31 292h26"/><path d="M31 383h26"/>
-<path d="M316 201h54"/><path d="M316 292h54"/><path d="M316 383h54"/>
-<path d="M663 201h53"/><path d="M663 292h53"/><path d="M663 383h53"/>
-</g>
+<path class="rail ink-rail" d="M255 171H292M379 171H405M405 114V229"/>
+<path class="rail fail-rail" d="M405 114H729" marker-end="url(#capture-arrow)"/>
+<path class="rail act-rail" d="M405 229H729" marker-end="url(#capture-arrow)"/>
+<rect class="sync-pill" x="292" y="145" width="87" height="52" rx="6"/>
+<text class="label" x="335.5" y="167">SYNC</text>
+<text class="sub" x="335.5" y="186">step 210</text>
 
-<rect class="expert-box" x="61" y="164" width="255" height="74" rx="4"/>
-<text class="left label" x="73" y="188">Expert-guided recovery</text>
-<text class="left sub" x="73" y="209">Expert tags stall and gives cue</text>
-<text class="left sub" x="73" y="227">π0.5 executes and resumes task</text>
-<text class="left label" x="374" y="188">Recovered · progress kept · success</text>
-<text class="left sub" x="374" y="209">Reviewer admits verified real actions</text>
-<text class="left sub" x="374" y="227">Join with the original executed prefix</text>
-<rect class="expert-box" x="720" y="164" width="198" height="74" rx="4"/>
-<text class="left label" x="732" y="188">π0.5 · SFT</text>
-<text class="left sub" x="732" y="209">100 recoveries planned</text>
-<text class="left sub" x="732" y="227">Mix with original demos</text>
+<text class="left label" x="428" y="91">Unassisted control</text>
+<text class="left sub" x="428" y="140">Same original instruction</text>
+<text class="left sub" x="428" y="158">Repeated attempts · frame 360</text>
+<rect class="fail-tint" x="740" y="55" width="180" height="112" rx="5"/>
+<image href="pilot/moka-control.jpg" x="748" y="62" width="164" height="74" preserveAspectRatio="xMidYMax slice"/>
+<text class="label" x="830" y="156">Timeout · 520</text>
 
-<rect class="gate-box" x="61" y="255" width="255" height="74" rx="4"/>
-<text class="left label" x="73" y="279">Matched ACT / THINK</text>
-<text class="left sub" x="73" y="300">Restore the same SYNC twice</text>
-<text class="left sub" x="73" y="318">Direct vs. WM-selected action</text>
-<text class="left label" x="374" y="279">Same horizon · real rollouts</text>
-<text class="left sub" x="374" y="300">Compare returns and added latency</text>
-<text class="left sub" x="374" y="318">Target: Δ return − λ × Δ latency</text>
-<rect class="gate-box" x="720" y="255" width="198" height="74" rx="4"/>
-<text class="left label" x="732" y="279">Gate · supervision</text>
-<text class="left sub" x="732" y="300">Learn when THINK</text>
-<text class="left sub" x="732" y="318">is worth its cost</text>
+<text class="left label" x="428" y="204">Hint-guided π0.5</text>
+<circle class="act-node" cx="445" cy="229" r="5.5"/><circle class="act-node" cx="585" cy="229" r="5.5"/>
+<text class="left sub" x="428" y="255">Tag stall + cue</text>
+<text class="left sub" x="575" y="255">Lift · 417</text>
+<text class="left sub" x="575" y="273">Resume original task</text>
+<rect class="act-tint" x="740" y="172" width="180" height="118" rx="5"/>
+<image href="pilot/moka-recovery.jpg" x="748" y="179" width="164" height="79" preserveAspectRatio="xMidYMax slice"/>
+<text class="label" x="830" y="279">Success · 498</text>
 
-<rect class="world-fill" x="61" y="346" width="255" height="74" rx="4"/>
-<text class="left label" x="73" y="370">Measured transitions</text>
-<text class="left sub" x="73" y="391">Log every executed action</text>
-<text class="left sub" x="73" y="409">Keep both successes and failures</text>
-<text class="left label" x="374" y="370">Action-aligned observations</text>
-<text class="left sub" x="374" y="391">Real start + commands → real future</text>
-<text class="left sub" x="374" y="409">Pair predictions with measured frames</text>
-<rect class="world-fill" x="720" y="346" width="198" height="74" rx="4"/>
-<text class="left label" x="732" y="370">Cosmos · fine-tune</text>
-<text class="left sub" x="732" y="391">Train on real frames</text>
-<text class="left sub" x="732" y="409">Audit prediction error</text>
+<rect class="review-tint" x="20" y="308" width="900" height="35" rx="4"/>
+<text class="left label" x="34" y="331">100 planned</text>
+<text class="left sub" x="164" y="331">Human review requires recovery, preserved progress and official task success</text>
 </svg>
 </div>
-<figcaption>画面来自双摩卡壶的失败回放。三条路径说明拟采集的训练信号。</figcaption>
+<figcaption>试跑使用人工编写的提示，VLA 执行全部动作。该条尚待专家复核。<a href="pilot/moka-pilot.json">试跑记录</a></figcaption>
+</figure>
+
+<figure class="data-flow-figure" id="supervision-routes">
+<div class="data-flow-scroll" tabindex="0" role="region" aria-label="Trajectory record and model supervision">
+<svg class="diagram data-flow" viewBox="0 0 940 380" role="img" aria-labelledby="record-title record-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="record-title">b · Turn one record into three training signals</title>
+<desc id="record-desc">A frame log synchronizes cameras, proprioception, commands, and measured results by step. An imagined branch is stored separately under its snapshot ID. Intent is available before acting; outcome is post-rollout supervision; provenance identifies the source for filtering and audit. Verified real actions plus demonstrations train pi 0.5, measured transitions including failures train Cosmos, and automatic ACT and THINK executed from the same snapshot provide a latency-adjusted Gate target.</desc>
+<defs><marker id="record-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
+
+<text class="panel" x="20" y="26">b</text><text class="left label" x="49" y="26">Turn one record into three training signals</text>
+<path class="rule" d="M20 36H920"/>
+<rect class="record-tint" x="20" y="51" width="602" height="167" rx="5"/>
+<text class="left eyebrow" x="34" y="73">TRAJECTORY RECORD</text>
+<text class="right sub" x="606" y="73">Parquet + camera MP4</text>
+<g>
+<rect class="frame-box" x="34" y="86" width="150" height="48" rx="4"/>
+<text class="label" x="109" y="106">Observation t</text><text class="sub" x="109" y="124">Camera + proprio</text>
+<rect class="action-chip" x="212" y="86" width="138" height="48" rx="4"/>
+<text class="label" x="281" y="106">ACT at t</text><text class="sub" x="281" y="124">Native command</text>
+<rect class="frame-box" x="378" y="86" width="228" height="48" rx="4"/>
+<text class="label" x="492" y="106">Measured observation t+1</text><text class="sub" x="492" y="124">Camera + proprio + outcome</text>
+<path class="edge" d="M184 110h24" marker-end="url(#record-arrow)"/><path class="edge" d="M350 110h24" marker-end="url(#record-arrow)"/>
+</g>
+<rect class="imagine-box" x="34" y="151" width="572" height="49" rx="4"/>
+<text class="left label" x="48" y="172">Imagined branch log</text>
+<text class="left sub" x="48" y="190">Predicted frames and candidate actions · linked by snapshot and step</text>
+
+<rect class="intent-tag" x="644" y="51" width="276" height="50" rx="4"/>
+<text class="left label" x="659" y="72">Intent</text><text class="left sub" x="659" y="90">Task and phase · known before ACT</text>
+<rect class="outcome-tag" x="644" y="110" width="276" height="50" rx="4"/>
+<text class="left label" x="659" y="131">Outcome</text><text class="left sub" x="659" y="149">Recovery and success · training target</text>
+<rect class="source-tag" x="644" y="169" width="276" height="50" rx="4"/>
+<text class="left label" x="659" y="190">Provenance</text><text class="left sub" x="659" y="208">Demo / policy / guided / imagined</text>
+
+<path class="edge" d="M321 218v20M163 238H776"/>
+<g class="edge" marker-end="url(#record-arrow)"><path d="M163 238v14"/><path d="M469 238v14"/><path d="M776 238v14"/></g>
+<rect class="act-tint" x="20" y="257" width="286" height="92" rx="5"/>
+<text class="left label" x="34" y="280">π0.5 · SFT</text>
+<text class="left sub" x="34" y="304">Verified real recovery + demos</text>
+<text class="left sub" x="34" y="328">Observation + task → executed action</text>
+
+<rect class="record-tint" x="326" y="257" width="286" height="92" rx="5"/>
+<text class="left label" x="340" y="280">Cosmos · fine-tune</text>
+<text class="left sub" x="340" y="304">All real transitions, including failures</text>
+<text class="left sub" x="340" y="328">Start + commands → measured frames</text>
+
+<rect class="gate-tint" x="632" y="257" width="288" height="92" rx="5"/>
+<text class="left label" x="646" y="280">Gate · predict value of THINK</text>
+<text class="left sub" x="646" y="304">Matched automatic ACT vs. THINK</text>
+<text class="left sub" x="646" y="328">Target: Δ return − λ × Δ latency</text>
+<text class="left sub" x="20" y="371">Split by task and initial state · keep all branches from one snapshot in the same split</text>
+</svg>
+</div>
+<figcaption>示范来源 <a href="https://huggingface.co/datasets/physical-intelligence/libero">PI LIBERO</a> · <a href="https://huggingface.co/datasets/RoboDojo-Benchmark/RoboDojo/tree/main/data">RoboDojo</a></figcaption>
 </figure>
 <details class="data-records">
 <summary>Data sources, schema and example record</summary>

@@ -722,9 +722,9 @@ figcaption{font-size:1rem;color:var(--ink)}
 </figure>
 <details class="training-setup">
 <summary>Initialization and action adapters</summary>
-<p><strong>Checkpoints.</strong> LIBERO 用本地 <code>pi05_libero</code>。RoboDojo 用适配后的 <a href="https://github.com/XPolicyLab/XPolicyLab/blob/main/policy/Pi_05/README.md">Pi_05</a> 或从 <code>pi05_base</code> 做 SFT。世界模型采用 <a href="https://huggingface.co/nvidia/Cosmos-Predict2.5-2B/tree/85f8ae7bfe8f5525c8d103429524dcf12f98bf7b/robot/action-cond">Cosmos-Predict2.5-2B action-cond</a> 的 <a href="https://github.com/nvidia-cosmos/cosmos-predict2.5/blob/main/docs/post-training_video2world_action.md">rectified-flow 配方</a>。Prophet 作同域对照。</p>
+<p><strong>Checkpoints.</strong> LIBERO 从适配该基准的 π0.5 权重初始化。RoboDojo 使用<a href="https://github.com/XPolicyLab/XPolicyLab/blob/main/policy/Pi_05/README.md">适配版 π0.5</a>，或用该平台示范对 π0.5 基础权重做 SFT。世界模型采用 <a href="https://huggingface.co/nvidia/Cosmos-Predict2.5-2B/tree/85f8ae7bfe8f5525c8d103429524dcf12f98bf7b/robot/action-cond">Cosmos-Predict2.5-2B action-cond</a> 的 <a href="https://github.com/nvidia-cosmos/cosmos-predict2.5/blob/main/docs/post-training_video2world_action.md">rectified-flow 配方</a>。Prophet 作同域对照。</p>
 <p><strong>Update schedule.</strong> 在开发集核验动作敏感性、接触事件、分支排序和时延后，冻结本轮 WM。用实测结果训练 Effect 和 Gate，混合示范与验证过的恢复动作做 SFT。后续在真实 on-policy 轨迹上做 <a href="https://arxiv.org/abs/2510.25889">Flow-SDE PPO</a>，每轮保留均匀采样与冻结旧版本对照。</p>
-<p><strong>Action adapter.</strong> LIBERO 与 RoboDojo 的单臂 EEF、双臂 joint 指令分别保留。单臂条件是局部 Δxyz、Δrpy 和夹爪命令。RoboDojo 由关节命令目标的正运动学构造逐臂增量，训练双臂 conditioner；未来实测位姿只作监督。原版 Cosmos action-cond 为单视角 4 FPS，按时间戳匹配候选与输出；没有对齐帧时跳过打分，短接触另训高时间分辨率 latent WM 对照。单卡先做 100 步显存与重放检查。</p>
+<p><strong>Action adapter.</strong> 策略保留各平台的原生指令。Cosmos 在 LIBERO 上以局部 Δxyz、Δrpy 和夹爪指令为条件。在 RoboDojo 上用关节命令目标的正运动学计算双臂末端增量，未来实测位姿只作监督。按时间戳对齐动作与预测帧，缺少对应帧时跳过打分。以高时间分辨率 latent WM 对照短时接触预测。</p>
 </details>
 <div class="equation-block">
 <h3>Dynamics and branch selection</h3>
@@ -825,7 +825,7 @@ G(h)&amp;=\mathbb E[\Delta R-\lambda\Delta T_{\rm WM}\mid h],\\
 </ol>
 <div class="moka-pilot" id="sync-pilot">
 <h3 id="failure-videos">Current pilot</h3>
-<p>LIBERO-90 抽屉任务在 400 步内未完成。第 200 步的 <code>SYNC</code> 已精确恢复，四个 π 动作前缀与第 205 步的真实观测已保存。<a href="sync-pilot-assets/libero90-sync-calibration.zip">下载校准记录</a>。Cosmos 主权重与 CUDA 环境尚未完成验证；暂未运行外部 WM 回灌，也未产出 SFT 正样本。</p>
+<p>LIBERO-90 抽屉任务在 400 步内未完成。第 200 步的 <code>SYNC</code> 已精确恢复，四个 π 动作前缀与第 205 步的真实观测已保存。<a href="sync-pilot-assets/libero90-sync-calibration.zip">下载校准记录</a>。试验进度到此为止。下一步验证 Cosmos 的预测能否驱动分支动作，并由环境确认恢复结果。</p>
 <figure class="sync-video"><video controls playsinline preload="none" width="640" height="540" poster="sync-pilot-assets/libero90-sync200.png" aria-label="LIBERO-90 抽屉任务失败录像"><source src="sync-pilot-assets/libero90-drawer-baseline.mp4" type="video/mp4"></video></figure>
 <p id="moka-pilot"><a href="pilot/moka-pilot.json">双摩卡壶回溯试跑记录</a> · <a href="pilot/moka-recovery-sft.zip">历史提示恢复样本</a></p>
 </div>
@@ -857,7 +857,7 @@ r_{\rm sel}&amp;=\Delta J_{\rm dev}-\lambda_m\Delta C,\\
 <ul>
 <li><strong>Contact and time.</strong> Cosmos 2.5 action-cond 的公开权重需授权访问。先测动作交换、双臂同步和短视界接触，再考虑 <a href="https://nvidia.github.io/cosmos-framework/skills/cookbooks/cosmos3/generator/action/">Cosmos 3 forward dynamics</a> 或蒸馏。画质指标不替代动作可控性。</li>
 <li><strong>Protocol.</strong> 先验证 Isaac Sim 的快照恢复、控制器状态和重放一致性。跨平台需要原生动作、相机与归一化适配，官方测试不能用于更新任何模型。</li>
-<li><strong>Evidence.</strong> 已有本地回放和第三方录像均不能证明方案有效。先验证真实分支排序，再测 Gate 和等预算学习曲线。</li>
+<li><strong>Evidence.</strong> 现有试跑只覆盖失败复现、快照恢复和提示引导。先用实测结果验证分支排序，再测 Gate 和等预算学习曲线。</li>
 </ul>
 </section>
 </main>

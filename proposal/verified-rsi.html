@@ -383,11 +383,11 @@ figcaption{font-size:1rem;color:var(--ink)}
 <section class="page" id="question">
 <h1>When to Think: <wbr>Selective Imagination for Self-Improving VLAs</h1>
 <h2 class="abstract-heading" id="abstract">Abstract</h2>
-<p id="abstract-text">长程操作中的局部停滞容易让视觉–语言–动作模型反复执行无效动作，而频繁预演会增加推理时延。我们提出一种按需预演方法。策略通常直接执行 π0.5 的动作，检测到低进展时，从同一真实状态生成四段候选动作，由动作条件 Cosmos 预测各自的短期后果。策略用共享视觉特征评估候选，只将选中动作的短前缀交给真实环境。用同起点实测的回报与耗时校准触发阈值，用验收通过的完整恢复轨迹更新 π0.5，并用实测转移更新 Cosmos。更新后的系统继续采集新失败，重复验证和训练。</p>
+<p id="abstract-text">长程操作中的局部停滞容易让视觉–语言–动作模型反复执行无效动作，而频繁预演会增加推理时延。我们提出一种按需预演方法。策略通常直接执行 π0.5 的动作，检测到低进展时，从同一真实状态生成四段候选动作，其中一路保留默认动作。Cosmos 预测各候选的短期后果，系统只执行选中动作的短前缀。预测缺失或步号对不齐时，执行默认动作。用同起点实测的回报与耗时校准触发阈值，用验收通过的完整恢复轨迹更新 π0.5，并用实测转移更新 Cosmos。更新后的系统继续采集新失败，重复验证和训练。</p>
 <figure class="hero-figure pitch-flow" id="flow" tabindex="0" aria-label="Selective imagination and real execution">
 <svg class="diagram pitch-diagram" viewBox="0 0 1000 304" role="img" aria-labelledby="pitch-title pitch-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="pitch-title">Think selectively, act on the real state</title>
-<desc id="pitch-desc">The Gate uses observation history and remaining budget. The default path executes a policy action chunk directly. When recent progress drops below the calibrated threshold, one SYNC point seeds four action chunks for Cosmos to predict. The shared progress readout ranks their predicted outcomes. In either path only a short action prefix is executed and a real observation starts the next decision.</desc>
+<desc id="pitch-desc">The Gate uses observation history and remaining budget. The default path executes a policy action chunk directly. When recent progress drops below the calibrated threshold, one SYNC point seeds four action chunks for Cosmos to predict. The four include the default policy chunk. The shared progress readout ranks aligned predictions. A missing or misaligned prediction sends the decision back to direct ACT. Either path executes the same prefix length and reobserves.</desc>
 <defs><marker id="pitch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"/></marker></defs>
 <text class="column-title" x="500" y="25">One decision · two paths · one real execution</text>
 <rect class="act-box" x="370" y="48" width="206" height="36" rx="5"/>
@@ -418,7 +418,7 @@ figcaption{font-size:1rem;color:var(--ink)}
 <rect class="world-fill" x="532" y="168" width="156" height="30" rx="4"/><text class="sub" x="610" y="188">3 · π chunk → Cosmos</text>
 <rect class="world-fill" x="532" y="204" width="156" height="30" rx="4"/><text class="sub" x="610" y="224">4 · π chunk → Cosmos</text>
 </g>
-<text class="sub" x="610" y="253">Four short visual predictions from one real state</text>
+<text class="sub" x="610" y="253">Include default ACT · fall back if predictions cannot be aligned</text>
 <path class="return feedback" d="M913 202v74H94v-76" marker-end="url(#pitch-arrow)"/>
 <text class="sub" x="500" y="295">New real observation → next decision</text>
 </svg>
@@ -840,15 +840,16 @@ J(\eta)&amp;=N^{-1}\sum_j g_\eta(p_j,b_j)\,\Delta_j,\\
 <p>第 <code>r</code> 轮固定策略和世界模型，采集轨迹并在真实环境复验。每次更新后用开发集重新校准调用阈值，再用实际闭环测试核对调用率。完整验收轨迹 <code>ℰverified</code> 进入策略数据，全部对齐的真实转移 <code>𝒳real</code> 进入世界模型数据。带实测标签的候选与真实帧对进入读出头数据 <code>𝒟Q</code>，<code>α</code> 调节读出头损失。用更新后的系统采集下一轮数据。</p>
 <p>后续可另采 π0.5 的真实 on-policy ACT 轨迹做 PPO，使用共享特征上的价值头。预演筛选和专家引导得到的动作进入监督训练。<a href="#rl-objectives">PPO 目标</a></p>
 </div></div></div>
-<h2>What would validate it?</h2>
-<div class="claim-tests">
-<article><h3>01 · Does selective imagination help?</h3><p>固定 π0.5、Cosmos 和候选生成，按相同调用预算比较阈值规则、固定频率和置信度触发，另报纯 ACT 基线。用真实后续回报、恢复率和墙钟时间检验收益，并单独报告预测排序准确率。</p></article>
-<article><h3>02 · Does the loop improve over rounds?</h3><p>以相同起点与数据预算比较逐轮重采集和固定数据训练。用未见布局上的成功率、失败复现率和耗时评估每轮变化。用 π0.5 与 Cosmos 的冻结／更新 2×2 对照定位收益来源。</p></article>
-</div>
-<p><strong>Benchmarks.</strong> LIBERO-90 用于单臂恢复，RoboDojo 用于双臂协作，RoboCasa365 用于新布局和长任务。按任务族、布局与初始条件隔离训练和测试，同一快照的分支留在同一划分。</p>
+<h2>First working loop</h2>
+<ol>
+<li><strong>Replay.</strong> 从 LIBERO-90 抽屉任务的失败点开始。固定 π0.5 和 Cosmos，同起点实测默认动作及另外三段候选，匹配执行步数和后续时限。先看四条里是否存在优于默认动作的真实分支。</li>
+<li><strong>Decide.</strong> 用训练起点的实测结果拟合进展读出头，在开发起点校准 Gate。在独立起点上对比直接 ACT，报告恢复成功率和额外耗时。预测缺失或步号不齐时直接 ACT。</li>
+<li><strong>Update once.</strong> 用验收通过的完整轨迹更新 π0.5，用对齐的实测转移更新 Cosmos。再跑一轮闭环，对比冻结旧版本在同一批保留起点上的成功率和耗时。</li>
+</ol>
+<p><strong>Follow-up.</strong> 首轮通过后，再做同调用预算对照与 π0.5 / Cosmos 的冻结消融，并扩展到 RoboDojo 和 RoboCasa365。</p>
 <div class="moka-pilot" id="sync-pilot">
 <h3 id="failure-videos">Calibration case</h3>
-<p>LIBERO-90 抽屉任务已复现失败并保存四个动作前缀及实测后继帧，可用于校验预测和实测的时间对齐。<a href="sync-pilot-assets/libero90-sync-calibration.zip">校准记录</a></p>
+<p>已复现 LIBERO-90 抽屉任务的失败，并从同一快照保存四个动作前缀及实测后继帧。下一项是核对 Cosmos 的预测步号和实测排序。<a href="sync-pilot-assets/libero90-sync-calibration.zip">校准记录</a></p>
 <figure class="sync-video"><video controls playsinline preload="none" width="640" height="540" poster="sync-pilot-assets/libero90-sync200.png" aria-label="LIBERO-90 抽屉任务失败录像"><source src="sync-pilot-assets/libero90-drawer-baseline.mp4" type="video/mp4"></video></figure>
 <p id="moka-pilot"><a href="pilot/moka-pilot.json">双摩卡壶试跑记录</a> · <a href="pilot/moka-recovery-sft.zip">恢复样本</a></p>
 </div>

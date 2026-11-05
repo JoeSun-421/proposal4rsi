@@ -1,0 +1,50 @@
+{
+  "sample_id": "libero10-task08-init01-rollback210-seed42",
+  "task": "put both moka pots on the stove",
+  "sync": {
+    "tag": "SYNC",
+    "step": 210,
+    "snapshot_ref": "pilot/moka-full-vla-trajectory.zip#snapshot-210.npz",
+    "restore_exact": true
+  },
+  "segments": {
+    "original_prefix": [
+      0,
+      210
+    ],
+    "guided_recovery": [
+      210,
+      417
+    ],
+    "resume_original_task": [
+      417,
+      498
+    ]
+  },
+  "matched_control": {
+    "same_snapshot": true,
+    "same_policy_seed": 42,
+    "episode_success": false,
+    "terminal_step": 520
+  },
+  "guided": {
+    "executor": "pi05_libero",
+    "hint": "turn on the stove and put the moka pot on it",
+    "retained": true,
+    "episode_success": true,
+    "terminal_step": 498
+  },
+  "annotation": {
+    "event_tags": "derived_from_recorded_steps",
+    "human_expert_verified": false
+  },
+  "wm": {
+    "used_for_action_selection": false
+  },
+  "sft": {
+    "candidate_episode": "full_real_episode",
+    "accept_for_expert_dataset": false,
+    "review_status": "pending_human_review"
+  },
+  "trajectory_ref": "pilot/moka-full-vla-trajectory.zip"
+}

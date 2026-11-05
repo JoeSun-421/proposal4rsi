@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-05",
+  "as_of": "2026-11-05T20:10:00+08:00",
+  "items": [
+    {
+      "id": "cronos",
+      "title": "CRONOS：减少复位之后，VLA 还能持续学习吗？",
+      "original_title": "CRONOS: Benchmarking Non-Episodic Reinforcement Learning for Robotic Manipulation",
+      "institution": "National Taiwan University",
+      "published_at": "2026-11-03T15:41:07Z",
+      "source_url": "https://arxiv.org/abs/2611.05080",
+      "summary": "将 VLA 的 RL 微调放进连续共享场景。物体布局和末端位姿漂移会让朴素微调失效；有针对性的复位可缓解问题，并改善未见布局与任务序列上的泛化。",
+      "comment": "把复位成本纳入学习问题，比单看成功率更接近自主练习。当前主要是仿真证据，部分场景检测仍依赖特权状态。",
+      "kind": "paper"
+    },
+    {
+      "id": "gradient",
+      "title": "动作专家是否应该反向训练 VLM？",
+      "original_title": "Should the Action Expert Train the VLM? Action-Token Supervision and Gradient Routing in Mixture-of-Transformer VLAs",
+      "institution": "NVIDIA · Princeton · Stanford",
+      "published_at": "2026-11-03T17:35:27Z",
+      "source_url": "https://arxiv.org/abs/2611.05249",
+      "summary": "独立比较动作 token 监督与梯度回传，发现梯度隔离的价值取决于训练历史和评测设置。共同训练时，允许动作损失更新 VLM，也能改善机器人操作表现。",
+      "comment": "物理反馈该更新哪一层，是自我改进回路的关键设计。这是训练机制研究，尚非系统自主改进学习算法的证据。",
+      "kind": "paper"
+    },
+    {
+      "id": "arpg",
+      "title": "ARPG：从任务描述生成可学习的 RL 流程",
+      "original_title": "LLMs as MDP Designers: A Dependency-Aware Agentic Framework for Automated Robot Policy Generation",
+      "institution": "Sejong University · AIRI",
+      "published_at": "2026-11-03T14:29:36Z",
+      "source_url": "https://arxiv.org/abs/2611.04974",
+      "summary": "先按依赖顺序构造状态、动作、奖励与终止条件，再模块化实现仿真并局部纠错。Isaac Sim 实验显示，其建模正确性、环境可执行性与策略生成成功率优于对照。",
+      "comment": "代码能运行，不代表策略能学会。中间产物与依赖检查值得借鉴；主要验证仍在仿真，距离长期真机闭环有差距。",
+      "kind": "paper"
+    },
+    {
+      "id": "robotryon",
+      "title": "RoboTryOn：将人类视频转换为机器人示范",
+      "original_title": "RoboTryOn: Synthesizing Dexterous Robot Demonstrations from Human Videos via Virtual Try-On",
+      "institution": "KAIST · RLWRLD · Korea University",
+      "published_at": "2026-11-03T16:35:42Z",
+      "source_url": "https://arxiv.org/abs/2611.05163",
+      "summary": "把人类操作视频转换成目标机器人视频，再用逆动力学模型推断动作标签。作者报告未见任务平均成功率约从 2% 提升至 60%，采集成本约为纯遥操作方案的三分之一。",
+      "comment": "降低示范成本很有价值；下一步要看能否针对机器人失败定向生成并验证新数据。当前还不是自主运转的数据飞轮。",
+      "kind": "paper"
+    },
+    {
+      "id": "arp",
+      "title": "ARP：让语义推理与动作控制异步运行",
+      "original_title": "Asynchronous Robot Policies",
+      "institution": "INSAIT · Sofia University",
+      "published_at": "2026-11-03T16:30:27Z",
+      "source_url": "https://arxiv.org/abs/2611.05155",
+      "summary": "大 VLM 低频更新语义记忆，轻量动作专家高频控制，并在训练中模拟记忆过期与执行延迟。作者报告动态仿真表现约为基线的 3–5 倍。",
+      "comment": "更快的响应有助于提高试验吞吐，但执行效率不等于持续学习。应视为自我改进的支撑架构。",
+      "kind": "paper"
+    }
+  ]
+}

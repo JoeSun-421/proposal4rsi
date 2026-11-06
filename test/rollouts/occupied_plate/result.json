@@ -1,0 +1,8 @@
+{
+  "name": "occupied_plate",
+  "prompt": "put the red mug on the plate",
+  "seed": 7,
+  "success": false,
+  "control_steps": 220,
+  "seconds": 12.3
+}

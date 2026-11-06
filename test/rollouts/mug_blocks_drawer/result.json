@@ -1,0 +1,8 @@
+{
+  "name": "mug_blocks_drawer",
+  "prompt": "open the top drawer of the cabinet",
+  "seed": 7,
+  "success": false,
+  "control_steps": 220,
+  "seconds": 15.0
+}

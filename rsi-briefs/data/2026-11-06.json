@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-06",
+  "as_of": "2026-11-06T09:02:55+08:00",
+  "items": [
+    {
+      "id": "pyrua-real",
+      "title": "PyRUA-REAL：把真机试错写成可复用技能",
+      "original_title": "PyRUA-REAL: Robot Exploration and Adaptive Learning through RSI in the Real World",
+      "institution": "北京大学 · 众擎机器人 · 新加坡国立大学",
+      "published_at": "2026-11-04T16:46:03Z",
+      "source_url": "https://arxiv.org/abs/2611.06768",
+      "summary": "代码智能体在双臂 Franka 上反复执行、读日志并修程序，将有效修复存成可调用技能。8 项真机任务中，7 项产出无需在线调用语言模型的程序。另在 4 项 RoboDojo 仿真任务上，五轮改写后，视频与关节轨迹反馈把留出布局平均成功率从 15.3% 提到 54.2%。",
+      "comment": "技能库对照把八项新仿真任务的平均成功率从 21.3% 提到 40.0%，直接测到了复用收益。真机的开发日志混合了多个程序版本，冻结后的可靠性仍需单独测量。",
+      "kind": "paper"
+    },
+    {
+      "id": "generalist-policy-improvement",
+      "title": "π₀.₅ 在线强化学习的收益能否跨任务迁移？",
+      "original_title": "Reinforcement Learning Enables Scaling Generalist Robot Policy Improvement",
+      "institution": "ETH Zurich · CMU · UC Berkeley · Physical Intelligence 等",
+      "published_at": "2026-11-04T18:52:28Z",
+      "source_url": "https://arxiv.org/abs/2611.06905",
+      "summary": "研究在 MolmoSpaces 和 LIBERO 仿真中以 π₀.₅ 为起点，每轮每任务采集 20 条轨迹，共做 10 轮策略改进。MolmoSpaces 上，扩大练习任务范围并使用价值模型后，相对初始策略在留出场景和留出物体上最多提升 58 和 39 个百分点。结果取三个训练种子的均值。",
+      "comment": "多换练习物体比只换场景更有利于新物体泛化。LIBERO 的任务变化更大，实验主要看到遗忘减轻，说明换物体和换任务结构要分别评测。",
+      "kind": "paper"
+    },
+    {
+      "id": "cando",
+      "title": "CANDO：用真机回合训练噪声与动作残差",
+      "original_title": "CANDO: Conservative Action-Noise Directional Optimization for Residual Reinforcement Learning",
+      "institution": "复旦大学 · 北京大学 · Simplexity Robotics · 上海交通大学 · 上海创智学院",
+      "published_at": "2026-11-03T09:11:27Z",
+      "source_url": "https://arxiv.org/abs/2611.04543",
+      "summary": "冻结生成式基座策略，用真机回合更新噪声方向、动作残差和执行门控。四项双臂任务在固定位置训练，训练后每项独立评测 20 次。联合残差的平均成功率为 87.5%，噪声残差单独训练为 86.25%，纯动作残差 DICE 为 42.5%，冻结基座为 40.0%。",
+      "comment": "真机上，噪声分支单独就获得了大部分收益。再加动作分支仅多 1.25 个百分点，相当于 80 次评测中多成功一次。位置固定，空间泛化还要另测。",
+      "kind": "paper"
+    },
+    {
+      "id": "pyrua-datafarm",
+      "title": "PyRUA-DataFarm：让代码智能体自建专家并验证训练数据",
+      "original_title": "PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data",
+      "institution": "北京大学 · NVIDIA",
+      "published_at": "2026-11-03T18:25:14Z",
+      "source_url": "https://arxiv.org/abs/2611.05320",
+      "summary": "从一段真机校准录像出发，代码智能体编写仿真任务、专家控制器和成功判据。独立检查将失败退回出错环节，合格轨迹用于训练策略。五项真机任务共 100 次评测，同量生成数据与遥操作数据训练出的策略分别成功 93 次和 84 次，换桌布和灯光后为 87 次和 46 次。",
+      "comment": "独立验收让数据生成能定位并修复上游错误。新桌布与灯光主要检验外观泛化，这组实验仍用同一双臂平台，换机器人或接触动力学的收益尚待验证。",
+      "kind": "paper"
+    }
+  ]
+}

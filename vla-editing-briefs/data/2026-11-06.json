@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-06",
+  "as_of": "2026-11-06T09:07:10+08:00",
+  "items": [
+    {
+      "id": "tnas-instructvla",
+      "title": "在 InstructVLA 中定向改变动作输出",
+      "original_title": "Say the Same, Act Differently: Diagnosing and Steering Text-Action Divergence in Reasoning VLAs",
+      "institution": "南加州大学 · 亚利桑那大学 · 通用汽车",
+      "published_at": "2026-11-03T01:57:41Z",
+      "source_url": "https://arxiv.org/abs/2611.04166",
+      "summary": "研究者冻结 InstructVLA，在 200 个 Bridge 操作样本上，对第 14 至 17 层响应词元的隐藏状态施加定向干预。等幅度比较下，沿文本中性动作方向的干预造成的动作块偏移为文本梯度方向的 4.64–5.51 倍、随机方向的 12.6 倍，同时文本分布变化较小。",
+      "comment": "等幅度对照表明，方向选择本身就能改变动作偏移。证据限于离线输出和文本分布，目标技能能否在闭环稳定改变、无关技能能否保留，仍待评测。",
+      "kind": "paper"
+    }
+  ]
+}

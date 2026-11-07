@@ -1,52 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>机器人研究晚间日报</title><style>
-:root { color-scheme:light dark; --bg:#f3f6f8; --ink:#172737; --muted:#43576a;
-  --line:#b6c7d2; --link:#005973; --tint:#dcebf1; }
-@media(prefers-color-scheme:dark) {
-  :root { --bg:#131e27; --ink:#eaf2f7; --muted:#afc3d1; --line:#435b6e;
-    --link:#92def5; --tint:#233743; }
-}
-* { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--ink);
-  font:16px/1.75 system-ui,"Noto Sans CJK SC",sans-serif; }
-main { width:min(65rem,100%); margin:auto; padding:clamp(1rem,5vw,4rem); }
-header { border-top:.3rem solid var(--link); border-bottom:1px solid var(--line);
-  padding:1rem 0 1.6rem; margin-bottom:2rem; }
-nav, .meta { font:0.85rem/1.6 ui-monospace,monospace; color:var(--muted); }
-nav { display:flex; gap:.8rem 1.5rem; flex-wrap:wrap; }
-h1,h2,h3 { line-height:1.3; text-wrap:balance; }
-h1 { font-size:clamp(2rem,6vw,3.7rem); margin:.9rem 0 .25rem; }
-h2 { font-size:1.5rem; margin:0; }
-h3 { font-size:1.2rem; margin:0; }
-a { color:var(--link); text-underline-offset:.2em; overflow-wrap:anywhere; }
-a:focus-visible { outline:2px solid var(--link); outline-offset:3px; }
-section { display:grid; gap:1.15rem; margin-bottom:2.5rem; }
-article { display:grid; gap:.45rem; padding-top:1rem; border-top:1px solid var(--line); }
-p { margin:0; max-width:65ch; }
-.badge { width:fit-content; background:var(--tint); padding:.1rem .55rem;
-  color:var(--link); font-weight:650; font-size:.82rem; }
-ul { margin:0; padding-inline-start:1.2rem; }
-li+li { margin-top:.5rem; }
-footer { padding-top:1rem; border-top:1px solid var(--line); color:var(--muted); }
-@media print { :root { color-scheme:light; --bg:#fff; --ink:#111; --muted:#333;
-  --line:#999; --link:#234; --tint:#eee; } article { break-inside:avoid; } }
-</style></head>
-<body><main><header><nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav>
-<h1>机器人研究晚间日报</h1><p class="meta"><time datetime="2026-11-07">2026-11-07</time> · 北京时间 · AGENTIC VLA / RSI</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/proposal4rsi/rsi-briefs/2026-11-07/">发布 Robotic RSI 晨间简报</a></strong>。筛选并整理 5 篇研究，核对了当天网页和归档。</li><li><strong><a href="https://joesun-421.github.io/proposal4rsi/vla-editing-briefs/2026-11-07/">发布 VLA 模型编辑晨间简报</a></strong>。整理 1 篇符合主题的研究，核对了当天网页和归档。</li><li><strong>归档机器人研究资料</strong>。整理了 7 篇论文 PDF 和 4 篇网页文章，并建立文献清单。</li><li><strong><a href="https://joesun-421.github.io/">发布个人主页</a></strong>。完成视觉调整并上线 GitHub Pages 根站，新增 Ideas、MMLab Intern Guide 和 Favorite Works 三个栏目。</li></ul></section>
-<section aria-labelledby="reading"><h2 id="reading">机器人研究选读</h2><article><p class="badge">Agentic VLA</p>
-<h3>Gemini 4 Argon for Robotics</h3><p class="meta">Google · 官方技术博客 · 2026-10-13</p>
-<p><strong>方法与结果</strong>　Argon 从一张工作台照片构建 MuJoCo 场景，编写闭环运动生成器，采集超过 4,500 条域随机化轨迹用于微调 VLA。官方报告实机成功率由 56% 升至 75%，完成时间由 35 秒降至 24 秒。</p>
-<p><strong>证据范围</strong>　数字来自博客中的工作台实验。机器人代理在这个案例中承担场景构建、任务设计和数据生成，跨平台泛化仍需独立评测。</p>
-<p><a href="https://developers.googleblog.com/gemini-4-argon-for-robotics/">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article><p class="badge">语言指令遵循</p>
-<h3>VLA Policies Do Not Know When Not to Act</h3><p class="meta">ETRI / UST · 研究预印本 · 2026-10-30</p>
-<p><strong>方法与结果</strong>　作者在 LIBERO-Goal 固定初始状态，只替换指令。空指令下，6 个策略检查点在所有测试回合都启动了动作。比较有指令与空指令的首个动作块作为门控，可在 6 个检查点中的 5 个抑制非任务输入触发的动作。</p>
-<p><strong>证据范围</strong>　实验限于 LIBERO-Goal 仿真。评测指令遵循时，可以把是否启动、选中什么任务、能否完成任务分开记录。</p>
-<p><a href="https://arxiv.org/abs/2610.41609v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article><p class="badge">Robotic RSI</p>
-<h3>AdaRSI: On-Demand Recursive Self-Improvement for Embodied Agents</h3><p class="meta">Peidong Wang 等 · 研究预印本 · 2026-10-14</p>
-<p><strong>方法与结果</strong>　编码代理先调整技能和执行框架，再从保存的状态重试失败子步骤，只对持续失败的子步骤采集示范并微调。在 RoboCasa365 上，GR00T N1.5 的未见组合任务成功率由 4.6% 升至 13.8%。相比逐步微调，仅用 28% 的 GPU 时间。</p>
-<p><strong>证据范围</strong>　实验依赖可回滚的仿真状态及特权信息来生成和标记示范。实机应用还要验证成功检测、复位和训练触发是否可靠。</p>
-<p><a href="https://arxiv.org/abs/2610.20474v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article></section><footer>工作记录以北京时间为准。研究条目注明原始来源及证据范围。</footer>
-</main></body></html>
+<title>11 月 7 日日报</title>
+<link rel="canonical" href="https://joesun-421.github.io/daily-report/2026-11-07/">
+<meta http-equiv="refresh" content="0; url=https://joesun-421.github.io/daily-report/2026-11-07/">
+</head><body><p>日报已迁至个人主页。<a href="https://joesun-421.github.io/daily-report/2026-11-07/">打开11 月 7 日日报</a></p></body></html>

@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-07",
+  "as_of": "2026-11-07T09:02:56+08:00",
+  "items": [
+    {
+      "id": "roboarcade",
+      "title": "RoboARCade：用执行反馈改写机器人操作指南",
+      "original_title": "RoboARCade: Benchmarking Agentic Robot Control",
+      "institution": "斯坦福大学",
+      "published_at": "2026-11-05T16:00:16Z",
+      "source_url": "https://arxiv.org/abs/2611.08209",
+      "summary": "GPT‑6 Astra 在 RoboARCade 仿真中把成功轨迹写成文字操作指南，再用评分回合修订，并由新会话读取。五项任务每种方法各测 10 次，平均子任务完成度从基线的 53.5% 升至首轮的 62.5% 和次轮的 72.0%，接近直接提供完整成功轨迹的 73.0%。",
+      "comment": "文字指南保留了大部分完整轨迹带来的收益，还降低了单次评测成本。两轮修订之后，精细放置和过早报成功仍是主要瓶颈。",
+      "kind": "paper"
+    },
+    {
+      "id": "criteria-exposure",
+      "title": "同一批机器人轨迹换个判据，技能库优势消失",
+      "original_title": "Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement",
+      "institution": "北京大学 · 新加坡国立大学",
+      "published_at": "2026-11-05T17:14:37Z",
+      "source_url": "https://arxiv.org/abs/2611.08318",
+      "summary": "代码智能体在 RoboDojo 仿真中迭代五轮并保留技能库。对 16 项原判据与指令有出入的任务，每项测试 20 个留出布局。可读取判据与仅收到成败反馈的技能库，按原判据分别得 51.6% 和 27.8%。对相同轨迹按贴合指令的判据重判，分别为 45.0% 和 47.2%。",
+      "comment": "固定轨迹重判把行为变化与评分变化分开。只留出布局仍可能测到对判据的适应，另设一套独立判据能检验增益是否对应指令。",
+      "kind": "paper"
+    },
+    {
+      "id": "oopsie-recover",
+      "title": "OopsieRecover：把人工接管转成可迁移的纠错规则",
+      "original_title": "OopsieRecover: Learning Transferable VLA Corrections from Semantic Interventions",
+      "institution": "得克萨斯大学奥斯汀分校 · 丰田研究院",
+      "published_at": "2026-11-05T18:53:16Z",
+      "source_url": "https://arxiv.org/abs/2611.08462",
+      "summary": "系统从人工接管轨迹推断纠错意图，根据触发与排序检查自动修订代价函数，保留规则以引导冻结的 π₀.₅。咖啡杯仿真中，一次纠错生成的规则在 10 个新场景均阻止了诱发碰撞。三项真机任务上，各难度的阶段完成度较同数据微调的 HG‑DAgger 至少高 60%。",
+      "comment": "可迁移的是碰撞触发条件和动作代价。真机指标按完成阶段计分，而规则能否纠错还取决于基座采样中是否已有可行的动作。",
+      "kind": "paper"
+    },
+    {
+      "id": "semantics-to-contact",
+      "title": "Semantics-to-Contact：把真机练习集中在接触区域",
+      "original_title": "Semantics-to-Contact: A Stagewise Framework for Robust Contact-Rich Manipulation",
+      "institution": "香港中文大学（深圳） · DexForce · 深圳河套学院",
+      "published_at": "2026-11-05T06:41:40Z",
+      "source_url": "https://arxiv.org/abs/2611.07532",
+      "summary": "视觉语言模型先定位插接区域，机械臂用真机回合、力反馈和人工接管在线训练动作残差。六项插接任务在闪光、红桌布与位置扰动叠加时，每项评测 20 次，平均完整插入成功率为 82.5%，HIL‑SERL 和 HIL‑ConRFT 分别为 9.17% 与 13.33%。",
+      "comment": "强光、红桌布与位置扰动下，两项消融任务移除人工接管或物体中心增强均为 0%。目前鲁棒性收益依赖这两种训练条件。",
+      "kind": "paper"
+    },
+    {
+      "id": "toyblocks-skill-experiments",
+      "title": "ToyBlocks：智能体做小实验后重写技能说明",
+      "original_title": "ToyBlocks: A controlled world for robot learning and evaluation",
+      "institution": "Allen Institute for AI（Ai2）",
+      "published_at": "2026-11-06T14:00:48.059Z",
+      "source_url": "https://huggingface.co/blog/allenai/toyblocks",
+      "summary": "Ai2 发布积木操作仿真平台。遇到技能表现与预期不符时，智能体提出假设、设计小实验，并把发现写进技能说明供后续使用。在积木评测中，采用实验所得说明的成功率为 63%，默认说明为 24%，人工专家撰写的说明为 36%。",
+      "comment": "同一技能接口下的说明对照，把收益定位到智能体学到的操作知识。真机零样本结果来自另一组实验，技能说明的增益仍需真机对照。",
+      "kind": "blog"
+    }
+  ]
+}

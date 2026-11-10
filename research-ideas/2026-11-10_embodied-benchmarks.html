@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="介绍 RoboDojo、LIBERO、RoboCasa 和 SimplerEnv：各自在测什么、什么本体、能不能拿来训练，以及为什么平均分不能互相替代。">
+<title>四套操作评测：RoboDojo、LIBERO、RoboCasa、SimplerEnv</title>
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f5f4ef;
+    --ink: #25241e;
+    --quiet: #55544a;
+    --rule: #c9c6ba;
+    --green: #31564a;
+    --sage: #e0e9de;
+    --sand: #efe5ca;
+    --mist: #e4e9ec;
+    --serif: "Georgia", "Times New Roman", serif;
+    --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 1.0625rem/1.66 var(--sans); }
+  a { color: var(--green); text-underline-offset: .19em; text-decoration-thickness: .075em; }
+  a:hover { text-decoration-thickness: .13em; }
+  a:focus-visible { outline: 2px solid var(--green); outline-offset: 5px; }
+  p, h1, h2, h3, ol, figure, dl { margin: 0; }
+  h1, h2 { font-family: var(--serif); font-weight: 400; text-wrap: balance; }
+  h1 { font-size: clamp(2.35rem, 6vw, 4.4rem); line-height: 1.04; letter-spacing: -.045em; }
+  h2 { font-size: clamp(1.7rem, 3.6vw, 2.7rem); line-height: 1.12; letter-spacing: -.03em; }
+  h3 { font-size: 1rem; line-height: 1.45; }
+  .shell { width: min(100% - 3rem, 69rem); margin-inline: auto; }
+  .masthead, .footer { display: flex; justify-content: space-between; gap: .5rem 1rem; flex-wrap: wrap; }
+  .masthead { padding-block: 1.1rem; border-bottom: 1px solid var(--rule); }
+  .label { color: var(--quiet); font: .79rem/1.5 var(--mono); letter-spacing: .075em; text-transform: uppercase; }
+  .masthead a { color: inherit; }
+  .hero { padding-block: clamp(2.5rem, 6vw, 4.5rem) 2.2rem; }
+  .hero h1 { max-width: 18ch; }
+  .lede { max-width: 68ch; margin-top: 1.15rem; font-size: 1.15rem; line-height: 1.65; }
+  .index { border-block: 1px solid var(--rule); padding-block: 1.1rem 1.25rem; }
+  .index ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 0; margin-top: .5rem; gap: .65rem 1.25rem; }
+  .index a { display: block; line-height: 1.42; }
+  .index .label { display: block; margin-bottom: .25rem; }
+  .table-wrap { overflow-x: auto; border-bottom: 1px solid var(--rule); }
+  table { width: 100%; border-collapse: collapse; min-width: 46rem; font-size: .98rem; }
+  th, td { text-align: left; vertical-align: top; padding: .75rem .8rem; border-bottom: 1px solid var(--rule); }
+  thead th { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; }
+  tbody th { font-weight: 650; white-space: nowrap; }
+  .study { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: .85rem 1.4rem; padding-block: 2.75rem 2.6rem; border-bottom: 1px solid var(--rule); scroll-margin-top: 1.5rem; }
+  .study > .label { padding-top: .45rem; }
+  .content { min-width: 0; }
+  .content h2 { max-width: 28ch; }
+  .overview { max-width: 74ch; margin-top: .85rem; font-size: 1.125rem; line-height: 1.6; }
+  .argument { margin-top: 1.25rem; }
+  .argument > section {
+    display: grid; grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr); gap: .35rem 1.3rem;
+    padding-block: .8rem; border-top: 1px solid var(--rule);
+  }
+  .argument > section:last-child { padding-bottom: 0; }
+  .argument h3 { font-weight: 680; padding-top: .1rem; }
+  .argument p { max-width: 74ch; }
+  .argument p + p { margin-top: .6rem; }
+  .backmatter { padding-block: 2.55rem; border-bottom: 1px solid var(--rule); }
+  .backmatter p { max-width: 74ch; }
+  .backmatter p + p { margin-top: .7rem; }
+  .bibliography { padding-left: 1.5rem; max-width: 90ch; margin-top: 1rem; }
+  .bibliography li { padding-left: .35rem; margin-bottom: .55rem; }
+  caption { caption-side: top; text-align: left; padding: .9rem .8rem .2rem; }
+  .footer { padding-block: 1rem 2rem; }
+  @media (max-width: 51rem) {
+    .study { grid-template-columns: 1fr; }
+    .study > .label { padding-top: 0; }
+    .index ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 36rem) {
+    .shell { width: calc(100% - 2rem); }
+    .lede, .overview { font-size: 1.0625rem; }
+    .argument > section { grid-template-columns: 1fr; }
+  }
+  @media print {
+    :root { --paper: #fff; }
+    @page { size: A4; margin: 14mm; }
+    body { font-size: 10pt; line-height: 1.45; }
+    .shell { width: auto; max-width: none; }
+    .index { display: none; }
+    .hero, .study, .backmatter { padding-block: .85rem; }
+    .study { display: block; }
+    .argument > section { grid-template-columns: 8rem minmax(0, 1fr); }
+    h2, h3 { break-after: avoid; }
+    .argument > section, .bibliography li { break-inside: avoid; }
+    .footer { padding-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+<header class="shell masthead label" id="top">
+  <a href="../index.html">站点</a>
+  <span>Manipulation benchmarks</span>
+  <time datetime="2026-11-10">10 November 2026</time>
+</header>
+<main class="shell">
+  <header class="hero">
+    <h1>四套操作评测</h1>
+    <p class="lede">RoboDojo、LIBERO、RoboCasa 和 SimplerEnv 都会给出操作成功率，问的是四件不同的事。RoboDojo 把泛化、记忆、长时程、精度和技能重组拆开，并另有一套真机。LIBERO 看终身学习里，换了空间、物体或目标之后，策略会不会遗忘、能不能往前迁移。RoboCasa 在多样的厨房里做多任务模仿。SimplerEnv 看真机上训好的策略放进对齐过的仿真之后，名次还跟不跟真机一致。下面按同一组问题介绍它们。一套上的平均分填进另一套的表，比的就不再是同一个问题。</p>
+  </header>
+
+  <nav class="index" aria-labelledby="index-label">
+    <h2 class="label" id="index-label">四套</h2>
+    <ol>
+      <li><a href="#robodojo"><span class="label">01</span>RoboDojo</a></li>
+      <li><a href="#libero"><span class="label">02</span>LIBERO</a></li>
+      <li><a href="#robocasa"><span class="label">03</span>RoboCasa</a></li>
+      <li><a href="#simpler"><span class="label">04</span>SimplerEnv</a></li>
+    </ol>
+  </nav>
+
+  <div class="table-wrap">
+    <table>
+      <caption class="label">对照</caption>
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">RoboDojo</th>
+          <th scope="col">LIBERO</th>
+          <th scope="col">RoboCasa</th>
+          <th scope="col">SimplerEnv</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">问题</th>
+          <td>五条能力轴，外加可远程复现的真机</td>
+          <td>终身学习里的遗忘和前向迁移</td>
+          <td>多样厨房里的多任务模仿</td>
+          <td>仿真名次能否代表两套真机名次</td>
+        </tr>
+        <tr>
+          <th scope="row">世界</th>
+          <td>仿真 42 个任务，真机 18 个任务。两者不成对</td>
+          <td>仿真</td>
+          <td>仿真厨房。论文另有一个小规模真机协同训练</td>
+          <td>仿真，对齐 Google Robot 和 WidowX / Bridge</td>
+        </tr>
+        <tr>
+          <th scope="row">本体</th>
+          <td>仿真是双臂 ARX X5。真机还有 Piper、Piper X</td>
+          <td>Franka Panda，建在 Robosuite 上</td>
+          <td>原文实验是带移动底盘的 Franka Panda。框架还支持别的本体</td>
+          <td>Google Robot，以及 WidowX</td>
+        </tr>
+        <tr>
+          <th scope="row">规模</th>
+          <td>仿真每任务 50 次，共 2,100 次</td>
+          <td>130 个语言条件任务，每任务 50 条示教</td>
+          <td>2024 年原文 100 个任务。现行仓库是 RoboCasa365</td>
+          <td>配对评测大约 1,500 个 episode</td>
+        </tr>
+        <tr>
+          <th scope="row">训练</th>
+          <td>34 个仿真任务有示教。8 个 Open 任务没有任务示教</td>
+          <td>示教公开，可以微调。原文协议是终身学习序列</td>
+          <td>示教公开，论文就在这些任务上训练</td>
+          <td>策略在真机数据上训练，再零样本放进仿真</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <article class="study" id="robodojo">
+    <p class="label">01 · 2026</p>
+    <div class="content">
+      <h2>RoboDojo</h2>
+      <p class="overview">它要看的是通用操作策略在五条能力轴上的差距，以及同一套评测能不能在真机上远程复现。仿真和真机是两批任务，论文写明不拿真机来报 sim-to-real 对齐率。</p>
+      <div class="argument">
+        <section>
+          <h3>测什么</h3>
+          <div>
+            <p>仿真 42 个任务，双臂 ARX X5，底座间距 0.6 m，后端是 Isaac Sim / Isaac Lab。README 徽章写 Isaac Sim 5.1、Isaac Lab 2.3。五条轴是 Generalization 12 个、Memory 6 个、Long-Horizon 8 个、Precision 8 个、Open 8 个。Generalization 的每次 50 局里，25 次是标准布局，25 次会改背景、杂物、任务相关物体和光照。Memory 要记住当前画面里已经不在的信息。Open 用的技能在别的任务里出现过，这个任务本身没有对应示教。</p>
+            <p>真机 18 个任务，ARX X5、Piper、Piper X 各 6 个。它覆盖长时程、精度、记忆和泛化，是压缩后的物理测试，不是五条轴的完整复刻。</p>
+          </div>
+        </section>
+        <section>
+          <h3>规模与判定</h3>
+          <div>
+            <p>仿真是 42 个任务、每任务 50 个 episode，共 2,100 次。榜单实验对多数策略训练 3 个种子，因此论文写除非另有说明，每任务 150 次。真机每任务 10 次，每策略 180 次。成功在仿真里由任务 YAML 的条件判定。对外同时报二值成功率和带部分进度的 average score。总平均是五条轴的不加权平均。真机由三名评测者在双盲下看最终成功和中间子步骤，单次取三人平均。</p>
+            <p>仿真观测含头部和两只腕部相机的 RGB-D，640×480，另有状态和动作里的末端位姿、夹爪和关节。真机是头部加两只腕部的 RGB，同样 640×480。数据采集写成 25 Hz。仓库把仿真步长写成 0.004 秒、渲染间隔 10，和 25 Hz 的渲染节拍一致。策略控制是不是每一步都等于这个节拍，论文没有收成一个固定说法。动作也没有收成一个唯一的整数维：官方同时提供 joint-only 和含末端位姿的两种打包。</p>
+            <p>单次步数上限随任务变。仿真取该任务示教长度的第 90 百分位再乘 1.2，短的自动合成任务乘 1.5；真机乘 1.5。</p>
+          </div>
+        </section>
+        <section>
+          <h3>能不能训练</h3>
+          <div>
+            <p>能。34 个非 Open 仿真任务各有 100 条示教，Generalization 的示教采自标准布局。另外 100 条与评测任务无关的轨迹只扩大视觉暴露。Open 的 8 个任务没有任务示教。真机 18 个任务也各有 100 条示教。公开布局是主榜。隐藏布局只在官方核验时加跑，用来看成绩相对公开布局掉得是否过多；论文把它写成辅助一致性检查。掉得显著就取消官方榜资格。</p>
+            <p>官方分数由 RoboDojo 在线系统计算。上榜时要求仿真报三个种子的均值和标准差，真机覆盖三种本体，并通过隐藏布局核验。仿真训练数据是 35 个目录、3,500 条轨迹、1,859,602 帧、20.66 小时。真机数据是 1,800 条、1,611,841 帧、17.91 小时，每种本体 600 条。</p>
+          </div>
+        </section>
+        <section>
+          <h3>原文里的限度</h3>
+          <div>
+            <p>论文把自己的仿真榜冻结在 2026-07-03。那是基准作者接入并评测的 30 个策略，不是独立复现。最好的公开策略平均成功率 8.80%、平均分 13.07；同一协议下人类遥操作是 80.42 分 / 76.03% 成功率。真机最好的是 π<sub>0.5</sub>，22.9 分 / 12.8% 成功率。代码仓库是 MIT。2026-11-09 查到的 Hugging Face 数据集卡把许可证写成 Apache-2.0。论文、项目页和 README 都把它标成预印本。</p>
+          </div>
+        </section>
+        <section>
+          <h3>材料</h3>
+          <div>
+            <p>Tianxing Chen、Yue Chen、Zixuan Li 等，<a href="https://arxiv.org/abs/2607.04434">arXiv:2607.04434</a>。项目页 <a href="https://robodojo-benchmark.com/">robodojo-benchmark.com</a>，<a href="https://robodojo-benchmark.com/leaderboard">排行榜</a>，代码 <a href="https://github.com/RoboDojo-Benchmark/RoboDojo">RoboDojo-Benchmark/RoboDojo</a>。arXiv 记录 v1 发布于 2026-07-05。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <article class="study" id="libero">
+    <p class="label">02 · 2023</p>
+    <div class="content">
+      <h2>LIBERO</h2>
+      <p class="overview">它把“换一种条件之后，旧技能还在不在、新技能能不能借用旧技能”拆成四套可重复的仿真任务。后来很多视觉–语言–动作论文仍用这四套报分，报的往往是套内微调后的成功率。</p>
+      <div class="argument">
+        <section>
+          <h3>测什么</h3>
+          <div>
+            <p>Bo Liu 等把问题写成终身机器人学习里的知识迁移。Spatial 换空间关系，Object 换被操作的物体，Goal 换目标，LIBERO-100 把短时程和长时程缠在一起。一共 130 个语言条件操作任务。Spatial、Object、Goal 各 10 个。LIBERO-100 再分成 90 个短时程任务，用于预训练，和 10 个长时程任务，代码里的 <span lang="en">libero_10</span>，用于下游终身学习。</p>
+          </div>
+        </section>
+        <section>
+          <h3>规模与判定</h3>
+          <div>
+            <p>每个任务 50 条人手遥操作示教。成功是稀疏目标谓词，完成时奖励 +1。论文的评测是每 5 个 epoch 用 20 条测试轨迹，单条最长 600 步，训练 50 个 epoch。测试用没见过的初始状态，任务名是公开的。官方 README 的最小例子把动作写成 7 维，离屏渲染相机设为 128×128，并使用固定的一组初始状态。控制频率在读到的论文正文和 README 里没有写成一个数字。</p>
+            <p>生成管线建在 Robosuite 上。后续工作有的把图像重渲染、删掉近零动作，再报四套平均分。那种分数和原文的 20 次、600 步、遗忘与前向迁移不是同一条协议。</p>
+          </div>
+        </section>
+        <section>
+          <h3>能不能训练</h3>
+          <div>
+            <p>能。划分在任务序列上：LIBERO-90 预训练，LIBERO-Long 做下游。基准发布的是示教和环境，不是一套官方策略权重。后来常见的做法是在 Spatial、Object、Goal、Long 每一套内部用那 50 条示教微调，再报该套成功率。那是套内学习的成功率。原文要报的是沿着任务序列的遗忘和前向迁移。</p>
+          </div>
+        </section>
+        <section>
+          <h3>原文里的限度</h3>
+          <div>
+            <p>附录 E.4 写，策略更注意机械臂和目标放置区域，也注意桌面空白等无关区域，并把无关特征和动作绑在一起。作者把这写成过拟合、跨任务迁不好的一个主要原因。代码许可证是 MIT，README 把数据集写成 CC BY 4.0。</p>
+          </div>
+        </section>
+        <section>
+          <h3>材料</h3>
+          <div>
+            <p>Bo Liu 等，<a href="https://arxiv.org/abs/2306.03310"><cite>LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning</cite></a>，arXiv:2306.03310。代码 <a href="https://github.com/Lifelong-Robot-Learning/LIBERO">Lifelong-Robot-Learning/LIBERO</a>，数据 <a href="https://huggingface.co/datasets/yifengzhu-hf/LIBERO-datasets">yifengzhu-hf/LIBERO-datasets</a>。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <article class="study" id="robocasa">
+    <p class="label">03 · 2024</p>
+    <div class="content">
+      <h2>RoboCasa</h2>
+      <p class="overview">2024 年的原文给通用机器人准备一个多样的仿真厨房：很多场景、很多物体、100 个任务，再用人类示教和自动生成的轨迹做多任务模仿。2026 年的官方仓库已经把现行评测改成 RoboCasa365。两套的分数要分开写。</p>
+      <div class="argument">
+        <section>
+          <h3>测什么</h3>
+          <div>
+            <p>Soroush Nasiriany 等，RSS 2024。框架建在 RoboSuite / MuJoCo 上，这一版聚焦厨房。10 种平面布局，120 个厨房场景，2,509 个物体、153 个类别，其中 1,592 个来自 Luma.ai 的文本生成三维资产。框架支持移动操作、人形和带臂四足。论文实验集中在一台装了 Omron 移动底盘的 Franka Panda 上。</p>
+            <p>100 个任务分成 25 个原子任务和 75 个复合任务。原子任务覆盖八类技能：抓放、开关门、开关抽屉、拧旋钮、扳杠杆、按按钮、插入、导航。复合任务由大语言模型提出厨房活动，再由人改写成可仿真的任务并实现。它测的是多样厨房里的多任务模仿，以及合成轨迹能不能把成功率做上去。终身遗忘、仿真名次和真机名次是否一致，都不是这篇文章的主问题。</p>
+          </div>
+        </section>
+        <section>
+          <h3>规模与判定</h3>
+          <div>
+            <p>25 个原子任务各有 50 条人手遥操作示教，共 1,250 条，每次采在随机的厨房里。MimicGen 当时不能生成移动操作轨迹，所以导航被排除。对其余 24 个原子任务，各用这 50 条生成 3,000 条，实验里是 72,000 条 Objaverse 物体轨迹。另外发布 28,000 条 AI 生成物体的轨迹，论文把两部分合成 100K。全部 100 个任务都有人类示教。复合任务里，论文实际训练并报告的五个任务也各用 50 条；其余复合任务是不是同样各 50 条，正文没有逐项写出。</p>
+            <p>原子任务的评测是每个任务 50 次，分布在五个固定场景上，物体实例都没在训练里见过，其中两个场景的风格也没见过。训练图像用 AI 生成纹理，评测场景用人工挑选的纹理。对外指标是任务成功率。Human-50 的 24 任务平均是 28.8%，Generated-3000 是 47.6%。这是作者自报的原子任务结果。</p>
+            <p>论文里的 BC-Transformer 吃过去 10 步观测和语言目标，输出接下来 10 步动作，执行第一步后再规划。观测包括末端位姿、移动底盘位姿，以及腕部、左侧、右侧三个相机。这是他们的学习设定，正文没有把动作收成一个所有接口共用的整数维。附录里每个仿真步对应世界时间 0.04 秒。和真机对比的那一节把仿真控制器写成 20 Hz，把 DROID 真机控制器写成 15 Hz。</p>
+          </div>
+        </section>
+        <section>
+          <h3>能不能训练</h3>
+          <div>
+            <p>能，而且论文的主实验就是在这些任务上训练再评测。原子任务换了物体实例和一部分厨房风格。任务本身带着示教。五个复合任务先在原子数据上预训练，再用各自的 50 条示教微调。论文另有一个真机厨房实验：三个抓放任务，每个 50 条真机示教，仿真数据用来协同训练。那是迁移实验。真机看见过的物体上，协同训练的任务平均是 24.4%，只用真机数据是 13.6%。它不是这 100 个任务的仿真榜。</p>
+          </div>
+        </section>
+        <section>
+          <h3>和 RoboCasa365</h3>
+          <div>
+            <p>当前仓库 README 和文档概述把 2026-02-18 的 v1.0 写成 RoboCasa365，引用信息写着 ICLR 2026。那里是 365 个任务、2,500 个以上厨房场景、3,200 个以上三维物体，另有 600 小时以上的人类示教和 1,600 小时以上由自动轨迹工具产生的机器人数据，并有公开排行榜。代码示例用 <span lang="en">pretrain</span> 和 <span lang="en">target</span> 区分厨房场景和物体。2026-05-12 的 v1.0.1 把全部任务的时限提高到 1.5 倍，并写明评测要用这个版本。当前 README 把代码写成 MIT，资产和数据集写成 CC BY 4.0。</p>
+            <p>RoboCasa365 的论文正文这次没有读，所以这里不写它的划分定义、逐任务成功条件和榜上分数。看到 “RoboCasa、24 个任务” 时，对得上的是 2024 年排除导航之后的原子任务实验。那个平均数对不上 RoboCasa365 的榜。</p>
+          </div>
+        </section>
+        <section>
+          <h3>原文里的限度</h3>
+          <div>
+            <p>结论里作者写下的限度是：复合任务微调后的成功率仍然很低，五个任务里 PrepareCoffee 在表中是 0；自动生成的轨迹虽然被判为成功，不少有抖动和碰撞；用语言模型提出任务之后，实现仍然要人来写；范围停在厨房，不含高灵巧、可变形物体和双臂。</p>
+          </div>
+        </section>
+        <section>
+          <h3>材料</h3>
+          <div>
+            <p>Nasiriany 等，<a href="https://arxiv.org/abs/2406.02523"><cite>RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots</cite></a>，arXiv:2406.02523，官方引用为 RSS 2024。<a href="https://robocasa.ai/">robocasa.ai</a>，代码 <a href="https://github.com/robocasa/robocasa">robocasa/robocasa</a>，<a href="https://robocasa.ai/leaderboard.html">排行榜</a>，<a href="https://robocasa.ai/assets/robocasa365_iclr26.pdf">RoboCasa365 论文 PDF</a>。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <article class="study" id="simpler">
+    <p class="label">04 · 2024</p>
+    <div class="content">
+      <h2>SimplerEnv</h2>
+      <p class="overview">它不在仿真里新学一套技能。它把已经在真机数据上训练的策略放进与 Google Robot、WidowX / Bridge 对齐的仿真，看仿真里的排名还跟不跟真机排名一致。</p>
+      <div class="argument">
+        <section>
+          <h3>测什么</h3>
+          <div>
+            <p>Xuanlin Li 等，<cite>Evaluating Real-World Robot Manipulation Policies in Simulation</cite>。论文写配对评测大约 1,500 个 episode。单次任务的墙钟时长在读到的正文里没有写成一个数。主结果在 SAPIEN。论文写同一套做法也能在 Isaac Sim 里复现。这次打开的 HTML 没有定位到会议版本，会议归属先空着。</p>
+          </div>
+        </section>
+        <section>
+          <h3>规模与判定</h3>
+          <div>
+            <p>官方 README 把动作写成 7 维：前三维是位移增量，接着三维是轴角旋转增量，最后一维是夹爪。Google Robot 的控制频率是 3 Hz，Bridge 环境是 5 Hz，仿真频率约 500 Hz。论文附录把 Google Robot 的仿真频率写成 501、控制频率写成 3，并说与 RT-1 一致。</p>
+            <p>Visual Matching 把真实背景贴进仿真，并调整前景物体和机械臂纹理。Variant Aggregation 在多组仿真变体上聚合。任务指标是成功率。用来判断仿真是否可信的是另一层指标：Mean Maximum Rank Violation，越低越好，以及 Pearson 相关。</p>
+          </div>
+        </section>
+        <section>
+          <h3>能不能训练</h3>
+          <div>
+            <p>这套环境没有“在 SimplerEnv 里训练、再在 SimplerEnv 里测试”的标准划分。策略在真机数据上训练，再零样本放进仿真。论文评测的系统包括 RT-1 的多个 checkpoint、RT-1-X、RT-2-X 和 Octo。训练数据可以离测试场景很远，也可以被后来的工作收集到测试旁边。代码许可证是 MIT。</p>
+          </div>
+        </section>
+        <section>
+          <h3>原文里的限度</h3>
+          <div>
+            <p>作者把软体仿真留作未来工作，并写当前绿幕只适用于固定相机，物体阴影表现不好。搭场景仍要手工选资产。报 SimplerEnv 的成功率，声称的是这个仿真分数对 Google Robot 或 WidowX / Bridge 的排名有参考价值。</p>
+          </div>
+        </section>
+        <section>
+          <h3>材料</h3>
+          <div>
+            <p>Li 等，<a href="https://arxiv.org/abs/2405.05941">arXiv:2405.05941</a>。项目页 <a href="https://simpler-env.github.io/">simpler-env.github.io</a>，代码 <a href="https://github.com/simpler-env/SimplerEnv">simpler-env/SimplerEnv</a>。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <section class="backmatter" id="close">
+    <h2>四套分数各算各的</h2>
+    <p>RoboDojo 的总平均是五条轴的不加权平均，主榜是可以训练的公开布局，Open 的 8 个任务没有任务示教。LIBERO 原文沿着任务序列看遗忘和前向迁移；四套各自微调后再平均，是后来论文里的另一种报法。RoboCasa 的 28.8% 和 47.6% 是 2024 年 24 个原子任务上的作者自报，现行仓库的榜是 RoboCasa365。SimplerEnv 的任务成功率还要配上排名违背和相关系数，才说得清仿真有没有保住真机名次。</p>
+    <p>四套各自的平均分回答各自的问题。排进同一张高低表之后，比的就不再是这些协议。</p>
+  </section>
+
+  <section class="backmatter" id="scope">
+    <h2>核对范围</h2>
+    <p>写于 2026-11-10。RoboDojo、LIBERO、SimplerEnv 的数字来自当天已经读过的论文 HTML、官方项目页、README 或代码说明。RoboCasa 原文按 arXiv HTML 2406.02523 核对；RoboCasa365 的任务数、场景数、数据时长、许可证和版本日期来自同一天打开的官方 README 与文档概述。RoboCasa365 论文正文没有读，页内因此没有它的榜上分数。正文里没有写明的控制频率、动作维数和会议归属保持空白，不另补。</p>
+  </section>
+
+  <section class="backmatter" id="references">
+    <h2>来源</h2>
+    <ol class="bibliography">
+      <li>Chen et al. <a href="https://arxiv.org/abs/2607.04434">RoboDojo: A Unified Sim-and-Real Benchmark for Comprehensive Evaluation of Generalist Robot Manipulation Policies</a>. arXiv:2607.04434, 2026. <a href="https://robodojo-benchmark.com/">Project</a>.</li>
+      <li>Liu et al. <a href="https://arxiv.org/abs/2306.03310">LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning</a>. arXiv:2306.03310. <a href="https://github.com/Lifelong-Robot-Learning/LIBERO">Code</a>.</li>
+      <li>Nasiriany et al. <a href="https://arxiv.org/abs/2406.02523">RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots</a>. RSS 2024. <a href="https://robocasa.ai/">Project</a>.</li>
+      <li>Nasiriany et al. <a href="https://robocasa.ai/assets/robocasa365_iclr26.pdf">RoboCasa365: A Large-Scale Simulation Framework for Training and Benchmarking Generalist Robots</a>. 官方引用为 ICLR 2026。正文未读，只用于和 2024 年原文区分。</li>
+      <li>Li et al. <a href="https://arxiv.org/abs/2405.05941">Evaluating Real-World Robot Manipulation Policies in Simulation</a>. arXiv:2405.05941. <a href="https://simpler-env.github.io/">Project</a>.</li>
+    </ol>
+  </section>
+</main>
+<footer class="shell footer label">
+  <span>Notes · manipulation benchmarks</span>
+  <a href="#top">Back to top</a>
+</footer>
+</body>
+</html>
